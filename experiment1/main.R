@@ -1,0 +1,96 @@
+# data cleaned by Riddhi and located in cleaned/
+# behaviours in ratings
+ratings <- read.csv("experiment1/cleaned/cleaned_data.csv")
+# file with gorilla IDs and OneReach IDs
+task <- read.csv("experiment1/cleaned/task_data.csv")
+task <- task[order(task$Participant.Private.ID),]
+# interaction via One Reach (thanks Daniel!)
+chat <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
+
+# create variable bot_type encoding both personality. Remember depends on order and chat
+# Bot is anxious if, chat=1 and order=Anxious first, but also when chat=2 and order=Normal first
+# Bot is normal if, chat=1 and order=Normal first, but also when chat=2 and order=Anxious first
+ratings$bot_type <- ifelse((ratings$chat == 1 & ratings$order == "Anxious first") |
+                             (ratings$chat == 2 & ratings$order == "Normal first"),
+                           "Anxious", ifelse((ratings$chat == 1 & ratings$order == "Normal first") |
+                                               (ratings$chat == 2 & ratings$order == "Anxious first"),
+                                             "Normal",NA))
+# visualize normal behavior
+library(ggplot2)
+(fig2A <- ggplot(ratings,aes(x=question,y=Response,col=bot_type,shape=bot_type)) + 
+  geom_hline(yintercept = 3, col="grey50") +
+  labs(y="Likert Scale", x="Question",
+       col = "Bot \nPersonality",shape = "Bot \nPersonality") +
+  stat_summary() + 
+  scale_shape_manual(values = c(17,19)) +
+  scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+                                              "Neutral","Agree","Strongly Agree")) + 
+  coord_cartesian(ylim = c(2,4)) +
+  facet_grid(.~order) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+)
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+length(unique(chat$userid))
+length(unique(task$Response))
+
+source("experiment1/functions.R")
+# use cleaning function to extract summary information for the interactions
+combine <- summariseChatInteraction(task, chat)
+
+
+# reshape data frame so we can easy visualize (melt by the count sentiment analysis
+# for each level (mixed, negative, neutral, and positive) for both user and bot)
+library(reshape2)
+combine2 <- melt(combine, measure.vars = c("user_Mixed","user_Negative","user_Neutral","user_Positive",
+                                           "bots_Mixed","bots_Negative","bots_Neutral","bots_Positive"))
+# change column name
+colnames(combine2)[ncol(combine2)] <- c("count") 
+# transform variable to character
+combine2$variable<- as.character(combine2$variable)
+# split string to get the first 4 character (user or bots)
+combine2$who <- factor(substr(combine2$variable,1,4),levels = c("user","bots"))
+# add a nicer names
+levels(combine2$who) <- c("User Texts","Bot Texts")
+# add the sentiment ased on column variable (created with the columns in melt)
+combine2$sentiment <- substr(combine2$variable,6,nchar(combine2$variable))
+
+# univariate statistical analysis
+summary(lm(user_Positive~chat_name,combine))
+summary(lm(user_Neutral~chat_name,combine))
+summary(lm(user_Negative~chat_name,combine))
+summary(lm(user_Mixed~chat_name,combine))
+
+df <- data.frame(
+  sentiment = c(2,4),
+  count = rep(c("1", "2"), times = 4),
+  who = c("User Texts","Bot Texts")
+)
+ann_text <- data.frame(sentiment = c(2,4), count = c(5,10), 
+                       lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
+                       chat_name = c("Anxious","Normal"))
+
+
+# visualize the average of count for each sentiment and for each chat personality
+(fig2B <- ggplot(combine2, aes(x=sentiment,y=count,col=chat_name,shape=chat_name)) + 
+  labs(y="Average Count", x = "Text Sentiment Category",
+       col = "Bot \nPersonality",shape = "Bot \nPersonality") +
+  stat_summary(position = position_dodge(0.3)) +
+  geom_text(data = ann_text,label = "*", col="black", size = 10) +
+  scale_shape_manual(values = c(17,19)) +
+  facet_grid(. ~ who) + 
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+)
+
+
+
+summary(lm(bots_Positive~chat_name,combine))
+summary(lm(bots_Neutral~chat_name,combine))
+summary(lm(bots_Negative~chat_name,combine))
+summary(lm(bots_Mixed~chat_name,combine))
