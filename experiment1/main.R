@@ -10,14 +10,17 @@ chat <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
 # create variable bot_type encoding both personality. Remember depends on order and chat
 # Bot is anxious if, chat=1 and order=Anxious first, but also when chat=2 and order=Normal first
 # Bot is normal if, chat=1 and order=Normal first, but also when chat=2 and order=Anxious first
-ratings$bot_type <- ifelse((ratings$chat == 1 & ratings$order == "Anxious first") |
-                             (ratings$chat == 2 & ratings$order == "Normal first"),
-                           "Anxious", ifelse((ratings$chat == 1 & ratings$order == "Normal first") |
-                                               (ratings$chat == 2 & ratings$order == "Anxious first"),
-                                             "Normal",NA))
+# ratings$bot_type <- ifelse((ratings$chat == 1 & ratings$order == "Anxious first") |
+#                              (ratings$chat == 2 & ratings$order == "Normal first"),
+#                            "Anxious", ifelse((ratings$chat == 1 & ratings$order == "Normal first") |
+#                                                (ratings$chat == 2 & ratings$order == "Anxious first"),
+#                                              "Normal",NA))
+ratings$chat <- as.factor(ratings$chat)
+levels(ratings$chat) <- c("Anxious","Normal")
+
 # visualize normal behavior
 library(ggplot2)
-(fig2A <- ggplot(ratings,aes(x=question,y=Response,col=bot_type,shape=bot_type)) + 
+(fig2A <- ggplot(ratings,aes(x=question,y=Response,col=chat,shape=chat)) + 
   geom_hline(yintercept = 3, col="grey50") +
   labs(y="Likert Scale", x="Question",
        col = "Bot \nPersonality",shape = "Bot \nPersonality") +
@@ -32,6 +35,43 @@ library(ggplot2)
 )
 
 
+ggplot(ratings, aes(x=q_scl_anxiety,y=Response,col=chat)) + 
+  geom_point(alpha = 0.1) +
+  geom_smooth(method="lm", se = F) +
+  facet_wrap(.~question) +
+  theme_classic()
+
+
+
+ratings$q_scl_anxiety_2 <- factor(ifelse(ratings$q_scl_anxiety > quantile(ratings$q_scl_anxiety,0.75),
+                                  "high","low"),levels = c("low","high")) 
+ann_text <- data.frame(Response = 4, 
+                       question = c("chat-again","different","distant","enjoy","similar","understood"),
+                       chat = c("Anxious","Normal"),
+                       q_scl_anxiety_2 = factor("high",levels = c("low","high")))
+ggplot(ratings, aes(x=q_scl_anxiety_2,y=Response,col=chat,shape=chat)) + 
+  stat_summary() +
+  geom_text(data = ann_text, label = c("*","*","*","*","*","*"), col="black", size = 10) +
+  scale_shape_manual(values = c(17,19)) +
+  facet_wrap(.~question) + 
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="chat-again",]))
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="different",]))
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="distant",]))
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="enjoy",]))
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="similar",]))
+summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="understood",]))
+
+summary(lm(Response~q_scl_anxiety,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~q_scl_anxiety,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Normal",]))
+
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -42,6 +82,22 @@ length(unique(task$Response))
 source("experiment1/functions.R")
 # use cleaning function to extract summary information for the interactions
 combine <- summariseChatInteraction(task, chat)
+
+outcome <- addRatingsToInteractions(combine, ratings, likert = "understood")
+
+summary(lm(likert~chat_name*q_scl_anxiety, outcome))
+ggplot(outcome, aes(x=q_scl_anxiety,y=likert,col=chat_name)) + 
+  labs(y = "Undersood") +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method="lm", se = F) +
+  scale_shape_manual(values = c(17,19)) +
+  scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+                                              "Neutral","Agree","Strongly Agree")) + 
+  coord_cartesian(ylim = c(1,5)) +
+  theme_classic()
+
+m <- lm(likert~q_scl_anxiety*chat_name*(bots_Negative+bots_Positive+user_Negative+user_Positive), outcome)
+summary(m)
 
 
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
@@ -66,16 +122,9 @@ summary(lm(user_Neutral~chat_name,combine))
 summary(lm(user_Negative~chat_name,combine))
 summary(lm(user_Mixed~chat_name,combine))
 
-df <- data.frame(
-  sentiment = c(2,4),
-  count = rep(c("1", "2"), times = 4),
-  who = c("User Texts","Bot Texts")
-)
 ann_text <- data.frame(sentiment = c(2,4), count = c(5,10), 
                        lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
                        chat_name = c("Anxious","Normal"))
-
-
 # visualize the average of count for each sentiment and for each chat personality
 (fig2B <- ggplot(combine2, aes(x=sentiment,y=count,col=chat_name,shape=chat_name)) + 
   labs(y="Average Count", x = "Text Sentiment Category",

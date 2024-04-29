@@ -27,7 +27,7 @@ source("normDataWithin.R")
 ##############################  COMPILING RAW TASK DATA ##############################
 
 # finding .csv files in the TASK DATA folder directory # CHANGE THIS TO YOUR DIRECTORY
-setwd(path)
+# setwd(path)
 
 # obtaining all the csv files
 indiv_files <- list.files("task data/",pattern = ".csv")
@@ -212,10 +212,11 @@ botques_data$Participant.Status <- botques_data$Tree.Node.Key <- botques_data$Qu
 
 # santiago 26/04/2024
 # mean(botques_data$Response)
-# ggplot(botques_data,(aes(x=question,y=Response,col=order))) + 
-#   stat_summary() + 
+# ggplot(botques_data,(aes(x=question,y=Response,col=chat))) +
+#   stat_summary() +
 #   theme_classic() +
-#   theme(axis.text.x = element_text(angle = 30, hjust = 1))
+#   facet_grid(.~order) +
+  # theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 summary_botques_data <- summarySEwithin(data=botques_data, measurevar = "Response", betweenvars = "order", 
                                withinvars = c("chat", "question"), idvar = "Participant.Private.ID")
