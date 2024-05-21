@@ -35,6 +35,7 @@ library(ggplot2)
 )
 
 
+
 ggplot(ratings, aes(x=q_scl_anxiety,y=Response,col=chat)) + 
   geom_point(alpha = 0.1) +
   geom_smooth(method="lm", se = F) +
@@ -86,6 +87,8 @@ combine <- summariseChatInteraction(task, chat)
 outcome <- addRatingsToInteractions(combine, ratings, likert = "understood")
 
 summary(lm(likert~chat_name*q_scl_anxiety, outcome))
+library(lmerTest)
+summary(lmer(likert~chat_name*q_scl_anxiety+(1|Participant.Private.ID),REML=F,outcome))
 ggplot(outcome, aes(x=q_scl_anxiety,y=likert,col=chat_name)) + 
   labs(y = "Undersood") +
   geom_point(alpha = 0.1) +
@@ -139,7 +142,40 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
 
 
 
+
+outcome2 <- melt(outcome, measure.vars = c("user_Mixed","user_Negative","user_Neutral","user_Positive",
+                                           "bots_Mixed","bots_Negative","bots_Neutral","bots_Positive"))
+# change column name
+colnames(outcome2)[ncol(outcome2)] <- c("count") 
+# transform variable to character
+outcome2$variable <- as.character(outcome2$variable)
+# split string to get the first 4 character (user or bots)
+outcome2$who <- factor(substr(outcome2$variable,1,4),levels = c("user","bots"))
+# add a nicer names
+levels(outcome2$who) <- c("User Texts","Bot Texts")
+# add the sentiment ased on column variable (created with the columns in melt)
+outcome2$sentiment <- substr(outcome2$variable,6,nchar(outcome2$variable))
+
+library(ggpubr)
+(fig2C <- ggplot(outcome2, aes(x=q_scl_anxiety,y=count,col=chat_name,shape=chat_name)) + 
+    labs(y="Average Count", x = "Anxiety",
+         col = "Bot \nPersonality",shape = "Bot \nPersonality") +
+    geom_smooth(method="lm", se=F) +
+    # stat_summary(position = position_dodge(0.3)) +
+    # geom_text(data = ann_text,label = "*", col="black", size = 10) +
+    scale_shape_manual(values = c(17,19)) +
+    facet_grid(sentiment ~ who) + 
+    stat_cor() +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+)
+
+
 summary(lm(bots_Positive~chat_name,combine))
 summary(lm(bots_Neutral~chat_name,combine))
 summary(lm(bots_Negative~chat_name,combine))
 summary(lm(bots_Mixed~chat_name,combine))
+
+
+
+# # # How can the sentiment analysis moderate anxiety and understanding? # # #
