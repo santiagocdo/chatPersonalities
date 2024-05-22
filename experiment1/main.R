@@ -7,6 +7,8 @@ task <- task[order(task$Participant.Private.ID),]
 # interaction via One Reach (thanks Daniel!)
 chat <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
 
+
+
 # create variable bot_type encoding both personality. Remember depends on order and chat
 # Bot is anxious if, chat=1 and order=Anxious first, but also when chat=2 and order=Normal first
 # Bot is normal if, chat=1 and order=Normal first, but also when chat=2 and order=Anxious first
