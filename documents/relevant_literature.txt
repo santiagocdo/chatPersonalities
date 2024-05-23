@@ -1,0 +1,5 @@
+Coda-Forno, J., Witte, K., Jagadish, A. K., Binz, M., Akata, Z., & Schulz, E. (2023). Inducing anxiety in large language models increases exploration and bias. arXiv preprint arXiv:2304.11111.
+https://arxiv.org/abs/2304.11111
+
+Ben-Zion, Z., Witte, K., Jagadish, A. K., Duek, O., Harpaz-Rotem, I., Khorsandian, M., … Spiller, T. R. (2024, May 20). “Chat-GPT on the Couch”: Assessing and Alleviating  State Anxiety in Large Language Models. https://doi.org/10.31234/osf.io/j7fwb
+https://osf.io/preprints/psyarxiv/j7fwb
