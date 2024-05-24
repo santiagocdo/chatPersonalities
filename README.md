@@ -14,11 +14,24 @@ Chat 2 Normal “Pat” First, Chat 1 Anxious “Alex” Last
 ## Counterbalance A only: 
 
 Link: https://app.gorilla.sc/admin/project/93613
+
 N = 36
 
 Nodes names:
-- demograhpics:
-- questionaires
+-   demograhpics: 8v2c
+-   psychological questionaires: 
+    -   BFI10: mcfk
+    -   SCL90R: 2bh6
+-   bots questionnaires:
+    -   A_1PatAnx_2AlexNorm: 4a4q
+    -   A_2AlexNorm_1PatAnx: ewzl
+-   task names:
+    -   A_1PatAnx_2AlexNorm 1PatAnx:    keg8 
+    -   A_1PatAnx_2AlexNorm 2AlexNorm:  mrfa
+    -   A_2AlexNorm_1PatAnx 2AlexNorm:  xy27
+    -   A_2AlexNorm_1PatAnx 1PatAnx:    vs28
+
+
 
 ## Counterbalance B only: 
 
@@ -34,6 +47,11 @@ Nodes names:
 -   bots questionnaires:
     -   B_1AlexAnx_2PatNorm: gjc4
     -   B_2PatNorm_1AlexAnx: gbf9
+-   task names:
+    -   B_1AlexAnx_2PatNorm 1AlexAnx:   p8dx   
+    -   B_1AlexAnx_2PatNorm 2PatNorm:   19sb
+    -   B_2PatNorm_1AlexAnx 2PatNorm:   ses1
+    -   B_2PatNorm_1AlexAnx 1AlexAnx:   ocuq
 
 
 
@@ -53,13 +71,12 @@ Nodes names:
     -   A_2AlexNorm_1PatAnx: 6eoj
     -   B_1AlexAnx_2PatNorm: wcll
     -   B_2PatNorm_1AlexAnx: eupm 
-
-Counterbalance A N = 
-Counterbalance B N =
-
-
-
-TO DO:
-
-Add names for counterbalance A
-Add tasks nodes for all counterbalances  
+-   task names:
+    -   A_1PatAnx_2AlexNorm 1PatAnx:    ncut
+    -   A_1PatAnx_2AlexNorm 2AlexNorm:  vjth
+    -   A_2AlexNorm_1PatAnx 2AlexNorm:  4nrv
+    -   A_2AlexNorm_1PatAnx 1PatAnx:    hu1g
+    -   B_1AlexAnx_2PatNorm 1AlexAnx:   4uru
+    -   B_1AlexAnx_2PatNorm 2PatNorm:   tvu5
+    -   B_2PatNorm_1AlexAnx 2PatNorm:   ppql
+    -   B_2PatNorm_1AlexAnx 1AlexAnx:   mghz

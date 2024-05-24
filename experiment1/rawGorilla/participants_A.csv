@@ -1,28 +1,32 @@
 ﻿PublicID,Name,Email Address,Recruitment Policy,Group,Version,Checkpoint,Current Node,Status,Included,Activated
+gvu7pevx,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
+wah4py6q,,,MTurk,,14,,task-xy27,Rejected (Manual),FALSE,12/10/2023
+q32yyqax,,,MTurk,,14,,,Complete,TRUE,12/10/2023
+2792wn7s,,,MTurk,,14,,task-keg8,Rejected (Manual),FALSE,12/10/2023
+t22xeqn9,,,MTurk,,15,,task-xy27,Rejected (Manual),FALSE,24/10/2023
 wo86jgqq,,,MTurk,,20,,,Complete,TRUE,03/11/2023
 feu7tcqu,,,MTurk,,20,,,Complete,TRUE,03/11/2023
 mg6qyeat,,,MTurk,,20,,task-l2e9,Rejected (Manual),FALSE,03/11/2023
 q6ma6smz,,,MTurk,,20,,task-keg8,Rejected (Manual),FALSE,03/11/2023
+m1xir2pl,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
+5sbtf6p0,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+rab03jrg,,,MTurk,,24,,task-keg8,Live,FALSE,21/11/2023
+aufyoxcq,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+ttax2g9j,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+6ufpq5pp,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
+4e1463jd,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+qf9u0ggo,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
+0ygxiwsf,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
+1dpp3scf,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+znse68yl,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+hvtxoy7i,,,MTurk,,24,,,Complete,TRUE,21/11/2023
 7vlinohh,,,MTurk,,24,,task-l2e9,Live,FALSE,21/11/2023
-pgktvywq,,,MTurk,,24,,,Complete,TRUE,22/11/2023
+jvichwbn,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+q83pc9iw,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
+2i7k1rwj,,,MTurk,,24,,,Complete,TRUE,21/11/2023
+27mz484w,,,MTurk,,24,,task-keg8,Live,FALSE,21/11/2023
 zhitmt8x,,,MTurk,,24,,,Complete,TRUE,21/11/2023
 pgvxq16i,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
-27mz484w,,,MTurk,,24,,task-keg8,Live,FALSE,21/11/2023
-2i7k1rwj,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-q83pc9iw,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
-jvichwbn,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-hvtxoy7i,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-znse68yl,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-1dpp3scf,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-0ygxiwsf,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
-qf9u0ggo,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
-4e1463jd,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-6ufpq5pp,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
-ttax2g9j,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-aufyoxcq,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-rab03jrg,,,MTurk,,24,,task-keg8,Live,FALSE,21/11/2023
-5sbtf6p0,,,MTurk,,24,,,Complete,TRUE,21/11/2023
-m1xir2pl,,,MTurk,,24,,questionnaire-8v2c,Live,FALSE,21/11/2023
 ai83wpto,,,MTurk,,20,,,Complete,TRUE,03/11/2023
 nn2mstvv,,,MTurk,,20,,questionnaire-8v2c,Rejected (Manual),FALSE,03/11/2023
 9eidynkq,,,MTurk,,20,,,Complete,TRUE,03/11/2023
@@ -31,15 +35,11 @@ nhw0a0rp,,,MTurk,,20,,,Complete,TRUE,03/11/2023
 3hs9p70u,,,MTurk,,20,,task-mrfa,Rejected (Manual),FALSE,30/10/2023
 mjcu07rb,,,MTurk,,20,,task-xy27,Rejected (Manual),FALSE,30/10/2023
 i18c75vl,,,MTurk,,19,,task-mrfa,Rejected (Manual),FALSE,30/10/2023
-t22xeqn9,,,MTurk,,15,,task-xy27,Rejected (Manual),FALSE,24/10/2023
 2x027yet,,,MTurk,,15,,task-xy27,Rejected (Manual),FALSE,21/10/2023
 lqnlsjf9,,,MTurk,,15,,,Complete,TRUE,16/10/2023
 etnhqahq,,,MTurk,,15,,task-keg8,Rejected (Manual),FALSE,12/10/2023
 v9rjgpbl,,,MTurk,,14,,task-xy27,Rejected (Manual),FALSE,12/10/2023
 pkrjv2yj,,,MTurk,,14,,task-keg8,Rejected (Manual),FALSE,12/10/2023
-2792wn7s,,,MTurk,,14,,task-keg8,Rejected (Manual),FALSE,12/10/2023
-q32yyqax,,,MTurk,,14,,,Complete,TRUE,12/10/2023
-wah4py6q,,,MTurk,,14,,task-xy27,Rejected (Manual),FALSE,12/10/2023
 4yhenx9y,,,MTurk,,14,,,Complete,TRUE,12/10/2023
 nfo1h1ht,,,MTurk,,14,,,Complete,TRUE,12/10/2023
 h9xjlqe0,,,MTurk,,14,,,Complete,TRUE,12/10/2023
@@ -48,14 +48,15 @@ t29hxvat,,,MTurk,,14,,task-xy27,Rejected (Manual),FALSE,12/10/2023
 zxgi99d7,,,MTurk,,14,,questionnaire-8v2c,Rejected (Manual),FALSE,12/10/2023
 32cibohg,,,MTurk,,14,,task-xy27,Rejected (Manual),FALSE,12/10/2023
 pa15r3xu,,,MTurk,,13,,questionnaire-5yf1,Rejected (Manual),FALSE,09/10/2023
-089f5a41,,,Simple Link,,9,,questionnaire-8v2c,Rejected (Manual),FALSE,21/08/2023
-197refwb,,,Simple Link,,9,,task-mrfa,Rejected (Manual),FALSE,21/08/2023
-yckeyqah,,,Simple Link,,9,,task-vs28,Rejected (Manual),FALSE,21/08/2023
+73e5jog8,,,MTurk,,11,,,Complete,TRUE,27/08/2023
+bkyp7gxn,,,MTurk,,11,,task-xy27,Rejected (Manual),FALSE,27/08/2023
+6vqx49wo,,,MTurk,,11,,,Complete,TRUE,27/08/2023
+mtsb2678,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
+3y3r8lau,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
 lqblawbb,,,Simple Link,,9,,questionnaire-8v2c,Rejected (Manual),FALSE,07/08/2023
 s1ecy8m9,,,Simple Link,,9,,questionnaire-8v2c,Rejected (Manual),FALSE,04/08/2023
 dui94mbh,,,Simple Link,,8,,questionnaire-rrqf,Rejected (Manual),FALSE,02/08/2023
 y8miwrpx,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
-gvu7pevx,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 zlesoj78,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 nf46he60,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 7racjj5a,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
@@ -69,8 +70,8 @@ qnjfbeii,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 t2ka5l86,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 ldhfy0ct,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
 8yatfg8p,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,01/08/2023
-vhi2vlqj,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,25/07/2023
 dyyp2pag,,,Simple Link,,8,,task-mrfa,Rejected (Manual),FALSE,17/07/2023
+pgktvywq,,,MTurk,,24,,,Complete,TRUE,22/11/2023
 aph0th9r,,,MTurk,,11,,,Complete,TRUE,27/08/2023
 z2qbjyvr,,,MTurk,,11,,,Complete,TRUE,27/08/2023
 invn4sq8,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
@@ -82,11 +83,10 @@ mc4g7miq,,,MTurk,,11,,,Complete,TRUE,27/08/2023
 q221ouy8,,,MTurk,,11,,,Complete,TRUE,27/08/2023
 ih5redzi,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
 zg81os7z,,,MTurk,,11,,,Complete,TRUE,27/08/2023
-73e5jog8,,,MTurk,,11,,,Complete,TRUE,27/08/2023
-bkyp7gxn,,,MTurk,,11,,task-xy27,Rejected (Manual),FALSE,27/08/2023
-6vqx49wo,,,MTurk,,11,,,Complete,TRUE,27/08/2023
-mtsb2678,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
-3y3r8lau,,,MTurk,,11,,questionnaire-8v2c,Rejected (Manual),FALSE,27/08/2023
+089f5a41,,,Simple Link,,9,,questionnaire-8v2c,Rejected (Manual),FALSE,21/08/2023
+197refwb,,,Simple Link,,9,,task-mrfa,Rejected (Manual),FALSE,21/08/2023
+yckeyqah,,,Simple Link,,9,,task-vs28,Rejected (Manual),FALSE,21/08/2023
+vhi2vlqj,,,Simple Link,,8,,questionnaire-8v2c,Rejected (Manual),FALSE,25/07/2023
 m6b7jn9o,,,Simple Link,,8,,,Complete,TRUE,04/07/2023
 iikuwdlj,,,Simple Link,,8,,,Complete,TRUE,28/06/2023
 e8q9mn6x,,,Simple Link,,8,,,Complete,TRUE,26/06/2023
