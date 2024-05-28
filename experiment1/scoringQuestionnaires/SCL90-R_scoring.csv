@@ -1,0 +1,91 @@
+item,subScale,subScaleNum,question
+1,somatization,1,Headaches
+2,anxiety,5,Nervousness or shakiness inside
+3,OCD,2,"Unwanted thoughts, words, or ideas that won't leave your mind"
+4,somatization,1,Faintness or dizziness
+5,depression,4,Loss of sexual interest or pleasure
+6,interSens,3,Feeling critical of others
+7,psychotic,9,The idea that someone else can control your thoughts
+8,paranoidId,8,Feeling others are to blame for most of your troubles
+9,OCD,2,Trouble remembering things
+10,OCD,2,Worried about sloppiness or carelessness
+11,angerHost,6,Feeling easily annoyed or irritated
+12,somatization,1,Pains in heart or chest
+13,phobic,7,Feeling afraid in open spaces or on the streets
+14,depression,4,Feeling low in energy or slowed down
+15,depression,4,Thoughts of ending your life
+16,psychotic,9,Hearing words that others do not hear
+17,anxiety,5,Trembling 
+18,paranoidId,8,Feeling that most people cannot be trusted
+19,addItems,10,Poor appetite
+20,depression,4,Crying easily
+21,interSens,3,Feeling shy or uneasy with the opposite sex
+22,depression,4,Feeling of being trapped or caught
+23,anxiety,5,Suddenly scared for no reason
+24,angerHost,6,Temper outbursts that you could not control
+25,phobic,7,Feeling afraid to go out of your house alone
+26,depression,4,Blaming yourself for things
+27,somatization,1,Pains in lower back
+28,OCD,2,Feeling blocked in getting things done
+29,depression,4,Feeling lonely
+30,depression,4,Feeling blue
+31,depression,4,Worrying too much about things
+32,depression,4,Feeling no interest in things
+33,anxiety,5,Feeling fearful
+34,interSens,3,Your feelings being easily hurt
+35,psychotic,9,Other people being aware of your private thoughts
+36,interSens,3,Feeling others do not understand you or are unsympathetic
+37,interSens,3,Feeling that people are unfriendly or dislike you
+38,OCD,2,Having to do things very slowly to insure correctness 
+39,anxiety,5,Heart pounding or racing
+40,somatization,1,Nausea or upset stomach
+41,interSens,3,Feeling inferior to others
+42,somatization,1,Soreness of your muscles
+43,paranoidId,8,Feeling that you are watched or talked about by others
+44,addItems,10,Trouble falling asleep
+45,OCD,2,Having to check and double-check what you do
+46,OCD,2,Difficulty making decisions
+47,phobic,7,"Feeling afraid to travel on buses, subways, or trains"
+48,somatization,1,Trouble getting your breath
+49,somatization,1,Hot or cold spells
+50,phobic,7,"Having to avoid certain things, places, or activities because they frighten you"
+51,OCD,2,Your mind going blank
+52,somatization,1,Numbness or tingling in parts of your body
+53,somatization,1,A lump in your throat
+54,depression,4,Feeling hopeless about the future
+55,OCD,2,Trouble concentrating
+56,somatization,1,Feeling weak in parts of your body
+57,anxiety,5,Feeling tense or keyed up
+58,somatization,1,Heavy feelings in your arms or legs
+59,addItems,10,Thoughts of death or dying
+60,addItems,10,Overeating
+61,interSens,3,Feeling uneasy when people are watching or talking about you
+62,psychotic,9,Having thoughts that are not your own
+63,angerHost,6,"Having urges to beat, injure, or harm someone"
+64,addItems,10,Awakening in the early morning
+65,OCD,2,"Having to repeat the same actions such as touching, counting, washing"
+66,addItems,10,Sleep that is restless or disturbed
+67,angerHost,6,Having urges to break or smash things
+68,paranoidId,8,Having ideas or beliefs that others do not share
+69,interSens,3,Feeling very self-conscious with others
+70,phobic,7,"Feeling uneasy in crowds, such as shopping or at a movie"
+71,depression,4,Feeling everything is an effort
+72,anxiety,5,Spells of terror or panic
+73,interSens,3,Feeling uncomfortable about eating or drinking in public
+74,angerHost,6,Getting into frequent arguments
+75,phobic,7,Feeling nervous when you are left alone
+76,paranoidId,8,Others not giving you proper credit for your achievements
+77,psychotic,9,Feeling lonely even when you are with people
+78,anxiety,5,Feeling so restless you couldn't sit still
+79,depression,4,Feelings of worthlessness
+80,anxiety,5,Feeling that familiar things are strange or unreal
+81,angerHost,6,Shouting or throwing things
+82,phobic,7,Feeling afraid you will faint in public
+83,paranoidId,8,Feeling that people will take advantage of you if you let them
+84,psychotic,9,Having thoughts about sex that bother you a lot
+85,psychotic,9,The idea that you should be punished for your sins
+86,anxiety,5,Feeling pushed to get things done
+87,psychotic,9,The idea that something serious is wrong with your body
+88,psychotic,9,Never feeling close to another person
+89,addItems,10,Feelings of guilt
+90,psychotic,9,The idea that something is wrong with your mind

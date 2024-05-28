@@ -1,24 +1,29 @@
 # data cleaned by Riddhi and located in cleaned/
 # behaviours in ratings
-ratings <- read.csv("experiment1/cleaned/cleaned_data.csv")
+ratings <- read.csv("experiment1/cleaned/ratings.csv")
 # file with gorilla IDs and OneReach IDs
-task <- read.csv("experiment1/cleaned/task_data.csv")
+task <- read.csv("experiment1/cleaned/task.csv")
 task <- task[order(task$Participant.Private.ID),]
 # interaction via One Reach (thanks Daniel!)
 chat <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
 
+# scl90
+scl90 <- read.csv("experiment1/cleaned/scl90.csv")
+# bfi10
+bfi10 <- read.csv("experiment1/cleaned/bfi10.csv")
 
+source("experiment1/functions.R")
+quest <- scoreQuestionnaires(scl90,bfi10)
+scl90 <- quest$scl
+bfi10 <- quest$bfi
 
-# create variable bot_type encoding both personality. Remember depends on order and chat
-# Bot is anxious if, chat=1 and order=Anxious first, but also when chat=2 and order=Normal first
-# Bot is normal if, chat=1 and order=Normal first, but also when chat=2 and order=Anxious first
-# ratings$bot_type <- ifelse((ratings$chat == 1 & ratings$order == "Anxious first") |
-#                              (ratings$chat == 2 & ratings$order == "Normal first"),
-#                            "Anxious", ifelse((ratings$chat == 1 & ratings$order == "Normal first") |
-#                                                (ratings$chat == 2 & ratings$order == "Anxious first"),
-#                                              "Normal",NA))
+# add questionnaires to ratings
+ratings <- addQuestionnaireToRating(ratings,scl90,bfi10)
+
+# add chat as factor with specific order
 ratings$chat <- as.factor(ratings$chat)
 levels(ratings$chat) <- c("Anxious","Normal")
+
 
 # visualize normal behavior
 library(ggplot2)
@@ -29,8 +34,8 @@ library(ggplot2)
   stat_summary() + 
   scale_shape_manual(values = c(17,19)) +
   scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
-                                              "Neutral","Agree","Strongly Agree")) + 
-  coord_cartesian(ylim = c(2,4)) +
+                                              "Neutral","Agree","Strongly Agree")) +
+  coord_cartesian(ylim = c(1.5,4.5)) +
   facet_grid(.~order) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
@@ -38,40 +43,61 @@ library(ggplot2)
 
 
 
-ggplot(ratings, aes(x=q_scl_anxiety,y=Response,col=chat)) + 
+ggplot(ratings, aes(x=scl90_anxiety,y=Response,col=chat)) +
   geom_point(alpha = 0.1) +
   geom_smooth(method="lm", se = F) +
   facet_wrap(.~question) +
   theme_classic()
+ 
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="chat-again",]))
 
-
-
-ratings$q_scl_anxiety_2 <- factor(ifelse(ratings$q_scl_anxiety > quantile(ratings$q_scl_anxiety,0.75),
-                                  "high","low"),levels = c("low","high")) 
-ann_text <- data.frame(Response = 4, 
-                       question = c("chat-again","different","distant","enjoy","similar","understood"),
-                       chat = c("Anxious","Normal"),
-                       q_scl_anxiety_2 = factor("high",levels = c("low","high")))
-ggplot(ratings, aes(x=q_scl_anxiety_2,y=Response,col=chat,shape=chat)) + 
-  stat_summary() +
-  geom_text(data = ann_text, label = c("*","*","*","*","*","*"), col="black", size = 10) +
-  scale_shape_manual(values = c(17,19)) +
-  facet_wrap(.~question) + 
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
-
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="chat-again",]))
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="different",]))
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="distant",]))
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="enjoy",]))
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="similar",]))
-summary(lm(Response~chat*q_scl_anxiety,ratings[ratings$question=="understood",]))
-
-summary(lm(Response~q_scl_anxiety,ratings[ratings$question=="understood" &
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="different",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Anxious",]))
-summary(lm(Response~q_scl_anxiety,ratings[ratings$question=="understood" &
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Normal",]))
 
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="distant",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="distant" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="distant" &
+                                            ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="enjoy",]))
+
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="similar",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="similar" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="similar" &
+                                            ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="understood",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_anxiety,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Normal",]))
+
+
+
+
+ratings$scl90_anxiety_2 <- factor(ifelse(ratings$scl90_anxiety > quantile(ratings$scl90_anxiety,0.75),
+                                         "high","low"),levels = c("low","high"))
+
+ann_text <- data.frame(Response = 4,
+                       question = c("chat-again","different","distant","enjoy","similar","understood"),
+                       chat = c("Anxious","Normal"),
+                       scl90_anxiety_2 = factor("high",levels = c("low","high")))
+ggplot(ratings, aes(x=scl90_anxiety_2,y=Response,col=chat,shape=chat)) +
+  stat_summary() +
+  geom_text(data = ann_text, label = c("","*","*","","*","*"), 
+            col="black", size = 10) +
+  scale_shape_manual(values = c(17,19)) +
+  scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+                                              "Neutral","Agree","Strongly Agree")) + 
+  coord_cartesian(ylim = c(1.5,4.5)) +
+  facet_wrap(.~question) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 
 

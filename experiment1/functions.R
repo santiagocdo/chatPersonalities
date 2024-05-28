@@ -1,4 +1,79 @@
-# function used to extract overall information from chat ineraction
+# score questionnaires
+scoreQuestionnaires <- function(scl90,bfi10) {
+  # # # # # # # # # # # # # # # SCL90-R # # # # # # # # # # # # # # #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # read scoring csv
+  subsco <- read.csv("experiment1/scoringQuestionnaires/SCL90-R_scoring.csv")
+  
+  # vector of subscales
+  subscales <- unique(subsco$subScale)
+  
+  # create empty matrix
+  scl90_total <- data.frame(matrix(NA,nrow=nrow(scl90),ncol=length(subscales)))
+  colnames(scl90_total) <- paste0("scl90_",subscales)
+  
+  for (i in 1:length(subscales)) {
+    tempItems <- paste0("item.",subsco$item[subsco$subScale == subscales[i]])
+    scl90_total[,i] <- rowSums(scl90[,tempItems])
+  }
+  scl90_total <- cbind(Participant.Private.ID=scl90$Participant.Private.ID,
+                       scl90_total)
+  
+  
+  
+  # # # # # # # # # # # # # # # BFI-10# # # # # # # # # # # # # # # #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # read scoring csv
+  subsco <- read.csv("experiment1/scoringQuestionnaires/BFI10_scoring.csv")
+  
+  # vector of subscales
+  subscales <- unique(subsco$subScale)
+  
+  # create empty matrix
+  bfi10_total <- data.frame(matrix(NA,nrow=nrow(bfi10),ncol=length(subscales)))
+  colnames(bfi10_total) <- paste0("bfi10_",subscales)
+  
+  for (i in 1:length(subscales)) {
+    tempItems <- paste0("item.",subsco$item[subsco$subScale == subscales[i]])
+    bfi10_total[,i] <- rowSums(bfi10[,tempItems])
+  }
+  bfi10_total <- cbind(Participant.Private.ID=bfi10$Participant.Private.ID,
+                       bfi10_total)
+  
+  
+  
+  # return
+  return(list(scl=scl90_total,bfi=bfi10_total))
+}
+
+
+# add questionnaires to ratings
+addQuestionnaireToRating <- function (ratings,scl90,bfi10) {
+  # create an empty matrix
+  temp <- matrix(NA,nrow=nrow(ratings),ncol=sum(ncol(scl90)-1,ncol(bfi10)-1))
+  colnames(temp) <- c(colnames(scl90)[-1],colnames(bfi10)[-1])
+  # add temp to ratings
+  ratings <- cbind(ratings,temp)
+  
+  # combine questionnaires
+  quests <- cbind(scl90,bfi10[-1])
+  
+  # vector with participants public id
+  Participant.Private.ID <- unique(ratings$Participant.Private.ID)
+
+  for (p in 1:length(Participant.Private.ID)) {
+    for (q in 1:ncol(temp)) {
+      ratings[ratings$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
+        quests[quests$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]]
+    }
+  }
+ 
+  # return ratings with questionnaires
+  return(ratings)
+}
+
+
+# function used to extract overall information from chat interaction
 summariseChatInteraction <- function(task, chat) {
   # get intersect between chat ids and what participants wrote as their ids.
   # remember: one element is not one participant but one chat
@@ -88,3 +163,5 @@ addRatingsToInteractions <- function (combine, ratings, likert="understood") {
   # output
   return(output)
 }
+
+
