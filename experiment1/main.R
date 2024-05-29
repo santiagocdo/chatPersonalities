@@ -114,10 +114,10 @@ combine <- summariseChatInteraction(task, chat)
 
 outcome <- addRatingsToInteractions(combine, ratings, likert = "understood")
 
-summary(lm(likert~chat_name*q_scl_anxiety, outcome))
+summary(lm(likert~chatType*scl90_anxiety, outcome))
 library(lmerTest)
-summary(lmer(likert~chat_name*q_scl_anxiety+(1|Participant.Private.ID),REML=F,outcome))
-ggplot(outcome, aes(x=q_scl_anxiety,y=likert,col=chat_name)) + 
+summary(lmer(likert~chatType*scl90_anxiety+(1|Participant.Private.ID),REML=F,outcome))
+ggplot(outcome, aes(x=scl90_anxiety,y=likert,col=chatType)) + 
   labs(y = "Undersood") +
   geom_point(alpha = 0.1) +
   geom_smooth(method="lm", se = F) +
@@ -127,7 +127,7 @@ ggplot(outcome, aes(x=q_scl_anxiety,y=likert,col=chat_name)) +
   coord_cartesian(ylim = c(1,5)) +
   theme_classic()
 
-m <- lm(likert~q_scl_anxiety*chat_name*(bots_Negative+bots_Positive+user_Negative+user_Positive), outcome)
+m <- lm(likert~scl90_anxiety*chatType*(bots_Negative+bots_Positive+user_Negative+user_Positive), outcome)
 summary(m)
 
 
@@ -144,20 +144,20 @@ combine2$variable<- as.character(combine2$variable)
 combine2$who <- factor(substr(combine2$variable,1,4),levels = c("user","bots"))
 # add a nicer names
 levels(combine2$who) <- c("User Texts","Bot Texts")
-# add the sentiment ased on column variable (created with the columns in melt)
+# add the sentiment on column variable (created with the columns in melt)
 combine2$sentiment <- substr(combine2$variable,6,nchar(combine2$variable))
 
 # univariate statistical analysis
-summary(lm(user_Positive~chat_name,combine))
-summary(lm(user_Neutral~chat_name,combine))
-summary(lm(user_Negative~chat_name,combine))
-summary(lm(user_Mixed~chat_name,combine))
+summary(lm(user_Positive~chatType,combine))
+summary(lm(user_Neutral~chatType,combine))
+summary(lm(user_Negative~chatType,combine))
+summary(lm(user_Mixed~chatType,combine))
 
 ann_text <- data.frame(sentiment = c(2,4), count = c(5,10), 
                        lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
-                       chat_name = c("Anxious","Normal"))
+                       chatType = c("Anxious","Normal"))
 # visualize the average of count for each sentiment and for each chat personality
-(fig2B <- ggplot(combine2, aes(x=sentiment,y=count,col=chat_name,shape=chat_name)) + 
+(fig2B <- ggplot(combine2, aes(x=sentiment,y=count,col=chatType,shape=chatType)) + 
   labs(y="Average Count", x = "Text Sentiment Category",
        col = "Bot \nPersonality",shape = "Bot \nPersonality") +
   stat_summary(position = position_dodge(0.3)) +
@@ -185,7 +185,7 @@ levels(outcome2$who) <- c("User Texts","Bot Texts")
 outcome2$sentiment <- substr(outcome2$variable,6,nchar(outcome2$variable))
 
 library(ggpubr)
-(fig2C <- ggplot(outcome2, aes(x=q_scl_anxiety,y=count,col=chat_name,shape=chat_name)) + 
+(fig2C <- ggplot(outcome2, aes(x=scl90_anxiety,y=count,col=chatType,shape=chatType)) + 
     labs(y="Average Count", x = "Anxiety",
          col = "Bot \nPersonality",shape = "Bot \nPersonality") +
     geom_smooth(method="lm", se=F) +
@@ -193,16 +193,15 @@ library(ggpubr)
     # geom_text(data = ann_text,label = "*", col="black", size = 10) +
     scale_shape_manual(values = c(17,19)) +
     facet_grid(sentiment ~ who) + 
-    stat_cor() +
+    # stat_cor() +
     theme_classic() +
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
 
-
-summary(lm(bots_Positive~chat_name,combine))
-summary(lm(bots_Neutral~chat_name,combine))
-summary(lm(bots_Negative~chat_name,combine))
-summary(lm(bots_Mixed~chat_name,combine))
+summary(lm(bots_Positive~chatType,combine))
+summary(lm(bots_Neutral~chatType,combine))
+summary(lm(bots_Negative~chatType,combine))
+summary(lm(bots_Mixed~chatType,combine))
 
 
 

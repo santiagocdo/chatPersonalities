@@ -141,22 +141,22 @@ addRatingsToInteractions <- function (combine, ratings, likert="understood") {
     temp2 <- temp2[temp2$question == likert,]
     
     # same order
-    temp1 <- temp1[order(temp1$chat_name),] 
-    temp2 <- temp2[order(temp2$chat),]
-    if (sum(temp1$chat_name == temp2$chat) != 2) {
-      temp2 <- temp2[temp2$chat == temp1$chat_name,]
+    temp1 <- temp1[order(temp1$chatType),] 
+    temp2 <- temp2[order(temp2$chatType),]
+    if (sum(temp1$chatType == temp2$chatType) != 2) {
+      temp2 <- temp2[temp2$chatType == temp1$chatType,]
     }
    
     
     # combine ratings with interactions
     if (i == 1) {
       output <- data.frame(temp1, likert=temp2$Response,
-                           temp2[,grepl("q_scl",colnames(temp2)) | 
-                                   grepl("q_bfi",colnames(temp2))])
+                           temp2[,grepl("scl90",colnames(temp2)) | 
+                                   grepl("bfi10",colnames(temp2))])
     } else {
       output <- rbind(output,data.frame(temp1, likert=temp2$Response,
-                                        temp2[,grepl("q_scl",colnames(temp2)) | 
-                                                grepl("q_bfi",colnames(temp2))]))
+                                        temp2[,grepl("scl90",colnames(temp2)) | 
+                                                grepl("bfi10",colnames(temp2))]))
     }
   }
   
