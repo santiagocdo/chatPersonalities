@@ -1,4 +1,6 @@
-# data cleaned by Riddhi and located in cleaned/
+# data cleaned by Riddhi and Santiago check script cleaning.R
+# demographics
+demo <- read.csv("experiment1/cleaned/demographics.csv")
 # behaviours in ratings
 ratings <- read.csv("experiment1/cleaned/ratings.csv")
 # file with gorilla IDs and OneReach IDs
@@ -36,7 +38,7 @@ library(ggplot2)
   scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
                                               "Neutral","Agree","Strongly Agree")) +
   coord_cartesian(ylim = c(1.5,4.5)) +
-  facet_grid(.~order) +
+  # facet_grid(.~order) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
@@ -48,24 +50,30 @@ ggplot(ratings, aes(x=scl90_anxiety,y=Response,col=chat)) +
   geom_smooth(method="lm", se = F) +
   facet_wrap(.~question) +
   theme_classic()
- 
-summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="chat-again",]))
 
-summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="different",]))
+library(lmerTest)
+summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+             ratings[ratings$question=="chat-again",])) 
+
+summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+             ratings[ratings$question=="different",])) 
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Anxious",]))
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Normal",]))
 
-summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="distant",]))
+summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+             ratings[ratings$question=="distant",])) 
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="distant" &
                                             ratings$chat == "Anxious",]))
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="distant" &
                                             ratings$chat == "Normal",]))
 
-summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="enjoy",]))
+summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+             ratings[ratings$question=="enjoy",])) 
 
-summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="similar",]))
+summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+             ratings[ratings$question=="similar",])) 
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="similar" &
                                             ratings$chat == "Anxious",]))
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="similar" &
@@ -131,6 +139,7 @@ m <- lm(likert~scl90_anxiety*chatType*(bots_Negative+bots_Positive+user_Negative
 summary(m)
 
 
+
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
 # for each level (mixed, negative, neutral, and positive) for both user and bot)
 library(reshape2)
@@ -167,6 +176,10 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
   theme_classic() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
+summary(lm(bots_Positive~chatType,combine))
+summary(lm(bots_Neutral~chatType,combine))
+summary(lm(bots_Negative~chatType,combine))
+summary(lm(bots_Mixed~chatType,combine))
 
 
 
@@ -198,11 +211,12 @@ library(ggpubr)
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
 
-summary(lm(bots_Positive~chatType,combine))
-summary(lm(bots_Neutral~chatType,combine))
-summary(lm(bots_Negative~chatType,combine))
-summary(lm(bots_Mixed~chatType,combine))
+
 
 
 
 # # # How can the sentiment analysis moderate anxiety and understanding? # # #
+
+# More negatives messages from users impact in more negative messages from the bot?
+
+# longer user_mean_words

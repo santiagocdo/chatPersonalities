@@ -1,3 +1,9 @@
+# opposite to intersect
+outersect <- function(x, y) {
+  sort(c(setdiff(x, y),
+         setdiff(y, x)))
+}
+
 # score questionnaires
 scoreQuestionnaires <- function(scl90,bfi10) {
   # # # # # # # # # # # # # # # SCL90-R # # # # # # # # # # # # # # #
@@ -93,6 +99,18 @@ summariseChatInteraction <- function(task, chat) {
     # remove punctuation
     temp1$GPTsentiment <- gsub("[[:punct:]]", "", temp1$GPTsentiment)
     temp1$usersentiment <- gsub("[[:punct:]]", "", temp1$usersentiment)
+    
+    # # # TO WORK # # #
+    # transition p(bot_sentiment(t)|user_sentiment(t-1))
+    # tranMat <- as.matrix(table(temp1$GPTsentiment[2:nrow(temp1)],
+    #                            temp1$usersentiment[1:(nrow(temp1)-1)]))
+    # marg <- as.matrix(table(temp1$GPTsentiment[2:nrow(temp1)]))
+    # tranMat <- tranMat/matrix(rep(marg,ncol(tranMat)),ncol=ncol(tranMat))
+    # outersect(rownames(tranMat),colnames(tranMat))
+    
+    # transition p(user_sentiment(t)|bot_sentiment(t-1))
+    table(temp1$usersentiment,temp1$GPTsentiment)
+    
     # frequency of sentiment_label
     sent_bots <- data.frame(t(colSums(temp1$GPTsentiment==sentiment)))
     sent_user <- data.frame(t(colSums(temp1$usersentiment==sentiment)))
