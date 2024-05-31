@@ -1,3 +1,7 @@
+# rm(list=ls(all=TRUE))
+save_plots = 0
+# data cleaned by Riddhi and located in cleaned/
+=======
 # data cleaned by Riddhi and Santiago check script cleaning.R
 # demographics
 demo <- read.csv("experiment1/cleaned/demographics.csv")
@@ -26,30 +30,194 @@ ratings <- addQuestionnaireToRating(ratings,scl90,bfi10)
 ratings$chat <- as.factor(ratings$chat)
 levels(ratings$chat) <- c("Anxious","Normal")
 
+full_data <- ratings
+write.csv(full_data,"experiment1/cleaned/full_data.csv",row.names = F)
 
-# visualize normal behavior
+# summarising number of participants in each counterbalance and gorillaexp
+library(dplyr)
+summary_counterbalance_df <- ratings %>%
+  group_by(counterbalance) %>%
+  summarise(Number_of_Participants = n_distinct(Participant.Private.ID)) %>%
+  ungroup()
+
+summary_gorillaExp_df <- ratings %>%
+  group_by(gorillaExp) %>%
+  summarise(Number_of_Participants = n_distinct(Participant.Private.ID)) %>%
+  ungroup()
+
+############# VISUALISATIONS #############
 library(ggplot2)
-(fig2A <- ggplot(ratings,aes(x=question,y=Response,col=chat,shape=chat)) + 
-  geom_hline(yintercept = 3, col="grey50") +
-  labs(y="Likert Scale", x="Question",
-       col = "Bot \nPersonality",shape = "Bot \nPersonality") +
-  stat_summary() + 
-  scale_shape_manual(values = c(17,19)) +
-  scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+
+# scale_x_discrete(name = "Question", 
+#                  labels = c("I would chat with them again",
+#                             "I felt that they were different from me",
+#                             "I felt distant from them",
+#                             "I enjoyed our conversation", 
+#                             "I felt that we are similar",
+#                             "I felt that they understood me")) +
+
+# likert ratings by order
+(plot_likert_byorder <- ggplot(full_data,aes(x=question,
+                                   y=Response,
+                                   col=chat,
+                                   shape=chat)) + 
+    geom_hline(yintercept = 3, col="grey50") +
+    labs(title = "Ratings regarding chatbots (by order)", 
+         y="Likert Scale", x="Question",
+         col = "Bot \nPersonality",
+         shape = "Bot \nPersonality") +
+    stat_summary(size = 1) + 
+    scale_shape_manual(values = c(17,19)) +
+    scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
                                               "Neutral","Agree","Strongly Agree")) +
-  coord_cartesian(ylim = c(1.5,4.5)) +
-  # facet_grid(.~order) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+    coord_cartesian(ylim = c(1.5,4.5)) +
+    scale_color_manual(name = "Bot \nPersonality", 
+                       values=c('#C42021','#25283D'),
+                       labels=c("Anxious","Normal")) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          axis.text.x = element_text(angle = 60, hjust = 1),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5)) +
+    facet_grid(.~order)
+  )
+summary(lm(Response~chat*order,full_data[ratings$question=="chat-again",]))
+summary(lm(Response~chat*order,full_data[ratings$question=="different",]))
+summary(lm(Response~chat*order,full_data[ratings$question=="distant",]))
+summary(lm(Response~chat*order,full_data[ratings$question=="enjoy",]))
+summary(lm(Response~chat*order,full_data[ratings$question=="similar",]))
+summary(lm(Response~chat*order,full_data[ratings$question=="understood",]))
+
+
+
+# likert ratings
+(plot_likert <- ggplot(full_data,aes(x=question,
+                                   y=Response,
+                                   col=chat,
+                                   shape=chat)) + 
+    geom_hline(yintercept = 3, col="grey50") +
+    labs(title = "Ratings regarding chatbots", 
+         y="Likert Scale", x="Question",
+         col = "Bot \nPersonality",
+         shape = "Bot \nPersonality") +
+    stat_summary(size = 1) + 
+    scale_shape_manual(values = c(17,19)) +
+    scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+                                                "Neutral","Agree","Strongly Agree")) +
+    coord_cartesian(ylim = c(1.5,4.5)) +
+    scale_color_manual(name = "Bot \nPersonality", 
+                       values=c('#C42021','#25283D'),
+                       labels=c("Anxious","Normal")) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          axis.text.x = element_text(angle = 60, hjust = 1),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
 )
 
+# plotting anxiety scores 
+psychques_data <- full_data[!duplicated(full_data$Participant.Private.ID), ]
 
+(plot_anxietyscores <- ggplot(psychques_data, aes(x = scl90_anxiety)) +
+    geom_histogram(binwidth = 1, fill = "#6D7275", alpha = 0.7) +
+    labs(title = "Histogram of Anxiety Scores",
+         x = "Anxiety Scores",
+         y = "Frequency") +
+    theme_minimal() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
+)
 
-ggplot(ratings, aes(x=scl90_anxiety,y=Response,col=chat)) +
-  geom_point(alpha = 0.1) +
-  geom_smooth(method="lm", se = F) +
-  facet_wrap(.~question) +
-  theme_classic()
+# plotting depression scores
+(plot_depscores <- ggplot(psychques_data, aes(x = scl90_depression)) +
+    geom_histogram(binwidth = 1, fill = "#6D7275", alpha = 0.7) +
+    labs(title = "Histogram of Depression Scores",
+         x = "Depression Scores",
+         y = "Frequency") +
+    theme_minimal() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
+)
+
+# plotting likert ratings by anxiety score
+sig_3_int <- data.frame(
+  scl90_anxiety = c(35, 35), 
+  Response = c(2, 2), 
+  question = c("different", "distant") 
+)
+
+sig_2_int <- data.frame(
+  scl90_anxiety = c(35, 35), 
+  Response = c(4, 4), 
+  question = c("similar", "understood") 
+)
+
+sig_3_red <- data.frame(
+  scl90_anxiety = c(20, 20, 20, 20), 
+  Response = c(1.5, 1.5, 4.5, 4.5), 
+  question = c("different", "distant", "similar", "understood" ) 
+)
+
+sig_1_black <- data.frame(
+  scl90_anxiety = c(20), 
+  Response = c(3.5), 
+  question = c("different") 
+)
+
+(plot_likert_byanxiety <- ggplot(full_data, 
+                                 aes(x=scl90_anxiety,
+                                     y=Response,col=chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method="lm", se = F) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = "Ratings by anxiety",
+         x = "Anxiety Scores",
+         y = "Response") +
+    facet_wrap(~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat with them again", 
+        "different" = "I felt that they were different from me", 
+        "distant" = "I felt distant from them", 
+        "enjoy" = "I enjoyed our conversation", 
+        "similar" = "I felt that we are similar", 
+        "understood" = "I felt that they understood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    geom_text(data = sig_3_int, aes(x = scl90_anxiety, y = Response, label = "***"), 
+              color = "#135E90", size = 6) +
+    geom_text(data = sig_2_int, aes(x = scl90_anxiety, y = Response, label = "**"), 
+              color = "#135E90", size = 6) +
+    geom_text(data = sig_3_red, aes(x = scl90_anxiety, y = Response, label = "***"), 
+              color = "#C42021", size = 6) +
+    geom_text(data = sig_1_black, aes(x = scl90_anxiety, y = Response, label = "*"), 
+              color = "#25283D", size = 6) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
+)
+summary(lm(Response~chat*scl90_anxiety,ratings[ratings$question=="chat-again",]))
 
 library(lmerTest)
 summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
@@ -85,7 +253,275 @@ summary(lm(Response~scl90_anxiety,ratings[ratings$question=="understood" &
 summary(lm(Response~scl90_anxiety,ratings[ratings$question=="understood" &
                                             ratings$chat == "Normal",]))
 
+# plotting likert ratings by anxiety score by order
+(plot_likert_byanxiety_byorder <- ggplot(full_data, 
+                                 aes(x=scl90_anxiety,
+                                     y=Response,col=chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method="lm", se = F) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = "Ratings by anxiety (by order)",
+         x = "Anxiety Scores",
+         y = "Response") +
+    facet_grid(order~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat \nwith them again", 
+        "different" = "I felt that \nthey were \ndifferent from me", 
+        "distant" = "I felt distant \nfrom them", 
+        "enjoy" = "I enjoyed our \nconversation", 
+        "similar" = "I felt that we \nare similar", 
+        "understood" = "I felt that they \nunderstood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5)) 
+)
+summary(lm(Response~chat*scl90_anxiety*order,ratings[ratings$question=="chat-again",]))
 
+summary(lm(Response~chat*scl90_anxiety*order,ratings[ratings$question=="enjoy",]))
+
+
+# plotting likert ratings by depression score
+sig_3_int_dep <- data.frame(
+  scl90_depression = c(45, 45, 45), 
+  Response = c(2.5, 2.3, 3.8), 
+  question = c("different", "distant", "similar") 
+)
+
+sig_1_int_dep <- data.frame(
+  scl90_depression = c(45), 
+  Response = c(3.8), 
+  question = c("understood") 
+)
+
+sig_3_red_dep <- data.frame(
+  scl90_depression = c(25, 25), 
+  Response = c(1.5, 4.2), 
+  question = c("different", "similar") 
+)
+
+sig_2_red_dep <- data.frame(
+  scl90_depression = c(25, 25), 
+  Response = c(2, 4), 
+  question = c("distant", "understood") 
+)
+
+sig_1_red_dep <- data.frame(
+  scl90_depression = c(25), 
+  Response = c(2.7), 
+  question = c("chat-again") 
+)
+
+sig_1_black_dep <- data.frame(
+  scl90_depression = c(25), 
+  Response = c(3.5), 
+  question = c("different") 
+)
+
+(plot_likert_bydep <- ggplot(full_data, 
+                                 aes(x=scl90_depression,
+                                     y=Response,col=chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method="lm", se = F) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = "Ratings by depression",
+         x = "Depression Scores",
+         y = "Response") +
+    facet_wrap(~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat with them again", 
+        "different" = "I felt that they were different from me", 
+        "distant" = "I felt distant from them", 
+        "enjoy" = "I enjoyed our conversation", 
+        "similar" = "I felt that we are similar", 
+        "understood" = "I felt that they understood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    geom_text(data = sig_3_int_dep, aes(x = scl90_depression, y = Response, label = "***"), 
+              color = "#135E90", size = 6) +
+    geom_text(data = sig_1_int_dep, aes(x = scl90_depression, y = Response, label = "*"), 
+              color = "#135E90", size = 6) +
+    geom_text(data = sig_3_red_dep, aes(x = scl90_depression, y = Response, label = "***"), 
+              color = "#C42021", size = 6) +
+    geom_text(data = sig_2_red_dep, aes(x = scl90_depression, y = Response, label = "**"), 
+              color = "#C42021", size = 6) +
+    geom_text(data = sig_1_red_dep, aes(x = scl90_depression, y = Response, label = "*"), 
+              color = "#C42021", size = 6) +
+    geom_text(data = sig_1_black_dep, aes(x = scl90_depression, y = Response, label = "*"), 
+              color = "#25283D", size = 6) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
+)
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="chat-again",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="chat-again" &
+                                               ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="chat-again" &
+                                               ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="different",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="different" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="different" &
+                                            ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="distant",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="distant" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="distant" &
+                                            ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="enjoy",]))
+
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="similar",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="similar" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="similar" &
+                                            ratings$chat == "Normal",]))
+
+summary(lm(Response~chat*scl90_depression,ratings[ratings$question=="understood",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Anxious",]))
+summary(lm(Response~scl90_depression,ratings[ratings$question=="understood" &
+                                            ratings$chat == "Normal",]))
+
+# plotting likert ratings by depression score by order
+(plot_likert_bydep_byorder <- ggplot(full_data, 
+                             aes(x=scl90_depression,
+                                 y=Response,col=chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method="lm", se = F) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = "Ratings by depression (by order)",
+         x = "Depression Scores",
+         y = "Response") +
+    facet_grid(order~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat \nwith them again", 
+        "different" = "I felt that \nthey were \ndifferent from me", 
+        "distant" = "I felt distant \nfrom them", 
+        "enjoy" = "I enjoyed our \nconversation", 
+        "similar" = "I felt that we \nare similar", 
+        "understood" = "I felt that they \nunderstood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 16, hjust = 0.5))
+)
+summary(lm(Response~chat*scl90_depression*order,ratings[ratings$question=="chat-again",]))
+
+summary(lm(Response~chat*scl90_depression*order,ratings[ratings$question=="enjoy",]))
+
+if (save_plots == 1) {
+  ggsave('experiment1/figures/likert.jpeg', plot = plot_likert, 
+         width = 20, height = 15, units = "cm")
+  ggsave('experiment1/figures/likert_byorder.jpeg', plot = plot_likert_byorder, 
+         width = 25, height = 15, units = "cm")
+  ggsave('experiment1/figures/anxietyscores.jpeg', plot = plot_anxietyscores, 
+         width = 20, height = 15, units = "cm")
+  ggsave('experiment1/figures/depscores.jpeg', plot = plot_depscores, 
+         width = 20, height = 15, units = "cm")
+  ggsave('experiment1/figures/likert_byanxiety.jpeg', plot = plot_likert_byanxiety, 
+         width = 30, height = 15, units = "cm")
+  ggsave('experiment1/figures/likert_byanxiety_byorder.jpeg', plot = plot_likert_byanxiety_byorder, 
+         width = 30, height = 15, units = "cm")
+  ggsave('experiment1/figures/likert_bydep.jpeg', plot = plot_likert_bydep, 
+         width = 30, height = 15, units = "cm")
+  ggsave('experiment1/figures/likert_bydep_byorder.jpeg', plot = plot_likert_bydep_byorder, 
+         width = 30, height = 15, units = "cm")
+}
+
+# creating a mega-plot with mini-plots, one for each subscale
+library(gridExtra)
+
+NAME_LIST <- c("scl90_somatization", "scl90_anxiety", "scl90_OCD",
+               "scl90_depression", "scl90_interSens", "scl90_psychotic",
+               "scl90_paranoidId", "scl90_angerHost", "scl90_phobic",
+               "scl90_addItems", "bfi10_extraversion", "bfi10_agreeableness",
+               "bfi10_conscientiousness", "bfi10_neuroticism", "bfi10_openness"
+               )
+plot_list <- list()
+
+for (NAME in NAME_LIST) {
+  plot <- ggplot(full_data, 
+                 aes(x = !!sym(NAME), y = Response, col = chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method = "lm", se = FALSE) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = paste("Ratings by", NAME),
+         x = paste(NAME, "Scores"),
+         y = "Response") +
+    facet_wrap(~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat with them again", 
+        "different" = "I felt that they were different from me", 
+        "distant" = "I felt distant from them", 
+        "enjoy" = "I enjoyed our conversation", 
+        "similar" = "I felt that we are similar", 
+        "understood" = "I felt that they understood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 14, hjust = 0.5))
+  
+  # Append the plot to the list
+  plot_list[[NAME]] <- plot
+}
+
+grid_plot <- marrangeGrob(plot_list, nrow=5, ncol=3)
+
+ggsave("experiment1/mega_plot.pdf", grid_plot, width = 20, height = 25)
+
+# # Display the grid plot
+# grid::grid.newpage()
+# grid::grid.draw(grid_plot)
+ 
+
+
+########
 
 
 ratings$scl90_anxiety_2 <- factor(ifelse(ratings$scl90_anxiety > quantile(ratings$scl90_anxiety,0.75),
