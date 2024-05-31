@@ -1,5 +1,5 @@
 # rm(list=ls(all=TRUE))
-save_plots = 1
+save_plots = 0
 # data cleaned by Riddhi and located in cleaned/
 # behaviours in ratings
 ratings <- read.csv("experiment1/cleaned/ratings.csv")
@@ -451,14 +451,65 @@ if (save_plots == 1) {
          width = 30, height = 15, units = "cm")
 }
 
+# creating a mega-plot with mini-plots, one for each subscale
+library(gridExtra)
 
+NAME_LIST <- c("scl90_somatization", "scl90_anxiety", "scl90_OCD",
+               "scl90_depression", "scl90_interSens", "scl90_psychotic",
+               "scl90_paranoidId", "scl90_angerHost", "scl90_phobic",
+               "scl90_addItems", "bfi10_extraversion", "bfi10_agreeableness",
+               "bfi10_conscientiousness", "bfi10_neuroticism", "bfi10_openness"
+               )
+plot_list <- list()
 
+for (NAME in NAME_LIST) {
+  plot <- ggplot(full_data, 
+                 aes(x = !!sym(NAME), y = Response, col = chat)) +
+    geom_point(alpha = 0.01) +
+    geom_smooth(method = "lm", se = FALSE) +
+    geom_hline(yintercept = 3, color = "#6D7275", linetype = "dashed") +
+    labs(title = paste("Ratings by", NAME),
+         x = paste(NAME, "Scores"),
+         y = "Response") +
+    facet_wrap(~question, labeller = labeller(
+      question = c(
+        "chat-again" = "I would chat with them again", 
+        "different" = "I felt that they were different from me", 
+        "distant" = "I felt distant from them", 
+        "enjoy" = "I enjoyed our conversation", 
+        "similar" = "I felt that we are similar", 
+        "understood" = "I felt that they understood me"
+      )
+    )) +
+    scale_y_continuous(breaks = c(1, 2, 3, 4, 5), 
+                       labels = c("Strongly Disagree", "Disagree", 
+                                  "Neutral", "Agree", "Strongly Agree")) +
+    scale_color_manual(name = "Bot \nPersonality",
+                       values = c('#C42021', '#25283D'), 
+                       labels = c("Anxious", "Normal")) +
+    theme_classic() + 
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12), 
+          strip.text.x = element_text(size = 12),
+          plot.title = element_text(size = 14, hjust = 0.5))
+  
+  # Append the plot to the list
+  plot_list[[NAME]] <- plot
+}
 
+grid_plot <- marrangeGrob(plot_list, nrow=5, ncol=3)
 
+ggsave("experiment1/mega_plot.pdf", grid_plot, width = 20, height = 25)
+
+# # Display the grid plot
+# grid::grid.newpage()
+# grid::grid.draw(grid_plot)
  
 
 
-
+########
 
 
 ratings$scl90_anxiety_2 <- factor(ifelse(ratings$scl90_anxiety > quantile(ratings$scl90_anxiety,0.75),
