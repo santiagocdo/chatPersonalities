@@ -42,24 +42,41 @@ library(ggplot2)
   theme_classic() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
+ggsave("figures/figure2A.pdf", fig2A, dpi = 2400, scale = 1.1, units = "cm",
+       width = 12, height = 8, bg = "white")
 
 
 
-ggplot(ratings, aes(x=scl90_anxiety,y=Response,col=chat)) +
+fig2C <- ggplot(ratings, aes(x=scl90_anxiety,y=Response,col=chat)) +
+  labs(y="Likert Scale", x="Anxiey Score (SCL90-R)",
+       col = "Bot \nPersonality") +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method="lm", se = F) +
+  scale_y_continuous(breaks = c(1,3,5), 
+                     labels = c("Strongly Disagree","Neutral","Strongly Agree")) +
+  scale_x_continuous(breaks = c(0,20,40)) +
+  facet_wrap(.~question) +
+  theme_classic()
+ggsave("figures/figure2C.pdf", fig2C, dpi = 2400, scale = 1.1, units = "cm",
+       width = 12, height = 8, bg = "white")
+ggplot(ratings, aes(x=bfi10_extraversion,y=Response,col=chat)) +
   geom_point(alpha = 0.1) +
   geom_smooth(method="lm", se = F) +
   facet_wrap(.~question) +
   theme_classic()
 
+
+
 library(lmerTest)
-summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+# linear mixed model (assuming that likert is continious)
+summary(lmer(Response ~ chat * scl90_anxiety + (1|Participant.Private.ID), REML = T, 
              ratings[ratings$question=="chat-again",])) 
 
-summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
+summary(lmer(Response ~ chat * scl90_anxiety + (1|Participant.Private.ID), REML = T, 
              ratings[ratings$question=="different",])) 
-summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
+summary(lm(Response ~ scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Anxious",]))
-summary(lm(Response~scl90_anxiety,ratings[ratings$question=="different" &
+summary(lm(Response ~ scl90_anxiety,ratings[ratings$question=="different" &
                                             ratings$chat == "Normal",]))
 
 summary(lmer(Response~chat*scl90_anxiety+(1|Participant.Private.ID), REML = T, 
@@ -88,24 +105,24 @@ summary(lm(Response~scl90_anxiety,ratings[ratings$question=="understood" &
 
 
 
-ratings$scl90_anxiety_2 <- factor(ifelse(ratings$scl90_anxiety > quantile(ratings$scl90_anxiety,0.75),
-                                         "high","low"),levels = c("low","high"))
-
-ann_text <- data.frame(Response = 4,
-                       question = c("chat-again","different","distant","enjoy","similar","understood"),
-                       chat = c("Anxious","Normal"),
-                       scl90_anxiety_2 = factor("high",levels = c("low","high")))
-ggplot(ratings, aes(x=scl90_anxiety_2,y=Response,col=chat,shape=chat)) +
-  stat_summary() +
-  geom_text(data = ann_text, label = c("","*","*","","*","*"), 
-            col="black", size = 10) +
-  scale_shape_manual(values = c(17,19)) +
-  scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
-                                              "Neutral","Agree","Strongly Agree")) + 
-  coord_cartesian(ylim = c(1.5,4.5)) +
-  facet_wrap(.~question) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+# ratings$scl90_anxiety_2 <- factor(ifelse(ratings$scl90_anxiety > quantile(ratings$scl90_anxiety,0.75),
+#                                          "high","low"),levels = c("low","high"))
+# 
+# ann_text <- data.frame(Response = 4,
+#                        question = c("chat-again","different","distant","enjoy","similar","understood"),
+#                        chat = c("Anxious","Normal"),
+#                        scl90_anxiety_2 = factor("high",levels = c("low","high")))
+# ggplot(ratings, aes(x=scl90_anxiety_2,y=Response,col=chat,shape=chat)) +
+#   stat_summary() +
+#   geom_text(data = ann_text, label = c("","*","*","","*","*"), 
+#             col="black", size = 10) +
+#   scale_shape_manual(values = c(17,19)) +
+#   scale_y_continuous(breaks = 1:5, labels = c("Strongly Disagree","Disagree",
+#                                               "Neutral","Agree","Strongly Agree")) + 
+#   coord_cartesian(ylim = c(1.5,4.5)) +
+#   facet_wrap(.~question) +
+#   theme_classic() +
+#   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 
 
@@ -176,11 +193,12 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
   theme_classic() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
+ggsave("figures/figure2B.pdf", fig2B, dpi = 2400, scale = 1.1, units = "cm",
+       width = 12, height = 8, bg = "white")
 summary(lm(bots_Positive~chatType,combine))
 summary(lm(bots_Neutral~chatType,combine))
 summary(lm(bots_Negative~chatType,combine))
 summary(lm(bots_Mixed~chatType,combine))
-
 
 
 
@@ -211,9 +229,15 @@ library(ggpubr)
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
 )
 
+summary(lm(user_Mixed~scl90_anxiety*chatType, outcome[,]))
+summary(lm(user_Negative~scl90_anxiety*chatType, outcome[,]))
+summary(lm(user_Neutral~scl90_anxiety*chatType, outcome[,]))
+summary(lm(user_Positive~scl90_anxiety*chatType, outcome[,]))
 
-
-
+summary(lm(bots_Mixed~scl90_anxiety*chatType, outcome[,]))
+summary(lm(bots_Negative~scl90_anxiety*chatType, outcome[,]))
+summary(lm(bots_Neutral~scl90_anxiety*chatType, outcome[,]))
+summary(lm(bots_Positive~scl90_anxiety*chatType, outcome[,]))
 
 # # # How can the sentiment analysis moderate anxiety and understanding? # # #
 
