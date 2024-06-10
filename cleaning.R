@@ -53,30 +53,29 @@ if (sum(demographics_sex$Participant.Public.ID ==
 
 
 # # creating a summary dataframe
+# # manual removal
+# demo <- demo[demo$Participant.Private.ID != "9810928",] # removing our team's pilot data
 # summary_demographics <- data.frame(matrix(nrow = 6, ncol = 2))
 # colnames(summary_demographics)[1] <- "Property"
 # colnames(summary_demographics)[2] <- "Value"
-# summary_demographics[,1] <- c("N", "num_M", "num_F", "num_other", "mean_Age", "sd_Age") 
+# summary_demographics[,1] <- c("N", "num_M", "num_F", "num_other", "mean_Age", "sd_Age")
 # 
 # gender_distribution <- table(demographics_gender$Response)
 # demographics_age$Response <- as.integer(demographics_age$Response)
 # # filling in demographic information into the summary sheet
-# summary_demographics$Value[summary_demographics$Property == "N"] <- 
+# summary_demographics$Value[summary_demographics$Property == "N"] <-
 #   length(unique(demographics_gender$Participant.Private.ID))
-# summary_demographics$Value[summary_demographics$Property == "num_M"] <- 
+# summary_demographics$Value[summary_demographics$Property == "num_M"] <-
 #   gender_distribution[names(gender_distribution) == 1]
-# summary_demographics$Value[summary_demographics$Property == "num_F"] <- 
+# summary_demographics$Value[summary_demographics$Property == "num_F"] <-
 #   gender_distribution[names(gender_distribution) == 2]
 # summary_demographics$Value[summary_demographics$Property == "num_other"] <-
 #   gender_distribution[names(gender_distribution) == 3]
-# summary_demographics$Value[summary_demographics$Property == "mean_Age"] <- 
+# summary_demographics$Value[summary_demographics$Property == "mean_Age"] <-
 #   mean(demographics_age$Response)
-# summary_demographics$Value[summary_demographics$Property == "sd_Age"] <- 
+# summary_demographics$Value[summary_demographics$Property == "sd_Age"] <-
 #   sd(demographics_age$Response)
-# # print?
-# if (print_csv == 1) {
-#   write.csv(summary_demographics,"experiment1/cleaned/demographics_summarised.csv",row.names = F)
-# }
+
 
 
 
@@ -474,6 +473,7 @@ likert$Participant.Public.ID <- NULL
 # print?
 if (print_csv == 1) {
   write.csv(demo,"experiment1/cleaned/demographics.csv",row.names = F)
+  # write.csv(summary_demographics,"experiment1/cleaned/demographics_summarised.csv",row.names = F)
   write.csv(bfi10,"experiment1/cleaned/bfi10.csv",row.names = F)
   write.csv(scl90,"experiment1/cleaned/scl90.csv",row.names = F)
   write.csv(dat,"experiment1/cleaned/task.csv",row.names = F)
