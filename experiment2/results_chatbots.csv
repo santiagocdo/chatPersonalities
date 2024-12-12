@@ -1,0 +1,13 @@
+"Question","Predictor","Estimate","Std_Error","t_value","p_value"
+"chat-again","(Intercept)",3.61,0.118,30.568,0
+"chat-again","chatIntrovert",-0.169,0.167,-1.015,0.311
+"different","(Intercept)",2.831,0.117,24.177,0
+"different","chatIntrovert",0.203,0.166,1.228,0.221
+"distant","(Intercept)",2.585,0.118,21.821,0
+"distant","chatIntrovert",0.314,0.168,1.872,0.062
+"enjoy","(Intercept)",3.831,0.101,38.075,0
+"enjoy","chatIntrovert",-0.093,0.142,-0.655,0.513
+"similar","(Intercept)",3.305,0.112,29.511,0
+"similar","chatIntrovert",-0.034,0.158,-0.214,0.831
+"understood","(Intercept)",3.644,0.109,33.307,0
+"understood","chatIntrovert",-0.127,0.155,-0.822,0.412
