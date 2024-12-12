@@ -2,12 +2,12 @@ rm(list=ls(all=TRUE))
 
 if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 
-ratings <- read.csv("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/cleaned/ratings.csv")
-task <- read.csv("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/cleaned/task.csv")
+ratings <- read.csv("experiment2/cleaned/ratings.csv")
+task <- read.csv("experiment2/cleaned/task.csv")
 task <- task[order(task$Participant.Private.ID),]
-bfi <- read.csv("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/cleaned/bfi44.csv")
+bfi <- read.csv("experiment2/cleaned/bfi44.csv")
 
-source("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/functions.R")
+source("experiment2/functions.R")
 quest <- scoreQuestionnaires(bfi)
 
 bfi <- quest$bfi
@@ -37,7 +37,7 @@ ratings$chat <- as.factor(ratings$chat)
 # levels(ratings$chat) <- c("Anxious","Normal")
 
 full_data <- ratings
-write.csv(full_data,"/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/cleaned/full_data.csv",row.names = F)
+write.csv(full_data,"experiment2/cleaned/full_data.csv",row.names = F)
 
 # removing PIDs after qualitative elimination
 elim_PIDs <- c("11566059", "11566066", "11566067", "11566069", "11566073",
@@ -66,7 +66,7 @@ full_data <- full_data[full_data$Participant.Private.ID %in%
 
 ########## DEMOGRAPHICS ####################
 
-demographics <- read.csv("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/cleaned/demographics.csv")
+demographics <- read.csv("experiment2/cleaned/demographics.csv")
 
 for (p in 1:length(nsubj)) {
   demographics[demographics$Participant.Private.ID == nsubj[p], "gorillaExp"] <-
@@ -230,10 +230,10 @@ summary(lm(Response~chat,full_data[ratings$question=="enjoy",]))
 summary(lm(Response~chat,full_data[ratings$question=="similar",]))
 summary(lm(Response~chat,full_data[ratings$question=="understood",]))
 
-ggsave("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/figures/likert.jpeg", 
+ggsave("experiment2/figures/likert.jpeg", 
        plot_likert, width = 10, height = 7)
 
-ggsave("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/figures/likert_byorder.jpeg", 
+ggsave("experiment2/figures/likert_byorder.jpeg", 
        plot_likert_byorder, width = 10, height = 8)
 
 # creating a mega-plot with mini-plots, one for each subscale
@@ -283,7 +283,7 @@ for (NAME in NAME_LIST) {
 
 grid_plot <- marrangeGrob(plot_list, nrow=2, ncol=3)
 
-ggsave("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/mega_plot.pdf", 
+ggsave("experiment2/mega_plot.pdf", 
        grid_plot, width = 20, height = 15)
 
 # statisitcal analysis
@@ -367,12 +367,12 @@ for (question in questions) {
 }
 
 # Save results to CSV
-write.csv(results, "/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/results_bdi.csv", row.names = FALSE)
+write.csv(results, "experiment2/results_bdi.csv", row.names = FALSE)
 
 ############
 # histograms for the bfi factors
 
-output_dir <- "/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/figures/histograms/"
+output_dir <- "experiment2/figures/histograms/"
 for (bfi in bfi_factors) {
   p <- ggplot(full_data, aes_string(x = bfi)) +
     geom_histogram(
@@ -440,7 +440,7 @@ for (question in questions) {
 }
 
 # Save results to CSV
-write.csv(results, "/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/results_blockorder.csv", row.names = FALSE)
+write.csv(results, "experiment2/results_blockorder.csv", row.names = FALSE)
 
 
 
@@ -485,4 +485,4 @@ for (question in questions) {
 
 
 # Save results to CSV
-write.csv(results, "/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/results_chatbots.csv", row.names = FALSE)
+write.csv(results, "experiment2/results_chatbots.csv", row.names = FALSE)

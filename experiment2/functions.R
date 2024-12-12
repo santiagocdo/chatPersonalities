@@ -6,7 +6,7 @@ scoreQuestionnaires <- function(bfi10) {
   # # # # # # # # # # # # # # # BFI-10# # # # # # # # # # # # # # # #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # read scoring csv
-  subsco <- read.csv("/Users/riddhi_rjp/Library/CloudStorage/OneDrive-Nexus365/Oxford/Research Projects/Ox_OneReach/1_Data&Analysis/FinalAnalysis_SCdOandRJP/chatPersonalities/experiment2/scoringQuestionnaires/BFI44_scoring.csv")
+  subsco <- read.csv("experiment2/scoringQuestionnaires/BFI44_scoring.csv")
   
   # vector of subscales
   subscales <- unique(subsco$subScale)
