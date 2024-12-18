@@ -4,8 +4,8 @@ outersect <- function(x, y) {
          setdiff(y, x)))
 }
 
-# score questionnaires
-scoreQuestionnaires <- function(scl90,bfi10) {
+# score questionnaires Experiment 1
+scoreQuestionnaires_e1 <- function(scl90, bfi10) {
   # # # # # # # # # # # # # # # SCL90-R # # # # # # # # # # # # # # #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # read scoring csv
@@ -52,9 +52,33 @@ scoreQuestionnaires <- function(scl90,bfi10) {
   return(list(scl=scl90_total,bfi=bfi10_total))
 }
 
+# score questionnaires Experiment 2
+scoreQuestionnaires_e2 <- function(bfi44) {
+  # # # # # # # # # # # # # # # BFI-10# # # # # # # # # # # # # # # #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # read scoring csv
+  subsco <- read.csv("experiment2/scoringQuestionnaires/BFI44_scoring.csv")
+  
+  # vector of subscales
+  subscales <- unique(subsco$subScale)
+  
+  # create empty matrix
+  bfi44_total <- data.frame(matrix(NA,nrow=nrow(bfi44),ncol=length(subscales)))
+  colnames(bfi44_total) <- paste0("bfi44_",subscales)
+  
+  for (i in 1:length(subscales)) {
+    tempItems <- paste0("item.",subsco$item[subsco$subScale == subscales[i]])
+    bfi44_total[,i] <- rowSums(bfi44[,tempItems])
+  }
+  bfi44_total <- cbind(Participant.Private.ID=bfi44$Participant.Private.ID,
+                       bfi44_total)
+  
+  # return
+  return(list(bfi=bfi44_total))
+}
 
-# add questionnaires to ratings
-addQuestionnaireToRating <- function (ratings,scl90,bfi10) {
+# add questionnaires to ratings Experiment 1
+addQuestionnaireToRating_e1 <- function (ratings,scl90,bfi10) {
   # create an empty matrix
   temp <- matrix(NA,nrow=nrow(ratings),ncol=sum(ncol(scl90)-1,ncol(bfi10)-1))
   colnames(temp) <- c(colnames(scl90)[-1],colnames(bfi10)[-1])
@@ -76,6 +100,31 @@ addQuestionnaireToRating <- function (ratings,scl90,bfi10) {
  
   # return ratings with questionnaires
   return(ratings)
+}
+
+# add questionnaires to ratings Experiment 2
+addQuestionnaireToRating_e2 <- function (ratings2,bfi44) {
+  # create an empty matrix
+  temp <- matrix(NA,nrow=nrow(ratings2),ncol=sum(ncol(bfi44)-1))
+  colnames(temp) <- colnames(bfi44)[-1]
+  # add temp to ratings
+  ratings2 <- cbind(ratings2,temp)
+  
+  # combine questionnaires (add here another quest, if needed)
+  quests <- cbind(bfi44)
+  
+  # vector with participants public id
+  Participant.Private.ID <- unique(ratings2$Participant.Private.ID)
+  
+  for (p in 1:length(Participant.Private.ID)) {
+    for (q in 1:ncol(temp)) {
+      ratings2[ratings2$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
+        quests[quests$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]]
+    }
+  }
+  
+  # return ratings with questionnaires
+  return(ratings2)
 }
 
 
@@ -169,17 +218,20 @@ addRatingsToInteractions <- function (combine, ratings, likert="understood") {
     # combine ratings with interactions
     if (i == 1) {
       output <- data.frame(temp1, likert=temp2$Response,
-                           temp2[,grepl("scl90",colnames(temp2)) | 
-                                   grepl("bfi10",colnames(temp2))])
+                           temp2[,grepl("scl90",colnames(temp2)) |
+                                   grepl("bfi10",colnames(temp2)) |
+                                   grepl("bfi44",colnames(temp2))])
     } else {
       output <- rbind(output,data.frame(temp1, likert=temp2$Response,
-                                        temp2[,grepl("scl90",colnames(temp2)) | 
-                                                grepl("bfi10",colnames(temp2))]))
+                                        temp2[,grepl("scl90",colnames(temp2)) |
+                                                grepl("bfi10",colnames(temp2)) |
+                                                grepl("bfi44",colnames(temp2))]))
     }
   }
   
   # output
   return(output)
 }
+
 
 
