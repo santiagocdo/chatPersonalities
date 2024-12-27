@@ -239,6 +239,7 @@ exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
 exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
 
 # exp1$effect <- factor(exp1$effect, levels = c("Anxious","Non-Anxious","Interaction"))
+library(ggplot2)
 (figure3 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
   labs(y = "Effect Size") +
   geom_hline(yintercept = 0, col="grey") +
@@ -438,7 +439,7 @@ ggsave("figures/figure2B.pdf", figure2B, dpi = 2400, scale = 1, units = "cm",
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
     scale_y_continuous(breaks = 1:5, limits = c(1, 5),
                        labels = c("Disagree","","","","Agree")) +
-    facet_wrap(. ~ question, ncol = 1, labeller = labeller(
+    facet_wrap(. ~ question, ncol = 3, labeller = labeller(
       question = c("chat-again" = "chat again",
                    "different" = "felt different",
                    "distant" = "felt distant",
@@ -459,7 +460,7 @@ ratings1$bfi10_extraversion <- ratings1$bfi10_extraversion/max(ratings1$bfi10_ex
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
     scale_y_continuous(breaks = 1:5, limits = c(1, 5),
                        labels = c("Disagree","","","","Agree")) +
-    facet_wrap(. ~ question, ncol = 1, labeller = labeller(
+    facet_wrap(. ~ question, ncol = 3, labeller = labeller(
       question = c("chat-again" = "chat again",
                    "different" = "felt different",
                    "distant" = "felt distant",
@@ -479,7 +480,7 @@ ratings1$bfi10_extraversion <- ratings1$bfi10_extraversion/max(ratings1$bfi10_ex
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
     scale_y_continuous(breaks = 1:5, limits = c(1, 5),
                        labels = c("Disagree","","","","Agree")) +
-    facet_wrap(. ~ question, ncol = 1, labeller = labeller(
+    facet_wrap(. ~ question, ncol = 3, labeller = labeller(
       question = c("chat-again" = "chat again",
                    "different" = "felt different",
                    "distant" = "felt distant",
@@ -504,17 +505,30 @@ exps$exp <- factor(exps$exp, levels = c("E2-Ext.","E1-Ext.","E1-Anx."))
     scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
     scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
     coord_flip() +
-    facet_wrap(. ~ quest, ncol = 1, labeller = labeller(
-      quest = c("chat-again" = "chat again",
-                   "different" = "felt different",
-                   "distant" = "felt distant",
-                   "enjoy" = "enjoyed",
-                   "similar" = "felt similar",
-                   "understood" = "felt understood"))) +
+    facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
+      # quest = c("chat-again" = "chat again",
+      #              "different" = "felt different",
+      #              "distant" = "felt distant",
+      #              "enjoy" = "enjoyed",
+      #              "similar" = "felt similar",
+      #              "understood" = "felt understood")
+      quest = c("chat-again" = "I would chat with\n them again",
+                "different" = "I felt that they were\n different from me",
+                "distant" = "I felt distant\n from them",
+                "enjoy" = "I enjoyed our\n conversation",
+                "similar" = "I felt that we\n are similar",
+                "understood" = "I felt that they\n understood me"))) +
     theme_classic() + theme(legend.position = "bottom",
                             legend.title = element_blank(),
                             axis.title.y = element_blank())
 )
+facet_wrap(. ~ question, labeller = labeller(
+  question = c("chat-again" = "I would chat with\n them again",
+               "different" = "I felt that they were\n different from me",
+               "distant" = "I felt distant\n from them",
+               "enjoy" = "I enjoyed our\n conversation",
+               "similar" = "I felt that we\n are similar",
+               "understood" = "I felt that they\n understood me"))) +
 legend <- get_legend(figureD)
 figureD <- figureD + theme(legend.position = "none")
 
