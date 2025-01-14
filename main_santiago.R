@@ -237,38 +237,55 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11
 
 exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
 exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
+# exps <- exps[exps$exp != "E1-Ext.",]
+exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
+# levels(exps$exp) <- c("Exp. 1", "Exp. 2")
+# change factor order
+exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
+                                            "enjoy","distant","understood"))
 
-# exp1$effect <- factor(exp1$effect, levels = c("Anxious","Non-Anxious","Interaction"))
 library(ggplot2)
-(figure3 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
-  labs(y = "Effect Size") +
-  geom_hline(yintercept = 0, col="grey") +
-  geom_point(size=2, position = position_dodge(.5)) +
-  geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
-                width=.1, position = position_dodge(.5)) +
-  scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
-  scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
-  coord_flip() +
-  facet_wrap(.~quest, labeller = labeller(
-    quest = c("chat-again" = "I would chat with\n them again",
-                 "different" = "I felt that they were\n different from me",
-                 "distant" = "I felt distant\n from them",
-                 "enjoy" = "I enjoyed our\n conversation",
-                 "similar" = "I felt that we\n are similar",
-                 "understood" = "I felt that they\n understood me"))) +
-  theme_classic() + theme(legend.position = "bottom",
-                          legend.title = element_blank(),
-                          axis.title.y = element_blank())
+(fig4 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
+    labs(title = "Both Experiments, Statistics and Summary", y = "Effect Size") +
+    geom_hline(yintercept = 0, col="grey") +
+    geom_point(size=2, position = position_dodge(.6)) +
+    geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
+                  width=.4, position = position_dodge(.6)) +
+    scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
+    scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
+    coord_flip() +
+    facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
+      # quest = c("chat-again" = "chat again",
+      #              "different" = "felt different",
+      #              "distant" = "felt distant",
+      #              "enjoy" = "enjoyed",
+      #              "similar" = "felt similar",
+      #              "understood" = "felt understood")
+      quest = c("chat-again" = "I would chat with\n them again",
+                "different" = "I felt that they were\n different from me",
+                "similar" = "I felt that we\n are similar",
+                "enjoy" = "I enjoyed our\n conversation",
+                "distant" = "I felt distant\n from them",
+                "understood" = "I felt that they\n understood me"))) +
+    theme_classic() + 
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          axis.title.y = element_blank(),
+          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-
-ggsave("figures/figure3.pdf", figure3, dpi = 2400, scale = 1, units = "cm",
-       width = 12, height = 10, bg = "white")
-
+ggsave("figures/fig4.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+       width = 16, height = 12, bg = "white")
 
 
 
 
 
+
+# change factor order
+ratings1$quest <- factor(ratings1$question, levels = c("chat-again","different","similar",
+                                                       "enjoy","distant","understood"))
+ratings2$quest <- factor(ratings2$question, levels = c("chat-again","different","similar",
+                                                       "enjoy","distant","understood"))
 
 # visualize normal behavior
 library(ggplot2)
@@ -284,13 +301,13 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
   scale_y_continuous(breaks = 1:5, limits = c(1, 5),
                      labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
-  facet_wrap(. ~ question, labeller = labeller(
-    question = c("chat-again" = "I would chat with\n them again",
-                 "different" = "I felt that they were\n different from me",
-                 "distant" = "I felt distant\n from them",
-                 "enjoy" = "I enjoyed our\n conversation",
-                 "similar" = "I felt that we\n are similar",
-                 "understood" = "I felt that they\n understood me"))) +
+  facet_wrap(. ~ quest, labeller = labeller(
+    quest = c("chat-again" = "I would chat with\n them again",
+              "different" = "I felt that they were\n different from me",
+               "similar" = "I felt that we\n are similar",
+               "enjoy" = "I enjoyed our\n conversation",
+               "distant" = "I felt distant\n from them",
+               "understood" = "I felt that they\n understood me"))) +
   theme_classic() + 
     theme(legend.position = "bottom",
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
@@ -308,26 +325,17 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
   scale_y_continuous(breaks = 1:5, limits = c(1, 5),
                      labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
-  facet_wrap(. ~ question, labeller = labeller(
-    question = c("chat-again" = "I would chat with\n them again",
-                 "different" = "I felt that they were\n different from me",
-                 "distant" = "I felt distant\n from them",
-                 "enjoy" = "I enjoyed our\n conversation",
-                 "similar" = "I felt that we\n are similar",
-                 "understood" = "I felt that they\n understood me"))) +
+  facet_wrap(. ~ quest, labeller = labeller(
+    quest = c("chat-again" = "I would chat with\n them again",
+              "different" = "I felt that they were\n different from me",
+              "similar" = "I felt that we\n are similar",
+              "enjoy" = "I enjoyed our\n conversation",
+              "distant" = "I felt distant\n from them",
+              "understood" = "I felt that they\n understood me"))) +
   theme_classic() + 
     theme(legend.position = "bottom",
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-
-
-# ggsave("figures/figure1A.pdf", figure1A, dpi = 2400, scale = 1, units = "cm",
-#        width = 12, height = 10, bg = "white")
-# ggsave("figures/figure1B.pdf", figure1B, dpi = 2400, scale = 1, units = "cm",
-#        width = 12, height = 10, bg = "white")
-
-
-
 
 
 
@@ -422,17 +430,12 @@ report_table(lm(user_Mixed~chatType,combine2))
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
-# ggsave("figures/figure2A.pdf", figure2A, dpi = 2400, scale = 1, units = "cm",
-#        width = 10, height = 8, bg = "white")
-# ggsave("figures/figure2B.pdf", figure2B, dpi = 2400, scale = 1, units = "cm",
-#        width = 10, height = 8, bg = "white")
-
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
+library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig2
@@ -518,7 +521,8 @@ ratings1$bfi10_extraversion <- ratings1$bfi10_extraversion/max(ratings1$bfi10_ex
 exps <- rbind(data.frame(exp="E1-Anx.",exp1),
               data.frame(exp="E1-Ext.",exp1_sm),
               data.frame(exp="E2-Ext.",exp2))
-exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
+exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert",
+                                                  "Non-Anxious","Anxious")))
 
 exps$exp <- factor(exps$exp, levels = c("E2-Ext.","E1-Ext.","E1-Anx.")) 
 (figureD <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
@@ -548,70 +552,26 @@ exps$exp <- factor(exps$exp, levels = c("E2-Ext.","E1-Ext.","E1-Anx."))
                             axis.title.y = element_blank())
 )
 
-ggsave("figures/figureA.pdf", figureA, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
-ggsave("figures/figureB.pdf", figureB, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
-ggsave("figures/figureC.pdf", figureC, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
-ggsave("figures/figureD.pdf", figureD, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
+# ggsave("figures/figureA.pdf", figureA, dpi = 1200, scale = 1, units = "cm",
+#        width = 16, height = 12, bg = "white")
+# ggsave("figures/figureB.pdf", figureB, dpi = 1200, scale = 1, units = "cm",
+#        width = 16, height = 12, bg = "white")
+# ggsave("figures/figureC.pdf", figureC, dpi = 1200, scale = 1, units = "cm",
+#        width = 16, height = 12, bg = "white")
+# ggsave("figures/figureD.pdf", figureD, dpi = 1200, scale = 1, units = "cm",
+#        width = 16, height = 12, bg = "white")
 
-
-
-exps <- exps[exps$exp != "E1-Ext.",]
-exps$exp<-as.factor(as.character(exps$exp))
-levels(exps$exp) <- c("Exp. 1", "Exp. 2")
-(fig4 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
-    labs(title = "Both Experiments, Statistics and Summary", y = "Effect Size") +
-    geom_hline(yintercept = 0, col="grey") +
-    geom_point(size=2, position = position_dodge(.6)) +
-    geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
-                  width=.4, position = position_dodge(.6)) +
-    scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
-    coord_flip() +
-    facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
-      # quest = c("chat-again" = "chat again",
-      #              "different" = "felt different",
-      #              "distant" = "felt distant",
-      #              "enjoy" = "enjoyed",
-      #              "similar" = "felt similar",
-      #              "understood" = "felt understood")
-      quest = c("chat-again" = "I would chat with\n them again",
-                "different" = "I felt that they were\n different from me",
-                "distant" = "I felt distant\n from them",
-                "enjoy" = "I enjoyed our\n conversation",
-                "similar" = "I felt that we\n are similar",
-                "understood" = "I felt that they\n understood me"))) +
-    theme_classic() + 
-    theme(legend.position = "bottom",
-          legend.title = element_blank(),
-          axis.title.y = element_blank(),
-          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
-)
-ggsave("figures/fig4.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
-
-# facet_wrap(. ~ question, labeller = labeller(
-#   question = c("chat-again" = "I would chat with\n them again",
-#                "different" = "I felt that they were\n different from me",
-#                "distant" = "I felt distant\n from them",
-#                "enjoy" = "I enjoyed our\n conversation",
-#                "similar" = "I felt that we\n are similar",
-#                "understood" = "I felt that they\n understood me"))) +
 library(ggpubr)
 legend <- get_legend(figureD)
 figureD <- figureD + theme(legend.position = "none")
 
 
 
-
 figure <- ggarrange(ggarrange(figureA,figureB,figureC,figureD, ncol=4,widths = c(1,1,1,1.2)),
                     legend,nrow=2,heights = c(10,1))
 
-ggsave("figures/figure.pdf", figure, dpi = 2400, scale = 1, units = "cm",
-       width = 20, height = 20, bg = "white")
+# ggsave("figures/figure.pdf", figure, dpi = 2400, scale = 1, units = "cm",
+#        width = 20, height = 20, bg = "white")
 
 
 (figureD <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
@@ -653,4 +613,4 @@ ggsave("figures/figure.pdf", figure, dpi = 2400, scale = 1, units = "cm",
 # Same script for the 2 experiments
 # Exp1 extroversion
 
-# obnibus test, reversing likerts to test an overall interaction
+# omnibus test, reversing likerts to test an overall interaction
