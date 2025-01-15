@@ -12,7 +12,7 @@ task2 <- read.csv("experiment2/cleaned/task.csv")
 task2 <- task2[order(task2$Participant.Private.ID),]
 # interaction via One Reach (thanks Daniel!)
 chat1 <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
-chat2 <- read.csv("experiment2/gptstudydata_S2B_Dec2024.csv")
+chat2 <- read.csv("experiment2/cleaned/gptstudydata_S2B_Dec2024.csv")
 
 # scl90
 scl90 <- read.csv("experiment1/cleaned/scl90.csv")
@@ -24,12 +24,12 @@ bfi44 <- read.csv("experiment2/cleaned/bfi44.csv")
 
 # score questionnires
 source("functions.R")
-quest <- scoreQuestionnaires_e2(bfi44)
-bfi44 <- quest$bfi
-
 quest <- scoreQuestionnaires_e1(scl90, bfi10)
 scl90 <- quest$scl
 bfi10 <- quest$bfi
+
+quest <- scoreQuestionnaires_e2(bfi44)
+bfi44 <- quest$bfi
 
 # add questionnaires to ratings
 ratings1 <- addQuestionnaireToRating_e1(ratings1, scl90, bfi10)
@@ -41,8 +41,32 @@ levels(ratings1$chat) <- c("Anxious","Non-Anxious")
 ratings2$chat <- as.factor(ratings2$chatType)
 levels(ratings2$chat) <- c("Extrovert","Introvert")
 
+# change factor order
+ratings1$quest <- factor(ratings1$question, levels = c("chat-again","different","similar",
+                                                       "enjoy","distant","understood"))
+ratings2$quest <- factor(ratings2$question, levels = c("chat-again","different","similar",
+                                                       "enjoy","distant","understood"))
+
+source("functions.R")
+# use cleaning function to extract summary information for the interactions
+combine1 <- summariseChatInteraction(task1, chat1, ratings1)
+combine2 <- summariseChatInteraction(task2, chat2, ratings2)
+
+# rows are conditional probabilities of the sentiment analysis, thus cells from 
+# the transition matrices
+influence1 <- combine1$influence
+influence2 <- combine2$influence
+
+# rows are chats in long format. It also contains the descriptions of the chats 
+# as well as ratings in wide format
+combine1 <- combine1$combine
+combine2 <- combine2$combine
 
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Statistical Analysis# # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # stats
 library(lmerTest)
 library(report)
@@ -235,6 +259,10 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11
 
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Visualization # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# combine experiment 1 and experiment 2
 exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
 exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
 # exps <- exps[exps$exp != "E1-Ext.",]
@@ -281,14 +309,7 @@ ggsave("figures/fig4.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
 
 
 
-# change factor order
-ratings1$quest <- factor(ratings1$question, levels = c("chat-again","different","similar",
-                                                       "enjoy","distant","understood"))
-ratings2$quest <- factor(ratings2$question, levels = c("chat-again","different","similar",
-                                                       "enjoy","distant","understood"))
-
 # visualize normal behavior
-library(ggplot2)
 ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
 (figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat)) +
   labs(title = "Exp. 1: Chatbots' Judgements", 
@@ -340,23 +361,18 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Sentiment Analysis and Influence# # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
+# options(scipen = 999) # in order to get non-scientific notation
 length(unique(chat1$userid))
 length(unique(task1$Response))
 
 length(unique(chat2$userid))
 length(unique(task2$Response))
 
-
-source("functions.R")
-# use cleaning function to extract summary information for the interactions
-combine1 <- summariseChatInteraction(task1, chat1)
-combine2 <- summariseChatInteraction(task2, chat2)
-
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
-# for each level (mixed, negative, neutral, and positive) for both user and bot)
+# for each level (mixed, negative, neutral, and positive) for both user and bot
 library(reshape2)
 combine1.lf <- melt(combine1, measure.vars = c("user_Mixed","user_Negative","user_Neutral","user_Positive",
                                                "bots_Mixed","bots_Negative","bots_Neutral","bots_Positive"))
@@ -379,24 +395,30 @@ combine1.lf$sentiment <- substr(combine1.lf$variable,6,nchar(combine1.lf$variabl
 combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variable))
 
 # add chat as factor with specific order
-combine1.lf$chatType <- as.factor(combine1.lf$chatType)
-levels(combine1.lf$chatType) <- c("Anxious","Non-Anxious")
-combine2.lf$chatType <- as.factor(combine2.lf$chatType)
-levels(combine2.lf$chatType) <- c("Extrovert","Introvert")
+# combines
+combine1.lf$chat <- as.factor(combine1.lf$chatType)
+levels(combine1.lf$chat) <- c("Anxious","Non-Anxious")
+combine2.lf$chat <- as.factor(combine2.lf$chatType)
+levels(combine2.lf$chat) <- c("Extrovert","Introvert")
+# influence
+influence1$chat <- as.factor(influence1$chatType)
+levels(influence1$chat) <- c("Anxious","Non-Anxious")
+influence2$chat <- as.factor(influence2$chatType)
+levels(influence2$chat) <- c("Extrovert","Introvert")
 
 
 
 # univariate statistical analysis
-report_table(lm(user_Positive~chatType,combine1))
-report_table(lm(user_Neutral~chatType,combine1))
-report_table(lm(user_Negative~chatType,combine1))
-report_table(lm(user_Mixed~chatType,combine1))
+report_table(lm(user_Positive~chat,combine1))
+report_table(lm(user_Neutral~chat,combine1))
+report_table(lm(user_Negative~chat,combine1))
+report_table(lm(user_Mixed~chat,combine1))
 
 ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
                        lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
-                       chatType = c("Anxious","Non-Anxious"))
+                       chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
-(figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=count,col=chatType,shape=chatType)) + 
+(figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 1: Sentiment Analysis",
          y="Average Count", x = "Text Sentiment Category",
          col = "Chatbot", shape = "Chatbot") +
@@ -411,12 +433,12 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
-report_table(lm(user_Positive~chatType,combine2))
-report_table(lm(user_Neutral~chatType,combine2))
-report_table(lm(user_Negative~chatType,combine2))
-report_table(lm(user_Mixed~chatType,combine2))
+report_table(lm(user_Positive~chat,combine2))
+report_table(lm(user_Neutral~chat,combine2))
+report_table(lm(user_Negative~chat,combine2))
+report_table(lm(user_Mixed~chat,combine2))
 
-(figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=count,col=chatType,shape=chatType)) + 
+(figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 2: Sentiment Analysis",
          y="Average Count", x = "Text Sentiment Category",
          col = "Chatbot", shape = "Chatbot") +
@@ -432,8 +454,107 @@ report_table(lm(user_Mixed~chatType,combine2))
 
 
 
+influence1 <- influence1[influence1$direction != "",]
+influence1$direction <- as.factor(influence1$direction)
+levels(influence1$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
+(p_inf_1 <- ggplot(influence1, aes(x=target,y=value,col=direction)) + stat_summary() +
+  labs(title = "Exp. 1: Chat Influence",
+       x = "Transition", y = "Probability", col = "Direction") +
+  scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
+  facet_grid(.~chat) + theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = c(0.2,0.8)))
+
+
+
+influence2 <- influence2[influence2$direction != "",]
+influence2$direction <- as.factor(influence2$direction)
+levels(influence2$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
+(p_inf_2 <- ggplot(influence2, aes(x=target,y=value,col=direction)) + stat_summary() +
+  labs(title = "Exp. 2: Chat Influence",
+       x = "Transition", y = "Probability", col = "Direction") +
+  scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
+  facet_grid(.~chat) + theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = c(0.2,0.8)))
+
+
+
+
+
+library(dplyr)
+tild_1 <- data.frame(influence1 %>% group_by(from,to,chatType,direction,target) %>% 
+                       summarise(mean=mean(value)))
+tild_2 <- data.frame(influence2 %>% group_by(from,to,chatType,direction,target) %>%
+                       summarise(mean=mean(value)))
+# tild_1 <- influence1[influence1$chatId=="6886",]
+ggplot(tild_1, 
+       aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
+  labs(title="Exp. 1: Probability of Current given Previous",
+       x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
+  geom_tile() + geom_text(col="red") +
+  facet_grid(chatType~direction) + theme_classic()
+ggplot(tild_2, 
+       aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
+  labs(title="Exp. 2: Probability of Current given Previous",
+       x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
+  geom_tile() + geom_text(col="red") +
+  facet_grid(chatType~direction) + theme_classic()
+
+
+
+
+
+
+combine1.lf <- melt(combine1, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
+combine2.lf <- melt(combine2, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
+# change column name
+colnames(combine1.lf)[ncol(combine1.lf)] <- c("rating") 
+colnames(combine2.lf)[ncol(combine2.lf)] <- c("rating") 
+
+plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
+  combine.lf$x_axis <- combine.lf[,x_var]
+  return(ggplot(combine.lf, aes(x=x_axis,y=rating)) + 
+           labs(title=title,x = x_label, y = "Likert Scale") +
+           geom_point(alpha=0.2,col="grey") +
+           geom_smooth(method = "lm",se=F) + stat_cor() + 
+           scale_y_continuous(breaks = 1:5, limits = c(1, 5),
+                              labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+           facet_wrap(variable~., labeller = labeller(
+             variable = c("chat-again" = "I would chat with\n them again",
+                          "different" = "I felt that they were\n different from me",
+                          "similar" = "I felt that we\n are similar",
+                          "enjoy" = "I enjoyed our\n conversation",
+                          "distant" = "I felt distant\n from them",
+                          "understood" = "I felt that they\n understood me"))) + 
+           theme_classic())
+}
+
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: Num. Interactions",
+                    x_var="num_interactions",x_label="Number of Intearactions")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: Same Sentiment",
+                    x_var="perc_mirror",x_label="p(Mirrored Interactions)")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: GPT Average Word",
+                    x_var="bots_mean_words",x_label="Bot Mean Words")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: User Average Word",
+                    x_var="user_mean_words",x_label="User Mean Words")
+
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: Num. Interactions",
+                    x_var="num_interactions",x_label="Number of Intearactions")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: Same Sentiment",
+                    x_var="perc_mirror",x_label="p(Mirrored Interactions)")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: GPT Average Word",
+                    x_var="bots_mean_words",x_label="Bot Mean Words")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
+                    x_var="user_mean_words",x_label="User Mean Words")
+
+
+
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Combine Figures # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
