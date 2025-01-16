@@ -243,7 +243,11 @@ summariseChatInteraction <- function(task, chat, ratings) {
     # total of interactions
     num_interactions <- nrow(temp1)
     # sentiment mirror %
-    perc_mirror <- sum(temp1$GPTsentiment==temp1$usersentiment)/nrow(temp1)
+    # gpt --> user
+    gpt_user_mirror <- sum(temp1$GPTsentiment==temp1$usersentiment)/nrow(temp1)
+    # user --> gpt
+    user_gpt_mirror <- sum(temp1$usersentiment[1:(nrow(temp1)-1)]==
+                             temp1$GPTsentiment[2:nrow(temp1)])/nrow(temp1)
     
     # combine all good_ids
     if (i == 1) {
@@ -251,7 +255,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
                             botpersonality=temp1$botpersonality[1],
                             sent_bots, bots_mean_words,
                             sent_user, user_mean_words, user_mean_rt,
-                            num_interactions, perc_mirror)
+                            num_interactions, gpt_user_mirror, user_gpt_mirror)
       influence <- data.frame(Participant.Private.ID=temp2$Participant.Private.ID,
                               arm = temp2$arm,chatId=good_ids[i],
                               chatType = temp2$chatType,
@@ -262,7 +266,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
                                   botpersonality=temp1$botpersonality[1],
                                   sent_bots, bots_mean_words,
                                   sent_user, user_mean_words, user_mean_rt,
-                                  num_interactions, perc_mirror))
+                                  num_interactions, gpt_user_mirror, user_gpt_mirror))
       influence <- rbind(influence,data.frame(Participant.Private.ID=temp2$Participant.Private.ID,
                                               arm = temp2$arm, chatId=good_ids[i],
                                               chatType = temp2$chatType,

@@ -62,10 +62,51 @@ influence2 <- combine2$influence
 combine1 <- combine1$combine
 combine2 <- combine2$combine
 
+# add chat as factor with specific order
+combine1$chat <- as.factor(combine1$chatType)
+levels(combine1$chat) <- c("Anxious","Non-Anxious")
+combine2$chat <- as.factor(combine2$chatType)
+levels(combine2$chat) <- c("Extrovert","Introvert")
+
+# REMOVE PARTICIPANTS IF THEY HAVE ONE CHAT WITH LESS THAN 8 INTERACTIONS
+# FIGURE 4 WITH INFLUENCE, SAME WITH INTERACTIONS AND SLOPES. SAME FORMAT DIFFERENT SLOPES
+
+# remove participants?
+remove_participants <- T
+if (remove_participants) {
+  # remove criterion
+  combine1$remove <- ifelse(combine1$num_interactions < 8,T,F)
+  combine2$remove <- ifelse(combine2$num_interactions < 8,T,F)
+  # shortened database
+  combine1 <- combine1[combine1$remove==F,]; combine1$remove <- NULL
+  combine2 <- combine2[combine2$remove==F,]; combine2$remove <- NULL
+  # IDs that we will keep 
+  keep1 <- unique(combine1$Participant.Private.ID)
+  keep2 <- unique(combine2$Participant.Private.ID)
+  # remove or keep in influence and ratings
+  influence1$remove <- T
+  ratings1$remove <- T
+  for (i in 1:length(keep1)) {
+    influence1$remove[influence1$Participant.Private.ID == keep1[i]] <- F
+    ratings1$remove[ratings1$Participant.Private.ID == keep1[i]] <- F
+  }
+  influence1 <- influence1[influence1$remove==F,]; influence1$remove <- NULL
+  ratings1 <- ratings1[ratings1$remove==F,]; ratings1$remove <- NULL
+  
+  influence2$remove <- T
+  ratings2$remove <- T
+  for (i in 1:length(keep2)) {
+    influence2$remove[influence2$Participant.Private.ID == keep2[i]] <- F
+    ratings2$remove[ratings2$Participant.Private.ID == keep2[i]] <- F
+  }
+  influence2 <- influence2[influence2$remove==F,]; influence2$remove <- NULL
+  ratings2 <- ratings2[ratings2$remove==F,]; ratings2$remove <- NULL
+}
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # Statistical Analysis# # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Statistical Analysis: Ratings - Questionnaires# # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # stats
 library(lmerTest)
@@ -260,27 +301,234 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # Visualization # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Statistical Analysis: Ratings - Influence # # # # # # # # # # # # #### 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# stats
+library(lmerTest)
+library(report)
+
+# Experiment 2
+# user to bot
+m.chat.int <- report_table(lmer(`chat-again` ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.chat.anx <- report_table(lm(`chat-again` ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.chat.nan <- report_table(lm(`chat-again` ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.diff.int <- report_table(lmer(different ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.diff.anx <- report_table(lm(different ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.diff.nan <- report_table(lm(different ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.simi.int <- report_table(lmer(similar ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.simi.anx <- report_table(lm(similar ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.simi.nan <- report_table(lm(similar ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.enjo.int <- report_table(lmer(enjoy ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.enjo.anx <- report_table(lm(enjoy ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.enjo.nan <- report_table(lm(enjoy ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.dist.int <- report_table(lmer(distant ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.dist.anx <- report_table(lm(distant ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.dist.nan <- report_table(lm(distant ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.unde.int <- report_table(lmer(understood ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
+m.unde.anx <- report_table(lm(understood ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
+m.unde.nan <- report_table(lm(understood ~ user_gpt_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+exp1_user_gpt <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
+                       data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,9:11]),
+                       data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,9:11]),
+                       data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
+                       data.frame(quest="different",effect="Anxious",m.diff.anx[2,9:11]),
+                       data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,9:11]), 
+                       data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
+                       data.frame(quest="distant",effect="Anxious",m.dist.anx[2,9:11]),          
+                       data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,9:11]),
+                       data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),    
+                       data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,9:11]),
+                       data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,9:11]),
+                       data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
+                       data.frame(quest="similar",effect="Anxious",m.simi.anx[2,9:11]),
+                       data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,9:11]),
+                       data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
+                       data.frame(quest="understood",effect="Anxious",m.unde.anx[2,9:11]),
+                       data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,9:11]))
+
+
+
+# bot to user
+m.chat.int <- report_table(lmer(`chat-again` ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.chat.anx <- report_table(lm(`chat-again` ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.chat.nan <- report_table(lm(`chat-again` ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.diff.int <- report_table(lmer(different ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.diff.anx <- report_table(lm(different ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.diff.nan <- report_table(lm(different ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.simi.int <- report_table(lmer(similar ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.simi.anx <- report_table(lm(similar ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.simi.nan <- report_table(lm(similar ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.enjo.int <- report_table(lmer(enjoy ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.enjo.anx <- report_table(lm(enjoy ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.enjo.nan <- report_table(lm(enjoy ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.dist.int <- report_table(lmer(distant ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.dist.anx <- report_table(lm(distant ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.dist.nan <- report_table(lm(distant ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+m.unde.int <- report_table(lmer(understood ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine1))
+m.unde.anx <- report_table(lm(understood ~ gpt_user_mirror, combine1[combine1$chat == "Anxious",]))
+m.unde.nan <- report_table(lm(understood ~ gpt_user_mirror, combine1[combine1$chat == "Non-Anxious",]))
+
+exp1_gpt_user <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
+                       data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,9:11]),
+                       data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,9:11]),
+                       data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
+                       data.frame(quest="different",effect="Anxious",m.diff.anx[2,9:11]),
+                       data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,9:11]), 
+                       data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
+                       data.frame(quest="distant",effect="Anxious",m.dist.anx[2,9:11]),          
+                       data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,9:11]),
+                       data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),    
+                       data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,9:11]),
+                       data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,9:11]),
+                       data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
+                       data.frame(quest="similar",effect="Anxious",m.simi.anx[2,9:11]),
+                       data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,9:11]),
+                       data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
+                       data.frame(quest="understood",effect="Anxious",m.unde.anx[2,9:11]),
+                       data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,9:11]))
+
+
+
+# Experiment 2
+# user to bot
+m.chat.int <- report_table(lmer(`chat-again` ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.chat.anx <- report_table(lm(`chat-again` ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.chat.nan <- report_table(lm(`chat-again` ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.diff.int <- report_table(lmer(different ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.diff.anx <- report_table(lm(different ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.diff.nan <- report_table(lm(different ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.simi.int <- report_table(lmer(similar ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.simi.anx <- report_table(lm(similar ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.simi.nan <- report_table(lm(similar ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.enjo.int <- report_table(lmer(enjoy ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.enjo.anx <- report_table(lm(enjoy ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.enjo.nan <- report_table(lm(enjoy ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.dist.int <- report_table(lmer(distant ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.dist.anx <- report_table(lm(distant ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.dist.nan <- report_table(lm(distant ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.unde.int <- report_table(lmer(understood ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine2))
+m.unde.anx <- report_table(lm(understood ~ user_gpt_mirror, combine2[combine2$chat == "Extrovert",]))
+m.unde.nan <- report_table(lm(understood ~ user_gpt_mirror, combine2[combine2$chat == "Introvert",]))
+
+exp2_user_gpt <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
+                       data.frame(quest="chat-again",effect="Extrovert",m.chat.anx[2,9:11]),
+                       data.frame(quest="chat-again",effect="Introvert",m.chat.nan[2,9:11]),
+                       data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
+                       data.frame(quest="different",effect="Extrovert",m.diff.anx[2,9:11]),
+                       data.frame(quest="different",effect="Introvert",m.diff.nan[2,9:11]), 
+                       data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
+                       data.frame(quest="distant",effect="Extrovert",m.dist.anx[2,9:11]),          
+                       data.frame(quest="distant",effect="Introvert",m.dist.nan[2,9:11]),
+                       data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),    
+                       data.frame(quest="enjoy",effect="Extrovert",m.enjo.anx[2,9:11]),
+                       data.frame(quest="enjoy",effect="Introvert",m.enjo.nan[2,9:11]),
+                       data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
+                       data.frame(quest="similar",effect="Extrovert",m.simi.anx[2,9:11]),
+                       data.frame(quest="similar",effect="Introvert",m.simi.nan[2,9:11]),
+                       data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
+                       data.frame(quest="understood",effect="Extrovert",m.unde.anx[2,9:11]),
+                       data.frame(quest="understood",effect="Introvert",m.unde.nan[2,9:11]))
+
+
+
+# bot to user
+m.chat.int <- report_table(lmer(`chat-again` ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.chat.anx <- report_table(lm(`chat-again` ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.chat.nan <- report_table(lm(`chat-again` ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.diff.int <- report_table(lmer(different ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.diff.anx <- report_table(lm(different ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.diff.nan <- report_table(lm(different ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.simi.int <- report_table(lmer(similar ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.simi.anx <- report_table(lm(similar ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.simi.nan <- report_table(lm(similar ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.enjo.int <- report_table(lmer(enjoy ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.enjo.anx <- report_table(lm(enjoy ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.enjo.nan <- report_table(lm(enjoy ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.dist.int <- report_table(lmer(distant ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.dist.anx <- report_table(lm(distant ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.dist.nan <- report_table(lm(distant ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+m.unde.int <- report_table(lmer(understood ~ gpt_user_mirror * chat + (1|Participant.Private.ID), combine2))
+m.unde.anx <- report_table(lm(understood ~ gpt_user_mirror, combine2[combine2$chat == "Extrovert",]))
+m.unde.nan <- report_table(lm(understood ~ gpt_user_mirror, combine2[combine2$chat == "Introvert",]))
+
+exp2_gpt_user <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
+                       data.frame(quest="chat-again",effect="Extrovert",m.chat.anx[2,9:11]),
+                       data.frame(quest="chat-again",effect="Introvert",m.chat.nan[2,9:11]),
+                       data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
+                       data.frame(quest="different",effect="Extrovert",m.diff.anx[2,9:11]),
+                       data.frame(quest="different",effect="Introvert",m.diff.nan[2,9:11]), 
+                       data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
+                       data.frame(quest="distant",effect="Extrovert",m.dist.anx[2,9:11]),          
+                       data.frame(quest="distant",effect="Introvert",m.dist.nan[2,9:11]),
+                       data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),    
+                       data.frame(quest="enjoy",effect="Extrovert",m.enjo.anx[2,9:11]),
+                       data.frame(quest="enjoy",effect="Introvert",m.enjo.nan[2,9:11]),
+                       data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
+                       data.frame(quest="similar",effect="Extrovert",m.simi.anx[2,9:11]),
+                       data.frame(quest="similar",effect="Introvert",m.simi.nan[2,9:11]),
+                       data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
+                       data.frame(quest="understood",effect="Extrovert",m.unde.anx[2,9:11]),
+                       data.frame(quest="understood",effect="Introvert",m.unde.nan[2,9:11]))
+
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Visualization # # # # # # # # # # # # # # # # # # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # combine experiment 1 and experiment 2
-exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
+exps <- rbind(data.frame(exp="Exp. 1: GPT to User",exp1_gpt_user),
+              data.frame(exp="Exp. 1: User to GPT",exp1_user_gpt),
+              data.frame(exp="Exp. 2: GPT to User",exp2_gpt_user),
+              data.frame(exp="Exp. 2: User to GPT",exp2_user_gpt))
+# exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
 exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
 # exps <- exps[exps$exp != "E1-Ext.",]
-exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
-# levels(exps$exp) <- c("Exp. 1", "Exp. 2")
+# exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
+exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2: GPT to User","Exp. 2: User to GPT",
+                                                      "Exp. 1: GPT to User","Exp. 1: User to GPT"))
+# levels(exps$exp) <- c(expression(Exp*`.`~1*`:`~p*`(`*user[t]==gpt[t-1]*`)`),expression(Exp*`.`~1*`:`~p*`(`*gpt[t]==user[t-1]*`)`),
+#                       expression(Exp*`.`~2*`:`~p*`(`*user[t]==gpt[t-1]*`)`),expression(Exp*`.`~2*`:`~p*`(`*gpt[t]==user[t-1]*`)`))
 # change factor order
 exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
                                             "enjoy","distant","understood"))
 
 library(ggplot2)
 (fig4 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
-    labs(title = "Both Experiments, Statistics and Summary", y = "Effect Size") +
+    labs(title = "Sentiment Influence predict Likert Scales",
+         subtitle = expression(Sentiment~Influence~`=`~p*`(`*user[t]==gpt[t-1]*`)`~OR~p*`(`*gpt[t]==user[t-1]*`)`), 
+         y = "Effect Size") +
     geom_hline(yintercept = 0, col="grey") +
     geom_point(size=2, position = position_dodge(.6)) +
     geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
                   width=.4, position = position_dodge(.6)) +
     scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
     scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
+    scale_x_discrete(labels = c(expression(Exp*`.`~2*`:`~p*`(`*user[t]==gpt[t-1]*`)`),
+                                expression(Exp*`.`~2*`:`~p*`(`*gpt[t]==user[t-1]*`)`),
+                                expression(Exp*`.`~1*`:`~p*`(`*user[t]==gpt[t-1]*`)`),
+                                expression(Exp*`.`~1*`:`~p*`(`*gpt[t]==user[t-1]*`)`))) +
     coord_flip() +
     facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
       # quest = c("chat-again" = "chat again",
@@ -301,7 +549,7 @@ library(ggplot2)
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-ggsave("figures/fig4.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+ggsave("figures/fig4_remove.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
        width = 16, height = 12, bg = "white")
 
 
@@ -514,7 +762,7 @@ colnames(combine2.lf)[ncol(combine2.lf)] <- c("rating")
 
 plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
   combine.lf$x_axis <- combine.lf[,x_var]
-  return(ggplot(combine.lf, aes(x=x_axis,y=rating)) + 
+  return(ggplot(combine.lf, aes(x=x_axis,y=rating,col=chatType)) + 
            labs(title=title,x = x_label, y = "Likert Scale") +
            geom_point(alpha=0.2,col="grey") +
            geom_smooth(method = "lm",se=F) + stat_cor() + 
@@ -550,6 +798,36 @@ plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
 
 
 
+summary(lm(`chat-again` ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+summary(lm(different ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+summary(lm(similar ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+summary(lm(enjoy ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+summary(lm(distant ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+summary(lm(understood ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine1))
+
+summary(lm(`chat-again` ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+summary(lm(different ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+summary(lm(similar ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+summary(lm(enjoy ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+summary(lm(distant ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+summary(lm(understood ~ num_interactions + perc_mirror + bots_mean_words + 
+             user_mean_words, combine2))
+
+m <- lm(understood ~ bots_Mixed + bots_Negative + bots_Neutral + bots_Positive +
+             user_Mixed + user_Negative + user_Neutral + user_Positive, combine2)
+summary(m)
+step(m)
 
 
 
@@ -560,12 +838,12 @@ library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig2
-ggsave("figures/fig2.pdf", fig2, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig2_remove.pdf", fig2, dpi = 2400, scale = 1, units = "cm",
        width = 24, height = 16, bg = "white")
 fig3 <- ggarrange(ggarrange(figure3A,figure3B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig3
-ggsave("figures/fig3.pdf", fig3, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig3_remove.pdf", fig3, dpi = 2400, scale = 1, units = "cm",
        width = 24, height = 16, bg = "white")
 
 
