@@ -11,9 +11,13 @@ task1 <- task1[order(task1$Participant.Private.ID),]
 task2 <- read.csv("experiment2/cleaned/task.csv")
 task2 <- task2[order(task2$Participant.Private.ID),]
 # interaction via One Reach (thanks Daniel!)
-chat1 <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
-chat2 <- read.csv("experiment2/cleaned/gptstudydata_S2B_Dec2024.csv")
-
+if (!require(readxl)) {install.packages("readxl")}; library(readxl)
+# chat1 <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
+chat1 <- read_excel("experiment1/cleaned/EXP1_data_jan2025.xlsx", sheet = 1)
+keep1 <- read_excel("experiment1/cleaned/EXP1_data_jan2025.xlsx", sheet = 2)
+# chat2 <- read.csv("experiment2/cleaned/gptstudydata_S2B_Dec2024.csv")
+chat2 <- read_excel("experiment2/cleaned/EXP2_data_jan2025.xlsx", sheet = 1)
+keep2 <- read_excel("experiment2/cleaned/EXP2_data_jan2025.xlsx", sheet = 2)
 # scl90
 scl90 <- read.csv("experiment1/cleaned/scl90.csv")
 # bfi10
@@ -68,6 +72,18 @@ levels(combine1$chat) <- c("Anxious","Non-Anxious")
 combine2$chat <- as.factor(combine2$chatType)
 levels(combine2$chat) <- c("Extrovert","Introvert")
 
+
+
+# we need to use good_pids to remove not included PIDs
+length(unique(ratings1$Participant.Private.ID))
+length(unique(ratings2$Participant.Private.ID))
+length(unique(task1$Participant.Private.ID))
+length(unique(task2$Participant.Private.ID))
+length(unique(chat1$PID))
+length(unique(chat2$PID))
+length(keep1$PID)
+length(keep2$PID)
+
 # REMOVE PARTICIPANTS IF THEY HAVE ONE CHAT WITH LESS THAN 8 INTERACTIONS
 # FIGURE 4 WITH INFLUENCE, SAME WITH INTERACTIONS AND SLOPES. SAME FORMAT DIFFERENT SLOPES
 
@@ -75,32 +91,38 @@ levels(combine2$chat) <- c("Extrovert","Introvert")
 remove_participants <- T
 if (remove_participants) {
   # remove criterion
-  combine1$remove <- ifelse(combine1$num_interactions < 8,T,F)
-  combine2$remove <- ifelse(combine2$num_interactions < 8,T,F)
+  # combine1$remove <- ifelse(combine1$num_interactions < 8,T,F)
+  # combine2$remove <- ifelse(combine2$num_interactions < 8,T,F)
   # shortened database
-  combine1 <- combine1[combine1$remove==F,]; combine1$remove <- NULL
-  combine2 <- combine2[combine2$remove==F,]; combine2$remove <- NULL
+  # combine1 <- combine1[combine1$remove==F,]; combine1$remove <- NULL
+  # combine2 <- combine2[combine2$remove==F,]; combine2$remove <- NULL
   # IDs that we will keep 
-  keep1 <- unique(combine1$Participant.Private.ID)
-  keep2 <- unique(combine2$Participant.Private.ID)
+  # keep1 <- unique(combine1$Participant.Private.ID)
+  # keep2 <- unique(combine2$Participant.Private.ID)
   # remove or keep in influence and ratings
   influence1$remove <- T
   ratings1$remove <- T
-  for (i in 1:length(keep1)) {
-    influence1$remove[influence1$Participant.Private.ID == keep1[i]] <- F
-    ratings1$remove[ratings1$Participant.Private.ID == keep1[i]] <- F
+  chat1$remove <- T
+  for (i in 1:length(keep1$PID)) {
+    influence1$remove[influence1$Participant.Private.ID == keep1$PID[i]] <- F
+    ratings1$remove[ratings1$Participant.Private.ID == keep1$PID[i]] <- F
+    chat1$remove[chat1$PID == keep1$PID[i]] <- F
   }
   influence1 <- influence1[influence1$remove==F,]; influence1$remove <- NULL
   ratings1 <- ratings1[ratings1$remove==F,]; ratings1$remove <- NULL
+  chat1 <- chat1[chat1$remove==F,]; chat1$remove <- NULL
   
   influence2$remove <- T
   ratings2$remove <- T
-  for (i in 1:length(keep2)) {
-    influence2$remove[influence2$Participant.Private.ID == keep2[i]] <- F
-    ratings2$remove[ratings2$Participant.Private.ID == keep2[i]] <- F
+  chat2$remove <- T
+  for (i in 1:length(keep2$PID)) {
+    influence2$remove[influence2$Participant.Private.ID == keep2$PID[i]] <- F
+    ratings2$remove[ratings2$Participant.Private.ID == keep2$PID[i]] <- F
+    chat2$remove[chat2$PID == keep2$PID[i]] <- F
   }
   influence2 <- influence2[influence2$remove==F,]; influence2$remove <- NULL
   ratings2 <- ratings2[ratings2$remove==F,]; ratings2$remove <- NULL
+  chat2 <- chat2[chat2$remove==F,]; chat2$remove <- NULL
 }
 
 
@@ -549,7 +571,7 @@ library(ggplot2)
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-ggsave("figures/fig4_remove.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+ggsave("figures/fig4_v2.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
        width = 16, height = 12, bg = "white")
 
 
@@ -762,6 +784,7 @@ colnames(combine2.lf)[ncol(combine2.lf)] <- c("rating")
 
 plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
   combine.lf$x_axis <- combine.lf[,x_var]
+  library(ggpubr)
   return(ggplot(combine.lf, aes(x=x_axis,y=rating,col=chatType)) + 
            labs(title=title,x = x_label, y = "Likert Scale") +
            geom_point(alpha=0.2,col="grey") +
@@ -780,8 +803,10 @@ plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
 
 plotWhatMakesLikert(combine1.lf,title="Exp. 1: Num. Interactions",
                     x_var="num_interactions",x_label="Number of Intearactions")
-plotWhatMakesLikert(combine1.lf,title="Exp. 1: Same Sentiment",
-                    x_var="perc_mirror",x_label="p(Mirrored Interactions)")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: User mirror Sentiment",
+                    x_var="gpt_user_mirror",x_label="p(Bot --> User)")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: Bot mirror Sentiment",
+                    x_var="user_gpt_mirror",x_label="p(User --> Bot)")
 plotWhatMakesLikert(combine1.lf,title="Exp. 1: GPT Average Word",
                     x_var="bots_mean_words",x_label="Bot Mean Words")
 plotWhatMakesLikert(combine1.lf,title="Exp. 1: User Average Word",
@@ -789,8 +814,10 @@ plotWhatMakesLikert(combine1.lf,title="Exp. 1: User Average Word",
 
 plotWhatMakesLikert(combine2.lf,title="Exp. 2: Num. Interactions",
                     x_var="num_interactions",x_label="Number of Intearactions")
-plotWhatMakesLikert(combine2.lf,title="Exp. 2: Same Sentiment",
-                    x_var="perc_mirror",x_label="p(Mirrored Interactions)")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: User mirror Sentiment",
+                    x_var="gpt_user_mirror",x_label="p(Bot --> User)")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: Bot mirror Sentiment",
+                    x_var="user_gpt_mirror",x_label="p(User --> Bot)")
 plotWhatMakesLikert(combine2.lf,title="Exp. 2: GPT Average Word",
                     x_var="bots_mean_words",x_label="Bot Mean Words")
 plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
@@ -798,31 +825,31 @@ plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
 
 
 
-summary(lm(`chat-again` ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
-summary(lm(different ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
-summary(lm(similar ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
-summary(lm(enjoy ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
-summary(lm(distant ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
-summary(lm(understood ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine1))
+summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine1))
 
-summary(lm(`chat-again` ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
-summary(lm(different ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
-summary(lm(similar ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
-summary(lm(enjoy ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
-summary(lm(distant ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
-summary(lm(understood ~ num_interactions + perc_mirror + bots_mean_words + 
-             user_mean_words, combine2))
+summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
+             bots_mean_words + user_mean_words, combine2))
 
 m <- lm(understood ~ bots_Mixed + bots_Negative + bots_Neutral + bots_Positive +
              user_Mixed + user_Negative + user_Neutral + user_Positive, combine2)
@@ -838,14 +865,53 @@ library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig2
-ggsave("figures/fig2_remove.pdf", fig2, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig2_v2.pdf", fig2, dpi = 2400, scale = 1, units = "cm",
        width = 24, height = 16, bg = "white")
 fig3 <- ggarrange(ggarrange(figure3A,figure3B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig3
-ggsave("figures/fig3_remove.pdf", fig3, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig3_v3.pdf", fig3, dpi = 2400, scale = 1, units = "cm",
        width = 24, height = 16, bg = "white")
 
+
+
+
+
+# combine experiment 1 and experiment 2
+exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
+exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
+# exps <- exps[exps$exp != "E1-Ext.",]
+exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
+# change factor order
+exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
+                                            "enjoy","distant","understood"))
+
+library(ggplot2)
+(figS1 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
+    labs(title = "Experiments Summary and Statistics",
+         y = "Effect Size") +
+    geom_hline(yintercept = 0, col="grey") +
+    geom_point(size=2, position = position_dodge(.6)) +
+    geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
+                  width=.4, position = position_dodge(.6)) +
+    scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
+    scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
+    coord_flip() +
+    facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
+      quest = c("chat-again" = "I would chat with\n them again",
+                "different" = "I felt that they were\n different from me",
+                "similar" = "I felt that we\n are similar",
+                "enjoy" = "I enjoyed our\n conversation",
+                "distant" = "I felt distant\n from them",
+                "understood" = "I felt that they\n understood me"))) +
+    theme_classic() + 
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          axis.title.y = element_blank(),
+          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+)
+ggsave("figures/figS1.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
+       width = 16, height = 12, bg = "white")
 
 
 
