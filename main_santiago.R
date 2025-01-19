@@ -259,66 +259,66 @@ exp1_sm <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4
 
 
 
-m.chat.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID),
+m.chat.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID),
                                 ratings2[ratings2$question == "chat-again",]))
-m.chat.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.chat.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "chat-again" & ratings2$chat == "Extrovert",]))
-m.chat.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.chat.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "chat-again" & ratings2$chat == "Introvert",]))
 
-m.diff.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
+m.diff.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
                                 ratings2[ratings2$question == "different",]))
-m.diff.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.diff.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "different" & ratings2$chat == "Extrovert",]))
-m.diff.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.diff.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "different" & ratings2$chat == "Introvert",]))
 
-m.dist.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
+m.dist.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
                                 ratings2[ratings2$question == "distant",]))
-m.dist.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.dist.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "distant" & ratings2$chat == "Extrovert",]))
-m.dist.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.dist.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "distant" & ratings2$chat == "Introvert",]))
 
-m.enjo.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
+m.enjo.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
                                 ratings2[ratings2$question == "enjoy",]))
-m.enjo.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.enjo.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "enjoy" & ratings2$chat == "Extrovert",]))
-m.enjo.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.enjo.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "enjoy" & ratings2$chat == "Introvert",]))
 
-m.simi.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
+m.simi.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
                                 ratings2[ratings2$question == "similar",]))
-m.simi.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.simi.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "similar" & ratings2$chat == "Extrovert",]))
-m.simi.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.simi.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "similar" & ratings2$chat == "Introvert",]))
 
-m.unde.int <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
+m.unde.dif <- report_table(lmer(Response ~ bfi44_extraversion * chat + (1|Participant.Private.ID), 
                                 ratings2[ratings2$question == "understood",]))
-m.unde.anx <- report_table(lm(Response ~ bfi44_extraversion,
+m.unde.ext <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "understood" & ratings2$chat == "Extrovert",]))
-m.unde.nan <- report_table(lm(Response ~ bfi44_extraversion,
+m.unde.int <- report_table(lm(Response ~ bfi44_extraversion,
                               ratings2[ratings2$question == "understood" & ratings2$chat == "Introvert",]))
 
-exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
-              data.frame(quest="chat-again",effect="Extrovert",m.chat.anx[2,9:11]),
-              data.frame(quest="chat-again",effect="Introvert",m.chat.nan[2,9:11]),
-              data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
-              data.frame(quest="different",effect="Extrovert",m.diff.anx[2,9:11]),
-              data.frame(quest="different",effect="Introvert",m.diff.nan[2,9:11]),
-              data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
-              data.frame(quest="distant",effect="Extrovert",m.dist.anx[2,9:11]),
-              data.frame(quest="distant",effect="Introvert",m.dist.nan[2,9:11]),
-              data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),
-              data.frame(quest="enjoy",effect="Extrovert",m.enjo.anx[2,9:11]),
-              data.frame(quest="enjoy",effect="Introvert",m.enjo.nan[2,9:11]),
-              data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
-              data.frame(quest="similar",effect="Extrovert",m.simi.anx[2,9:11]),
-              data.frame(quest="similar",effect="Introvert",m.simi.nan[2,9:11]),
-              data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
-              data.frame(quest="understood",effect="Extrovert",m.unde.anx[2,9:11]),
-              data.frame(quest="understood",effect="Introvert",m.unde.nan[2,9:11]))
+exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11:13]),
+              data.frame(quest="chat-again",effect="Extrovert",m.chat.ext[2,9:11]),
+              data.frame(quest="chat-again",effect="Introvert",m.chat.int[2,9:11]),
+              data.frame(quest="different",effect="Interaction",m.diff.dif[4,11:13]),
+              data.frame(quest="different",effect="Extrovert",m.diff.ext[2,9:11]),
+              data.frame(quest="different",effect="Introvert",m.diff.int[2,9:11]),
+              data.frame(quest="distant",effect="Interaction",m.dist.dif[4,11:13]),
+              data.frame(quest="distant",effect="Extrovert",m.dist.ext[2,9:11]),
+              data.frame(quest="distant",effect="Introvert",m.dist.int[2,9:11]),
+              data.frame(quest="enjoy",effect="Interaction",m.enjo.dif[4,11:13]),
+              data.frame(quest="enjoy",effect="Extrovert",m.enjo.ext[2,9:11]),
+              data.frame(quest="enjoy",effect="Introvert",m.enjo.int[2,9:11]),
+              data.frame(quest="similar",effect="Interaction",m.simi.dif[4,11:13]),
+              data.frame(quest="similar",effect="Extrovert",m.simi.ext[2,9:11]),
+              data.frame(quest="similar",effect="Introvert",m.simi.int[2,9:11]),
+              data.frame(quest="understood",effect="Interaction",m.unde.dif[4,11:13]),
+              data.frame(quest="understood",effect="Extrovert",m.unde.ext[2,9:11]),
+              data.frame(quest="understood",effect="Introvert",m.unde.int[2,9:11]))
 
 
 
@@ -539,7 +539,7 @@ exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
 library(ggplot2)
 (fig4 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
     labs(title = "Sentiment Influence predict Likert Scales",
-         subtitle = expression(Sentiment~Influence~`=`~p*`(`*user[t]==gpt[t-1]*`)`~OR~p*`(`*gpt[t]==user[t-1]*`)`), 
+         subtitle = expression(Sentiment~Influence~`=`~p*`(`*User[t]==GPT[t-1]*`)`~OR~p*`(`*GPT[t]==User[t-1]*`)`), 
          y = "Effect Size") +
     geom_hline(yintercept = 0, col="grey") +
     geom_point(size=2, position = position_dodge(.6)) +
@@ -547,10 +547,11 @@ library(ggplot2)
                   width=.4, position = position_dodge(.6)) +
     scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
     scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
-    scale_x_discrete(labels = c(expression(Exp*`.`~2*`:`~p*`(`*user[t]==gpt[t-1]*`)`),
-                                expression(Exp*`.`~2*`:`~p*`(`*gpt[t]==user[t-1]*`)`),
-                                expression(Exp*`.`~1*`:`~p*`(`*user[t]==gpt[t-1]*`)`),
-                                expression(Exp*`.`~1*`:`~p*`(`*gpt[t]==user[t-1]*`)`))) +
+    scale_y_continuous(breaks = c(-.5,0,.5)) +
+    scale_x_discrete(labels = c(expression(Exp*`.`~2*`:`~p*`(`*User[t]==GPT4[t-1]*`)`),
+                                expression(Exp*`.`~2*`:`~p*`(`*GPT4[t]==User[t-1]*`)`),
+                                expression(Exp*`.`~1*`:`~p*`(`*User[t]==GPT4[t-1]*`)`),
+                                expression(Exp*`.`~1*`:`~p*`(`*GPT4[t]==User[t-1]*`)`))) +
     coord_flip() +
     facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
       # quest = c("chat-again" = "chat again",
@@ -582,9 +583,9 @@ ggsave("figures/fig4_v2.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
 # visualize normal behavior
 ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
 (figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat)) +
-  labs(title = "Exp. 1: Chatbots' Judgements", 
+  labs(title = "Exp. 1: Users' Judgements", 
        y="Likert Scale", x="Anxiety (SCL-90R)",
-       col = "Chatbot", shape = "Chatbot") +
+       col = "GPT4:", shape = "GPT4:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
   scale_shape_manual(values = c(17, 19)) +
@@ -606,9 +607,9 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
 
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
 (figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat)) +
-  labs(title = "Exp. 2: Chatbots' Judgements", 
+  labs(title = "Exp. 2: Users' Judgements", 
        y="Likert Scale", x="Extraversion (BFI-44)",
-       col = "Chatbot", shape = "Chatbot") +
+       col = "GPT4:", shape = "GPT4:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
   scale_shape_manual(values = c(17, 19)) +
@@ -691,15 +692,18 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 1: Sentiment Analysis",
          y="Average Count", x = "Text Sentiment Category",
-         col = "Chatbot", shape = "Chatbot") +
+         col = "GPT4:", shape = "GPT4:") +
+    geom_hline(yintercept = 0) +
+    coord_cartesian(ylim = c(0,22)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
     geom_text(data = ann_text,label = "*", col="black", size = 10) +
     scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
     scale_shape_manual(values = c(17,19)) +
-    facet_grid(. ~ who) + 
+    facet_grid(who ~ .) + 
     theme_classic() +
-    theme(legend.position = "bottom", #legend.position = c(.7,.7),
-          axis.text.x = element_text(angle = 30, hjust = 1),
+    guides(color = guide_legend(nrow = 2)) +
+    theme(legend.position = c(.35,.35),
+          axis.text.x = element_text(angle = 45, hjust = 1),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
@@ -711,14 +715,17 @@ report_table(lm(user_Mixed~chat,combine2))
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 2: Sentiment Analysis",
          y="Average Count", x = "Text Sentiment Category",
-         col = "Chatbot", shape = "Chatbot") +
+         col = "GPT4:", shape = "GPT4:") +
+    geom_hline(yintercept = 0) +
+    coord_cartesian(ylim = c(0,22)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
     scale_shape_manual(values = c(17,19)) +
-    scale_colour_manual(values = c("#009E73","#CC79A7")) + 
-    facet_grid(. ~ who) + 
+    scale_colour_manual(values = c("#009E73","#CC79A7")) +
+    facet_grid(who ~ .) + 
     theme_classic() +
-    theme(legend.position = "bottom", #legend.position = c(.7,.7),
-          axis.text.x = element_text(angle = 30, hjust = 1),
+    guides(color = guide_legend(nrow = 2)) +
+    theme(legend.position = c(.35,.35),
+          axis.text.x = element_text(angle = 45, hjust = 1),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
@@ -728,7 +735,7 @@ influence1 <- influence1[influence1$direction != "",]
 influence1$direction <- as.factor(influence1$direction)
 levels(influence1$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
 (p_inf_1 <- ggplot(influence1, aes(x=target,y=value,col=direction)) + stat_summary() +
-  labs(title = "Exp. 1: Chat Influence",
+  labs(title = "Exp. 1: GPT4 Influence",
        x = "Transition", y = "Probability", col = "Direction") +
   scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
   facet_grid(.~chat) + theme_classic() +
@@ -741,7 +748,7 @@ influence2 <- influence2[influence2$direction != "",]
 influence2$direction <- as.factor(influence2$direction)
 levels(influence2$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
 (p_inf_2 <- ggplot(influence2, aes(x=target,y=value,col=direction)) + stat_summary() +
-  labs(title = "Exp. 2: Chat Influence",
+  labs(title = "Exp. 2: GPT4 Influence",
        x = "Transition", y = "Probability", col = "Direction") +
   scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
   facet_grid(.~chat) + theme_classic() +
@@ -865,12 +872,12 @@ library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig2
-ggsave("figures/fig2_v2.pdf", fig2, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig2_v3.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
        width = 24, height = 16, bg = "white")
 fig3 <- ggarrange(ggarrange(figure3A,figure3B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig3
-ggsave("figures/fig3_v3.pdf", fig3, dpi = 2400, scale = 1, units = "cm",
+ggsave("figures/fig3_v3.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
        width = 24, height = 16, bg = "white")
 
 
