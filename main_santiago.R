@@ -8,16 +8,22 @@ ratings2 <- read.csv("experiment2/cleaned/ratings.csv")
 # file with gorilla IDs and OneReach IDs
 task1 <- read.csv("experiment1/cleaned/task.csv")
 task1 <- task1[order(task1$Participant.Private.ID),]
+# task1$Response <- gsub("[^0-9]", "", task1$Response) 
 task2 <- read.csv("experiment2/cleaned/task.csv")
 task2 <- task2[order(task2$Participant.Private.ID),]
+# task2$Response <- gsub("[^0-9]", "", task1$Response) 
 # interaction via One Reach (thanks Daniel!)
 if (!require(readxl)) {install.packages("readxl")}; library(readxl)
 # chat1 <- read.csv("experiment1/cleaned/gptstudydata_cleaned_2024.csv")
 chat1 <- read_excel("experiment1/cleaned/EXP1_data_jan2025.xlsx", sheet = 1)
+chat1$botpersonality <- ifelse(chat1$botpersonality == "anxious","Anxious","Normal")
 keep1 <- read_excel("experiment1/cleaned/EXP1_data_jan2025.xlsx", sheet = 2)
+demo1 <- read.csv("experiment1/cleaned/demographics.csv")
 # chat2 <- read.csv("experiment2/cleaned/gptstudydata_S2B_Dec2024.csv")
 chat2 <- read_excel("experiment2/cleaned/EXP2_data_jan2025.xlsx", sheet = 1)
+chat2$botpersonality <- ifelse(chat2$botpersonality == "extrovert","Extrovert","Introvert")
 keep2 <- read_excel("experiment2/cleaned/EXP2_data_jan2025.xlsx", sheet = 2)
+demo2 <- read.csv("experiment2/cleaned/demographics.csv")
 # scl90
 scl90 <- read.csv("experiment1/cleaned/scl90.csv")
 # bfi10
@@ -51,10 +57,59 @@ ratings1$quest <- factor(ratings1$question, levels = c("chat-again","different",
 ratings2$quest <- factor(ratings2$question, levels = c("chat-again","different","similar",
                                                        "enjoy","distant","understood"))
 
+# REMOVE PARTICIPANTS IF THEY HAVE ONE CHAT WITH LESS THAN 8 INTERACTIONS
+# FIGURE 4 WITH INFLUENCE, SAME WITH INTERACTIONS AND SLOPES. SAME FORMAT DIFFERENT SLOPES
+
+# remove participants?
+remove_participants <- T
+if (remove_participants) {
+  # remove or keep in influence and ratings
+  task1$remove <- T
+  ratings1$remove <- T
+  chat1$remove <- T
+  demo1$remove <- T
+  for (i in 1:length(keep1$PID)) {
+    task1$remove[task1$Participant.Private.ID == keep1$PID[i]] <- F
+    ratings1$remove[ratings1$Participant.Private.ID == keep1$PID[i]] <- F
+    chat1$remove[chat1$PID == keep1$PID[i]] <- F
+    demo1$remove[demo1$Participant.Private.ID == keep1$PID[i]] <- F
+  }
+  task1 <- task1[task1$remove==F,]; task1$remove <- NULL
+  ratings1 <- ratings1[ratings1$remove==F,]; ratings1$remove <- NULL
+  chat1 <- chat1[chat1$remove==F,]; chat1$remove <- NULL
+  demo1 <- demo1[demo1$remove==F,]; demo1$remove <- NULL
+  
+  task2$remove <- T
+  ratings2$remove <- T
+  chat2$remove <- T
+  demo2$remove <- T
+  for (i in 1:length(keep2$PID)) {
+    task2$remove[task2$Participant.Private.ID == keep2$PID[i]] <- F
+    ratings2$remove[ratings2$Participant.Private.ID == keep2$PID[i]] <- F
+    chat2$remove[chat2$PID == keep2$PID[i]] <- F
+    demo2$remove[demo2$Participant.Private.ID == keep2$PID[i]] <- F
+  }
+  task2 <- task2[task2$remove==F,]; task2$remove <- NULL
+  ratings2 <- ratings2[ratings2$remove==F,]; ratings2$remove <- NULL
+  chat2 <- chat2[chat2$remove==F,]; chat2$remove <- NULL
+  demo2 <- demo2[demo2$remove==F,]; demo2$remove <- NULL
+}
+# how many participants?
+length(unique(task1$Participant.Private.ID))
+length(unique(task2$Participant.Private.ID))
+length(unique(ratings1$Participant.Private.ID))
+length(unique(ratings2$Participant.Private.ID))
+length(unique(chat1$PID))
+length(unique(chat2$PID))
+length(unique(demo1$Participant.Private.ID))
+length(unique(demo2$Participant.Private.ID))
+
+
+
 source("functions.R")
 # use cleaning function to extract summary information for the interactions
-combine1 <- summariseChatInteraction(task1, chat1, ratings1)
-combine2 <- summariseChatInteraction(task2, chat2, ratings2)
+combine1 <- summariseChatInteraction_v2(task=task1, chat=chat1, ratings=ratings1)
+combine2 <- summariseChatInteraction_v2(task=task2, chat=chat2, ratings=ratings2)
 
 # rows are conditional probabilities of the sentiment analysis, thus cells from 
 # the transition matrices
@@ -65,6 +120,10 @@ influence2 <- combine2$influence
 # as well as ratings in wide format
 combine1 <- combine1$combine
 combine2 <- combine2$combine
+sum(table(combine1$Participant.Private.ID)==2) 
+length(table(combine1$Participant.Private.ID))
+sum(table(combine2$Participant.Private.ID)==2)
+length(table(combine2$Participant.Private.ID))
 
 # add chat as factor with specific order
 combine1$chat <- as.factor(combine1$chatType)
@@ -84,46 +143,14 @@ length(unique(chat2$PID))
 length(keep1$PID)
 length(keep2$PID)
 
-# REMOVE PARTICIPANTS IF THEY HAVE ONE CHAT WITH LESS THAN 8 INTERACTIONS
-# FIGURE 4 WITH INFLUENCE, SAME WITH INTERACTIONS AND SLOPES. SAME FORMAT DIFFERENT SLOPES
+range(demo1$age,na.rm=T); mean(demo1$age,na.rm=T); sd(demo1$age,na.rm=T); nrow(demo1)
+table(demo1$sex)
+range(demo2$age,na.rm=T); mean(demo2$age,na.rm=T); sd(demo2$age,na.rm=T); nrow(demo2)
+table(demo2$sex)
 
-# remove participants?
-remove_participants <- T
-if (remove_participants) {
-  # remove criterion
-  # combine1$remove <- ifelse(combine1$num_interactions < 8,T,F)
-  # combine2$remove <- ifelse(combine2$num_interactions < 8,T,F)
-  # shortened database
-  # combine1 <- combine1[combine1$remove==F,]; combine1$remove <- NULL
-  # combine2 <- combine2[combine2$remove==F,]; combine2$remove <- NULL
-  # IDs that we will keep 
-  # keep1 <- unique(combine1$Participant.Private.ID)
-  # keep2 <- unique(combine2$Participant.Private.ID)
-  # remove or keep in influence and ratings
-  influence1$remove <- T
-  ratings1$remove <- T
-  chat1$remove <- T
-  for (i in 1:length(keep1$PID)) {
-    influence1$remove[influence1$Participant.Private.ID == keep1$PID[i]] <- F
-    ratings1$remove[ratings1$Participant.Private.ID == keep1$PID[i]] <- F
-    chat1$remove[chat1$PID == keep1$PID[i]] <- F
-  }
-  influence1 <- influence1[influence1$remove==F,]; influence1$remove <- NULL
-  ratings1 <- ratings1[ratings1$remove==F,]; ratings1$remove <- NULL
-  chat1 <- chat1[chat1$remove==F,]; chat1$remove <- NULL
-  
-  influence2$remove <- T
-  ratings2$remove <- T
-  chat2$remove <- T
-  for (i in 1:length(keep2$PID)) {
-    influence2$remove[influence2$Participant.Private.ID == keep2$PID[i]] <- F
-    ratings2$remove[ratings2$Participant.Private.ID == keep2$PID[i]] <- F
-    chat2$remove[chat2$PID == keep2$PID[i]] <- F
-  }
-  influence2 <- influence2[influence2$remove==F,]; influence2$remove <- NULL
-  ratings2 <- ratings2[ratings2$remove==F,]; ratings2$remove <- NULL
-  chat2 <- chat2[chat2$remove==F,]; chat2$remove <- NULL
-}
+age <- c(demo1$age,demo2$age)
+range(age,na.rm=T); mean(age,na.rm=T); sd(age,na.rm=T); length(age)
+table(c(demo1$sex,demo2$sex))
 
 
 
@@ -131,49 +158,72 @@ if (remove_participants) {
 # # # # # Statistical Analysis: Ratings - Questionnaires# # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # stats
-library(lmerTest)
-library(report)
-m.chat.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID),
-                   ratings1[ratings1$question == "chat-again",]))
-m.chat.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "chat-again" & ratings1$chat == "Anxious",]))
-m.chat.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "chat-again" & ratings1$chat == "Non-Anxious",]))
+library(lmerTest); library(report)
+chat <- stats_one_panel(ratings=ratings1,dep_var="chat-again",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.chat.int <- chat$regressions$m.int
+m.chat.anx <- chat$regressions$m.chat1
+m.chat.nan <- chat$regressions$m.chat2
+# m.chat.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID),
+#                    ratings1[ratings1$question == "chat-again",]))
+# m.chat.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "chat-again" & ratings1$chat == "Anxious",]))
+# m.chat.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "chat-again" & ratings1$chat == "Non-Anxious",]))
 
-m.diff.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
-                   ratings1[ratings1$question == "different",]))
-m.diff.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "different" & ratings1$chat == "Anxious",]))
-m.diff.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "different" & ratings1$chat == "Non-Anxious",]))
+diff <- stats_one_panel(ratings=ratings1,dep_var="different",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.diff.int <- diff$regressions$m.int
+m.diff.anx <- diff$regressions$m.chat1
+m.diff.nan <- diff$regressions$m.chat2
+# m.diff.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
+#                    ratings1[ratings1$question == "different",]))
+# m.diff.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "different" & ratings1$chat == "Anxious",]))
+# m.diff.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "different" & ratings1$chat == "Non-Anxious",]))
 
-m.dist.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
-                   ratings1[ratings1$question == "distant",]))
-m.dist.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "distant" & ratings1$chat == "Anxious",]))
-m.dist.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "distant" & ratings1$chat == "Non-Anxious",]))
+dist <- stats_one_panel(ratings=ratings1,dep_var="distant",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.dist.int <- dist$regressions$m.int
+m.dist.anx <- dist$regressions$m.chat1
+m.dist.nan <- dist$regressions$m.chat2
+# m.dist.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
+#                    ratings1[ratings1$question == "distant",]))
+# m.dist.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "distant" & ratings1$chat == "Anxious",]))
+# m.dist.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "distant" & ratings1$chat == "Non-Anxious",]))
 
-m.enjo.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
-                   ratings1[ratings1$question == "enjoy",]))
-m.enjo.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "enjoy" & ratings1$chat == "Anxious",]))
-m.enjo.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "enjoy" & ratings1$chat == "Non-Anxious",]))
+enjo <- stats_one_panel(ratings=ratings1,dep_var="enjoy",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.enjo.int <- enjo$regressions$m.int
+m.enjo.anx <- enjo$regressions$m.chat1
+m.enjo.nan <- enjo$regressions$m.chat2
+# m.enjo.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
+#                    ratings1[ratings1$question == "enjoy",]))
+# m.enjo.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "enjoy" & ratings1$chat == "Anxious",]))
+# m.enjo.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "enjoy" & ratings1$chat == "Non-Anxious",]))
 
-m.simi.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
-                   ratings1[ratings1$question == "similar",]))
-m.simi.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "similar" & ratings1$chat == "Anxious",]))
-m.simi.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "similar" & ratings1$chat == "Non-Anxious",]))
+simi <- stats_one_panel(ratings=ratings1,dep_var="similar",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.simi.int <- simi$regressions$m.int
+m.simi.anx <- simi$regressions$m.chat1
+m.simi.nan <- simi$regressions$m.chat2
+# m.simi.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
+#                    ratings1[ratings1$question == "similar",]))
+# m.simi.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "similar" & ratings1$chat == "Anxious",]))
+# m.simi.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "similar" & ratings1$chat == "Non-Anxious",]))
 
-m.unde.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
-                   ratings1[ratings1$question == "understood",]))
-m.unde.anx <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "understood" & ratings1$chat == "Anxious",]))
-m.unde.nan <- report_table(lm(Response ~ scl90_anxiety,
-                 ratings1[ratings1$question == "understood" & ratings1$chat == "Non-Anxious",]))
+unde <- stats_one_panel(ratings=ratings1,dep_var="understood",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+m.unde.int <- unde$regressions$m.int
+m.unde.anx <- unde$regressions$m.chat1
+m.unde.nan <- unde$regressions$m.chat2
+# m.unde.int <- report_table(lmer(Response ~ scl90_anxiety * chat + (1|Participant.Private.ID), 
+#                    ratings1[ratings1$question == "understood",]))
+# m.unde.anx <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "understood" & ratings1$chat == "Anxious",]))
+# m.unde.nan <- report_table(lm(Response ~ scl90_anxiety,
+#                  ratings1[ratings1$question == "understood" & ratings1$chat == "Non-Anxious",]))
 
 exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
       data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,9:11]),
@@ -326,10 +376,9 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11
 # # # # # Statistical Analysis: Ratings - Influence # # # # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # stats
-library(lmerTest)
-library(report)
+library(lmerTest); library(report)
 
-# Experiment 2
+# Experiment 1
 # user to bot
 m.chat.int <- report_table(lmer(`chat-again` ~ user_gpt_mirror * chat + (1|Participant.Private.ID), combine1))
 m.chat.anx <- report_table(lm(`chat-again` ~ user_gpt_mirror, combine1[combine1$chat == "Anxious",]))
@@ -572,7 +621,7 @@ library(ggplot2)
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-ggsave("figures/fig4_v2.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+ggsave("figures/fig4_v3.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
        width = 16, height = 12, bg = "white")
 
 
@@ -642,6 +691,25 @@ length(unique(task1$Response))
 length(unique(chat2$userid))
 length(unique(task2$Response))
 
+
+# normalize sentiments by proportions
+# experiment 1
+combine1$user_total <- rowSums(combine1[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")])
+combine1[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")] <- 
+  combine1[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")]/combine1$user_total
+combine1$bots_total <- rowSums(combine1[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")])
+combine1[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")] <- 
+  combine1[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")]/combine1$bots_total
+# experiment 2
+combine2$user_total <- rowSums(combine2[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")])
+combine2[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")] <- 
+  combine2[,c("user_Mixed","user_Negative","user_Neutral","user_Positive")]/combine2$user_total
+combine2$bots_total <- rowSums(combine2[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")])
+combine2[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")] <- 
+  combine2[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")]/combine2$bots_total
+
+
+
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
 # for each level (mixed, negative, neutral, and positive) for both user and bot
 library(reshape2)
@@ -659,8 +727,8 @@ combine2.lf$variable<- as.character(combine2.lf$variable)
 combine1.lf$who <- factor(substr(combine1.lf$variable,1,4),levels = c("user","bots"))
 combine2.lf$who <- factor(substr(combine2.lf$variable,1,4),levels = c("user","bots"))
 # add a nicer names
-levels(combine1.lf$who) <- c("User Texts","Bot Texts")
-levels(combine2.lf$who) <- c("User Texts","Bot Texts")
+levels(combine1.lf$who) <- c("User Texts","GPT4 Texts")
+levels(combine2.lf$who) <- c("User Texts","GPT4 Texts")
 # add the sentiment on column variable (created with the columns in melt)
 combine1.lf$sentiment <- substr(combine1.lf$variable,6,nchar(combine1.lf$variable))
 combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variable))
@@ -680,51 +748,59 @@ levels(influence2$chat) <- c("Extrovert","Introvert")
 
 
 # univariate statistical analysis
-report_table(lm(user_Positive~chat,combine1))
-report_table(lm(user_Neutral~chat,combine1))
-report_table(lm(user_Negative~chat,combine1))
-report_table(lm(user_Mixed~chat,combine1))
+report_table(anova(lm(count ~ sentiment * chat, combine1.lf)))
+report_table(t.test(user_Positive~chat,combine1, paired = TRUE))
+report_table(t.test(user_Neutral~chat,combine1, paired = TRUE))
+report_table(t.test(user_Negative~chat,combine1, paired = TRUE))
+report_table(t.test(user_Mixed~chat,combine1, paired = TRUE))
 
-ann_text <- data.frame(sentiment = c(2,4), count = c(5,10),
+ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
                        lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
                        chat = c("Anxious","Non-Anxious"))
+# ann_text <- data.frame(sentiment = c(2), count = c(.25),
+#                        lab = "Text", who = factor("User Texts",levels = c("User Texts","GPT4 Texts")),
+#                        chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 1: Sentiment Analysis",
-         y="Average Count", x = "Text Sentiment Category",
+         y="Normalize Frequency", x = "Text Sentiment Category",
          col = "GPT4:", shape = "GPT4:") +
     geom_hline(yintercept = 0) +
-    coord_cartesian(ylim = c(0,22)) +
+    coord_cartesian(ylim = c(0,1)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
     geom_text(data = ann_text,label = "*", col="black", size = 10) +
     scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
     scale_shape_manual(values = c(17,19)) +
-    facet_grid(who ~ .) + 
+    scale_y_continuous(breaks = c(0,.5,1)) +
+    facet_wrap(who ~ ., ncol = 1) + 
     theme_classic() +
     guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = c(.35,.35),
+    theme(legend.position = c(.4,.3),
           axis.text.x = element_text(angle = 45, hjust = 1),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
-report_table(lm(user_Positive~chat,combine2))
-report_table(lm(user_Neutral~chat,combine2))
-report_table(lm(user_Negative~chat,combine2))
-report_table(lm(user_Mixed~chat,combine2))
+
+report_table(anova(lm(count ~ sentiment * chat, combine2.lf)))
+report_table(t.test(user_Positive~chat,combine2, paired = TRUE))
+report_table(t.test(user_Neutral~chat,combine2, paired = TRUE))
+report_table(t.test(user_Negative~chat,combine2, paired = TRUE))
+report_table(t.test(user_Mixed~chat,combine2, paired = TRUE))
 
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 2: Sentiment Analysis",
-         y="Average Count", x = "Text Sentiment Category",
+         y="Normalize Frequency", x = "Text Sentiment Category",
          col = "GPT4:", shape = "GPT4:") +
     geom_hline(yintercept = 0) +
-    coord_cartesian(ylim = c(0,22)) +
+    coord_cartesian(ylim = c(0,1)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
     scale_shape_manual(values = c(17,19)) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) +
-    facet_grid(who ~ .) + 
+    scale_y_continuous(breaks = c(0,.5,1)) +
+    facet_wrap(who ~ ., ncol = 1) +
     theme_classic() +
     guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = c(.35,.35),
+    theme(legend.position = c(.4,.3),
           axis.text.x = element_text(angle = 45, hjust = 1),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )

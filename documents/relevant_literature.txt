@@ -1,11 +1,14 @@
+Parkinson, C., Kleinbaum, A. M., & Wheatley, T. (2018). Similar neural responses predict friendship. Nature communications, 9(1), 332. 
+https://www.nature.com/articles/s41467-017-02722-7
+
 Coda-Forno, J., Witte, K., Jagadish, A. K., Binz, M., Akata, Z., & Schulz, E. (2023). Inducing anxiety in large language models increases exploration and bias. arXiv preprint arXiv:2304.11111.
 https://arxiv.org/abs/2304.11111
 
-Ben-Zion, Z., Witte, K., Jagadish, A. K., Duek, O., Harpaz-Rotem, I., Khorsandian, M., … Spiller, T. R. (2024, May 20). “Chat-GPT on the Couch”: Assessing and Alleviating  State Anxiety in Large Language Models. https://doi.org/10.31234/osf.io/j7fwb
+Ben-Zion, Z., Witte, K., Jagadish, A. K., Duek, O., Harpaz-Rotem, I., Khorsandian, M., … Spiller, T. R. (2024). “Chat-GPT on the Couch”: Assessing and Alleviating  State Anxiety in Large Language Models. https://doi.org/10.31234/osf.io/j7fwb
 https://osf.io/preprints/psyarxiv/j7fwb
 
 Cheremukhin, A., Restrepo-Echavarria, P., Tutino, A., 2024; Marriage Market Sorting in the U.S., Federal Reserve Bank of St. Louis Working Paper 2023-023. 
 https://doi.org/10.20955/wp.2023.023
 
-Parkinson, C., Kleinbaum, A. M., & Wheatley, T. (2018). Similar neural responses predict friendship. Nature communications, 9(1), 332. 
-https://www.nature.com/articles/s41467-017-02722-7
+Ríos-Hoyo, A., Shan, N. L., Li, A., Pearson, A. T., Pusztai, L., & Howard, F. M. (2024). Evaluation of large language models as a diagnostic aid for complex medical cases. Frontiers in Medicine, 11, 1380148.
+https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2024.1380148/full
