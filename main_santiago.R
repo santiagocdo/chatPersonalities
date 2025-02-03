@@ -1,7 +1,10 @@
 rm(list=ls(all=TRUE))
 # data cleaned by Riddhi and Santiago check script cleaning.R
 
-# interaction via One Reach (thanks Daniel!)
+# print figures? if yes, then 1
+print_fig <- 0
+
+# interaction (chat1 and chat2) via One Reach (thanks Daniel!)
 # behaviours in ratings
 ratings1 <- read.csv("experiment1/cleaned/ratings.csv")
 ratings2 <- read.csv("experiment2/cleaned/ratings.csv")
@@ -42,8 +45,8 @@ quest <- scoreQuestionnaires_e2(bfi44)
 bfi44 <- quest$bfi
 
 # add questionnaires to ratings
-ratings1 <- addQuestionnaireToRating_e1(ratings1, scl90, bfi10)
-ratings2 <- addQuestionnaireToRating_e2(ratings2, bfi44)
+ratings1 <- addQuestionnaireToDataFrame_e1(ratings1, scl90, bfi10)
+ratings2 <- addQuestionnaireToDataFrame_e2(ratings2, bfi44)
 
 # add chat as factor with specific order
 ratings1$chat <- as.factor(ratings1$chatType)
@@ -131,6 +134,9 @@ levels(combine1$chat) <- c("Anxious","Non-Anxious")
 combine2$chat <- as.factor(combine2$chatType)
 levels(combine2$chat) <- c("Extrovert","Introvert")
 
+# add questionnaires to combine
+combine1 <- addQuestionnaireToDataFrame_e1(combine1, scl90, bfi10)
+combine2 <- addQuestionnaireToDataFrame_e2(combine2, bfi44)
 
 
 # we need to use good_pids to remove not included PIDs
@@ -143,15 +149,24 @@ length(unique(chat2$PID))
 length(keep1$PID)
 length(keep2$PID)
 
+# age and sex per experiment
 range(demo1$age,na.rm=T); mean(demo1$age,na.rm=T); sd(demo1$age,na.rm=T); nrow(demo1)
 table(demo1$sex)
 range(demo2$age,na.rm=T); mean(demo2$age,na.rm=T); sd(demo2$age,na.rm=T); nrow(demo2)
 table(demo2$sex)
 
+# age and sex overall
 age <- c(demo1$age,demo2$age)
 range(age,na.rm=T); mean(age,na.rm=T); sd(age,na.rm=T); length(age)
 table(c(demo1$sex,demo2$sex))
 
+# does anxiety and extroversion correlate?
+temp <- ratings1[!duplicated(ratings1$Participant.Private.ID),]
+report_table(cor.test(temp$bfi10_extraversion,temp$scl90_anxiety, method = "spearman"))
+report_table(cor.test(temp$bfi10_agreeableness,temp$scl90_anxiety, method = "spearman"))
+report_table(cor.test(temp$bfi10_conscientiousness,temp$scl90_anxiety, method = "spearman"))
+report_table(cor.test(temp$bfi10_neuroticism,temp$scl90_anxiety, method = "spearman"))
+report_table(cor.test(temp$bfi10_openness,temp$scl90_anxiety, method = "spearman"))
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -621,8 +636,11 @@ library(ggplot2)
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-ggsave("figures/fig4_v3.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
+if (print_fig == 1) {
+  ggsave("figures/fig4_v3.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+         width = 16, height = 12, bg = "white")
+}
+
 
 
 
@@ -709,6 +727,49 @@ combine2[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")] <-
   combine2[,c("bots_Mixed","bots_Negative","bots_Neutral","bots_Positive")]/combine2$bots_total
 
 
+# normalize questionnaires between 0 and 1
+combine1$scl90_anxiety <- combine1$scl90_anxiety/max(combine1$scl90_anxiety)
+combine2$bfi44_extraversion <- combine2$bfi44_extraversion/max(combine2$bfi44_extraversion)
+
+
+# difference between GPT-4 types, to simplify statistical analysis with triple order interaction
+# experiment 1
+combine1.wf <- combine1[combine1$chat == "Anxious",]
+temp <- combine1[combine1$chat == "Non-Anxious",]
+combine1.wf$mixed <- combine1.wf$user_Mixed - temp$user_Mixed
+combine1.wf$negative <- combine1.wf$user_Negative - temp$user_Negative
+combine1.wf$neutral <- combine1.wf$user_Neutral - temp$user_Neutral
+combine1.wf$positive <- combine1.wf$user_Positive - temp$user_Positive
+
+# experiment 2
+combine2.wf <- combine2[combine2$chat == "Extrovert",]
+temp <- combine2[combine2$chat == "Introvert",]
+combine2.wf$mixed <- combine2.wf$user_Mixed - temp$user_Mixed
+combine2.wf$negative <- combine2.wf$user_Negative - temp$user_Negative
+combine2.wf$neutral <- combine2.wf$user_Neutral - temp$user_Neutral
+combine2.wf$positive <- combine2.wf$user_Positive - temp$user_Positive
+
+# test difference scores
+library(reshape2)
+combine1.lf <- melt(combine1.wf, measure.vars = c("mixed","negative","neutral","positive"))
+combine2.lf <- melt(combine2.wf, measure.vars = c("mixed","negative","neutral","positive"))
+# change column names
+colnames(combine1.lf)[50:51] <- c("sentiment","diff")
+colnames(combine2.lf)[41:42] <- c("sentiment","diff")
+
+# stats
+ggplot(combine1.lf, aes(x=scl90_anxiety, y=diff, col=sentiment)) + geom_smooth(method = "lm") + labs(y="Anx-Non")
+anova(lmer(diff ~ sentiment * scl90_anxiety + (1|Participant.Private.ID), combine1.lf))
+summary(lm(diff ~ scl90_anxiety, combine1.lf[combine1.lf$sentiment=="mixed",]))
+summary(lm(diff ~ scl90_anxiety, combine1.lf[combine1.lf$sentiment=="negative",]))
+summary(lm(diff ~ scl90_anxiety, combine1.lf[combine1.lf$sentiment=="neutral",]))
+summary(lm(diff ~ scl90_anxiety, combine1.lf[combine1.lf$sentiment=="positive",]))
+summary(lmer(diff ~ sentiment * scl90_anxiety + (1|Participant.Private.ID), combine1.lf))
+
+ggplot(combine1.lf, aes(x=scl90_anxiety, y=diff, col=sentiment)) + geom_smooth(method = "lm")
+anova(lmer(diff ~ sentiment * bfi44_extraversion + (1|Participant.Private.ID), combine2.lf))
+
+
 
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
 # for each level (mixed, negative, neutral, and positive) for both user and bot
@@ -724,21 +785,16 @@ colnames(combine2.lf)[ncol(combine2.lf)] <- c("count")
 combine1.lf$variable<- as.character(combine1.lf$variable)
 combine2.lf$variable<- as.character(combine2.lf$variable)
 # split string to get the first 4 character (user or bots)
-combine1.lf$who <- factor(substr(combine1.lf$variable,1,4),levels = c("user","bots"))
-combine2.lf$who <- factor(substr(combine2.lf$variable,1,4),levels = c("user","bots"))
+combine1.lf$who <- factor(substr(combine1.lf$variable,1,4),levels = c("bots","user"))
+combine2.lf$who <- factor(substr(combine2.lf$variable,1,4),levels = c("bots","user"))
 # add a nicer names
-levels(combine1.lf$who) <- c("User Texts","GPT4 Texts")
-levels(combine2.lf$who) <- c("User Texts","GPT4 Texts")
+levels(combine1.lf$who) <- c("GPT4 Texts","User Texts")
+levels(combine2.lf$who) <- c("GPT4 Texts","User Texts")
 # add the sentiment on column variable (created with the columns in melt)
 combine1.lf$sentiment <- substr(combine1.lf$variable,6,nchar(combine1.lf$variable))
 combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variable))
 
 # add chat as factor with specific order
-# combines
-combine1.lf$chat <- as.factor(combine1.lf$chatType)
-levels(combine1.lf$chat) <- c("Anxious","Non-Anxious")
-combine2.lf$chat <- as.factor(combine2.lf$chatType)
-levels(combine2.lf$chat) <- c("Extrovert","Introvert")
 # influence
 influence1$chat <- as.factor(influence1$chatType)
 levels(influence1$chat) <- c("Anxious","Non-Anxious")
@@ -747,19 +803,32 @@ levels(influence2$chat) <- c("Extrovert","Introvert")
 
 
 
-# univariate statistical analysis
-report_table(anova(lm(count ~ sentiment * chat, combine1.lf)))
-report_table(t.test(user_Positive~chat,combine1, paired = TRUE))
-report_table(t.test(user_Neutral~chat,combine1, paired = TRUE))
-report_table(t.test(user_Negative~chat,combine1, paired = TRUE))
-report_table(t.test(user_Mixed~chat,combine1, paired = TRUE))
+# aim 1, GPT4 Texts are different between conditions (chatbots) 
+report_table(anova(lmer(count ~ sentiment * chat + (1|Participant.Private.ID),
+                        combine1.lf[combine1.lf$who=="GPT4 Texts",])))
+report_table(anova(lm(count ~ sentiment * chat,
+                        combine1.lf[combine1.lf$who=="GPT4 Texts",])))
+summary(aov(count ~ sentiment * chat + Error(Participant.Private.ID/(sentiment*chat)),
+            combine1.lf[combine1.lf$who=="GPT4 Texts",]))
+# run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
+report_table(anova(lmer(count ~ sentiment * chat * scl90_anxiety + (1|Participant.Private.ID),
+                        combine1.lf[combine1.lf$who=="User Texts",])))
+# summary(lmer(count ~ sentiment * chat * scl90_anxiety + (1|Participant.Private.ID),
+#              combine1.lf[combine1.lf$who=="User Texts",]))
+report_table(anova(lm(count ~ sentiment * chat * scl90_anxiety, 
+                      combine1.lf[combine1.lf$who=="User Texts",])))
+# summary(aov(count ~ sentiment * chat * scl90_anxiety + Error(Participant.Private.ID/(sentiment * chat)), 
+#                  combine1.lf[combine1.lf$who=="User Texts",]))
+
+# aim 2, GPT4 Texts are different between conditions (chatbots)
+# report_table(t.test(user_Positive~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Neutral~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Negative~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Mixed~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
 
 ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
-                       lab = "Text", who = factor("User Texts",levels = c("User Texts","Bot Texts")),
+                       lab = "Text", who = factor("User Texts",levels = c("Bot Texts","User Texts")),
                        chat = c("Anxious","Non-Anxious"))
-# ann_text <- data.frame(sentiment = c(2), count = c(.25),
-#                        lab = "Text", who = factor("User Texts",levels = c("User Texts","GPT4 Texts")),
-#                        chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 1: Sentiment Analysis",
@@ -767,25 +836,48 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
          col = "GPT4:", shape = "GPT4:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
-    stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
-    geom_text(data = ann_text,label = "*", col="black", size = 10) +
+    geom_violin(position = position_dodge(0.5)) +
+    stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
+    # geom_text(data = ann_text,label = "*", col="black", size = 10) +
     scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
     scale_shape_manual(values = c(17,19)) +
     scale_y_continuous(breaks = c(0,.5,1)) +
     facet_wrap(who ~ ., ncol = 1) + 
     theme_classic() +
     guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = c(.4,.3),
+    theme(legend.position = c(.3,.89),
           axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+          legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 )
+ggplot(combine1.lf, aes(x=scl90_anxiety,y=count,col=sentiment)) +
+  geom_smooth(method = "lm", se=F) +
+  facet_grid(. ~ chat)
+ggplot(combine1.lf, aes(x=scl90_anxiety,y=count,col=chat)) +
+  geom_smooth(method = "lm", se=F) +
+  facet_wrap(. ~ sentiment)
 
 
-report_table(anova(lm(count ~ sentiment * chat, combine2.lf)))
-report_table(t.test(user_Positive~chat,combine2, paired = TRUE))
-report_table(t.test(user_Neutral~chat,combine2, paired = TRUE))
-report_table(t.test(user_Negative~chat,combine2, paired = TRUE))
-report_table(t.test(user_Mixed~chat,combine2, paired = TRUE))
+
+# aim 1, GPT4 Texts are different between conditions (chatbots) 
+report_table(anova(lmer(count ~ sentiment * chat + (1|Participant.Private.ID), 
+                        combine2.lf[combine2.lf$who=="GPT4 Texts",])))
+report_table(anova(lm(count ~ sentiment * chat, 
+                      combine2.lf[combine2.lf$who=="GPT4 Texts",])))
+summary(aov(count ~ sentiment * chat + Error(Participant.Private.ID/(sentiment*chat)),
+            combine2.lf[combine2.lf$who=="GPT4 Texts",]))
+# run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
+report_table(anova(lmer(count ~ sentiment * chat * bfi44_extraversion + (1|Participant.Private.ID),
+                        combine2.lf[combine2.lf$who=="User Texts",])))
+report_table(anova(lm(count ~ sentiment * chat * bfi44_extraversion, 
+                      combine2.lf[combine2.lf$who=="User Texts",])))
+summary(aov(count ~ sentiment * chat * bfi44_extraversion + Error(Participant.Private.ID/(sentiment*chat)),
+            combine2.lf[combine2.lf$who=="GPT4 Texts",]))
+
+# aim 2, GPT4 Texts are different between conditions (chatbots)
+# report_table(t.test(user_Positive~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Neutral~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Negative~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
+# report_table(t.test(user_Mixed~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
 
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=count,col=chat,shape=chat)) + 
     labs(title = "Exp. 2: Sentiment Analysis",
@@ -793,72 +885,71 @@ report_table(t.test(user_Mixed~chat,combine2, paired = TRUE))
          col = "GPT4:", shape = "GPT4:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
-    stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.3)) +
+    geom_violin(position = position_dodge(0.5)) +
+    stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
     scale_shape_manual(values = c(17,19)) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) +
     scale_y_continuous(breaks = c(0,.5,1)) +
     facet_wrap(who ~ ., ncol = 1) +
     theme_classic() +
     guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = c(.4,.3),
+    theme(legend.position = c(.3,.89),
           axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+          legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 )
+ggplot(combine2.lf, aes(x=bfi44_extraversion,y=count,col=sentiment)) +
+  geom_smooth(method = "lm", se=F) +
+  facet_grid(. ~ chat)
+ggplot(combine2.lf, aes(x=bfi44_extraversion,y=count,col=chat)) +
+  geom_smooth(method = "lm", se=F) +
+  facet_wrap(. ~ sentiment)
 
 
 
-influence1 <- influence1[influence1$direction != "",]
-influence1$direction <- as.factor(influence1$direction)
-levels(influence1$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
-(p_inf_1 <- ggplot(influence1, aes(x=target,y=value,col=direction)) + stat_summary() +
-  labs(title = "Exp. 1: GPT4 Influence",
-       x = "Transition", y = "Probability", col = "Direction") +
-  scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
-  facet_grid(.~chat) + theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = c(0.2,0.8)))
+# influence1 <- influence1[influence1$direction != "",]
+# influence1$direction <- as.factor(influence1$direction)
+# levels(influence1$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
+# (p_inf_1 <- ggplot(influence1, aes(x=target,y=value,col=direction)) + stat_summary() +
+#   labs(title = "Exp. 1: GPT4 Influence",
+#        x = "Transition", y = "Probability", col = "Direction") +
+#   scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
+#   facet_grid(.~chat) + theme_classic() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+#         legend.position = c(0.2,0.8)))
+# 
+# influence2 <- influence2[influence2$direction != "",]
+# influence2$direction <- as.factor(influence2$direction)
+# levels(influence2$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
+# (p_inf_2 <- ggplot(influence2, aes(x=target,y=value,col=direction)) + stat_summary() +
+#   labs(title = "Exp. 2: GPT4 Influence",
+#        x = "Transition", y = "Probability", col = "Direction") +
+#   scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
+#   facet_grid(.~chat) + theme_classic() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+#         legend.position = c(0.2,0.8)))
+
+# library(dplyr)
+# tild_1 <- data.frame(influence1 %>% group_by(from,to,chatType,direction,target) %>% 
+#                        summarise(mean=mean(value)))
+# tild_2 <- data.frame(influence2 %>% group_by(from,to,chatType,direction,target) %>%
+#                        summarise(mean=mean(value)))
+# # tild_1 <- influence1[influence1$chatId=="6886",]
+# ggplot(tild_1, 
+#        aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
+#   labs(title="Exp. 1: Probability of Current given Previous",
+#        x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
+#   geom_tile() + geom_text(col="red") +
+#   facet_grid(chatType~direction) + theme_classic()
+# ggplot(tild_2, 
+#        aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
+#   labs(title="Exp. 2: Probability of Current given Previous",
+#        x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
+#   geom_tile() + geom_text(col="red") +
+#   facet_grid(chatType~direction) + theme_classic()
 
 
 
-influence2 <- influence2[influence2$direction != "",]
-influence2$direction <- as.factor(influence2$direction)
-levels(influence2$direction) <- c("User(t-1) --> Bot(t)","Bot(t-1) --> User(t)")
-(p_inf_2 <- ggplot(influence2, aes(x=target,y=value,col=direction)) + stat_summary() +
-  labs(title = "Exp. 2: GPT4 Influence",
-       x = "Transition", y = "Probability", col = "Direction") +
-  scale_y_continuous(breaks = c(0,.5,1), limits = c(0,1)) + 
-  facet_grid(.~chat) + theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = c(0.2,0.8)))
-
-
-
-
-
-library(dplyr)
-tild_1 <- data.frame(influence1 %>% group_by(from,to,chatType,direction,target) %>% 
-                       summarise(mean=mean(value)))
-tild_2 <- data.frame(influence2 %>% group_by(from,to,chatType,direction,target) %>%
-                       summarise(mean=mean(value)))
-# tild_1 <- influence1[influence1$chatId=="6886",]
-ggplot(tild_1, 
-       aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
-  labs(title="Exp. 1: Probability of Current given Previous",
-       x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
-  geom_tile() + geom_text(col="red") +
-  facet_grid(chatType~direction) + theme_classic()
-ggplot(tild_2, 
-       aes(x=from,y=to,fill=mean,label=round(mean,2))) + 
-  labs(title="Exp. 2: Probability of Current given Previous",
-       x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
-  geom_tile() + geom_text(col="red") +
-  facet_grid(chatType~direction) + theme_classic()
-
-
-
-
-
-
+# melt combine experiments 1 and 2
 combine1.lf <- melt(combine1, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
 combine2.lf <- melt(combine2, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
 # change column name
@@ -948,13 +1039,16 @@ library(ggpubr)
 fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig2
-ggsave("figures/fig2_v3.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
-       width = 24, height = 16, bg = "white")
 fig3 <- ggarrange(ggarrange(figure3A,figure3B, ncol=2, widths = c(2,1),
                             labels = c("A","B")))
 # fig3
-ggsave("figures/fig3_v3.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
-       width = 24, height = 16, bg = "white")
+if (print_fig == 1) {
+  ggsave("figures/fig2_v4.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
+         width = 24, height = 16, bg = "white")
+  
+  ggsave("figures/fig3_v4.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
+         width = 24, height = 16, bg = "white")
+}
 
 
 
@@ -993,8 +1087,10 @@ library(ggplot2)
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
-ggsave("figures/figS1.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
-       width = 16, height = 12, bg = "white")
+if (print_fig == 1) {
+  ggsave("figures/figS1.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
+         width = 16, height = 12, bg = "white")
+}
 
 
 

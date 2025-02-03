@@ -78,53 +78,53 @@ scoreQuestionnaires_e2 <- function(bfi44) {
 }
 
 # add questionnaires to ratings Experiment 1
-addQuestionnaireToRating_e1 <- function (ratings,scl90,bfi10) {
+addQuestionnaireToDataFrame_e1 <- function (dataframe,scl90,bfi10) {
   # create an empty matrix
-  temp <- matrix(NA,nrow=nrow(ratings),ncol=sum(ncol(scl90)-1,ncol(bfi10)-1))
+  temp <- matrix(NA,nrow=nrow(dataframe),ncol=sum(ncol(scl90)-1,ncol(bfi10)-1))
   colnames(temp) <- c(colnames(scl90)[-1],colnames(bfi10)[-1])
   # add temp to ratings
-  ratings <- cbind(ratings,temp)
+  dataframe <- cbind(dataframe,temp)
   
   # combine questionnaires
   quests <- cbind(scl90,bfi10[-1])
   
   # vector with participants public id
-  Participant.Private.ID <- unique(ratings$Participant.Private.ID)
+  Participant.Private.ID <- unique(dataframe$Participant.Private.ID)
 
   for (p in 1:length(Participant.Private.ID)) {
     for (q in 1:ncol(temp)) {
-      ratings[ratings$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
+      dataframe[dataframe$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
         quests[quests$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]]
     }
   }
  
   # return ratings with questionnaires
-  return(ratings)
+  return(dataframe)
 }
 
 # add questionnaires to ratings Experiment 2
-addQuestionnaireToRating_e2 <- function (ratings2,bfi44) {
+addQuestionnaireToDataFrame_e2 <- function (dataframe,bfi44) {
   # create an empty matrix
-  temp <- matrix(NA,nrow=nrow(ratings2),ncol=sum(ncol(bfi44)-1))
+  temp <- matrix(NA,nrow=nrow(dataframe),ncol=sum(ncol(bfi44)-1))
   colnames(temp) <- colnames(bfi44)[-1]
   # add temp to ratings
-  ratings2 <- cbind(ratings2,temp)
+  dataframe <- cbind(dataframe,temp)
   
   # combine questionnaires (add here another quest, if needed)
   quests <- cbind(bfi44)
   
   # vector with participants public id
-  Participant.Private.ID <- unique(ratings2$Participant.Private.ID)
+  Participant.Private.ID <- unique(dataframe$Participant.Private.ID)
   
   for (p in 1:length(Participant.Private.ID)) {
     for (q in 1:ncol(temp)) {
-      ratings2[ratings2$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
+      dataframe[dataframe$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]] <-
         quests[quests$Participant.Private.ID == Participant.Private.ID[p],colnames(temp)[q]]
     }
   }
   
   # return ratings with questionnaires
-  return(ratings2)
+  return(dataframe)
 }
 
 
@@ -134,8 +134,10 @@ summariseChatInteraction_v2 <- function(task, chat, ratings) {
   # remember: one element is not one participant but one chat
   task$good_ids <- paste0(task$Participant.Private.ID,task$chatType)
   chat$good_ids <- paste0(chat$PID,chat$botpersonality)
+
   # intersection
   good_ids <- intersect(chat$good_ids,task$good_ids)
+  Participant.Private.ID <- unique(ratings$Participant.Private.ID)
   
   # sentiment labels are:
   sentiment_label <- c("Mixed","Negative","Neutral","Positive")
@@ -145,6 +147,7 @@ summariseChatInteraction_v2 <- function(task, chat, ratings) {
     # extract one chat (each Participant.Private.ID has two chats)
     temp1 <- chat[chat$good_ids == good_ids[i],]
     temp2 <- task[task$good_ids == good_ids[i],]
+    temp3 <- ratings[ratings$Participant.Private.ID == temp2$Participant.Private.ID,]
     
     # # # sentiment analysis # # #
     sentiment <- t(matrix(rep(sentiment_label,nrow(temp1)),nrow=4))
