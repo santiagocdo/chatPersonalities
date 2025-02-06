@@ -162,6 +162,7 @@ table(c(demo1$sex,demo2$sex))
 
 # does anxiety and extroversion correlate?
 temp <- ratings1[!duplicated(ratings1$Participant.Private.ID),]
+if (!require(report)) {install.packages("report")}; library(report)
 report_table(cor.test(temp$bfi10_extraversion,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_agreeableness,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_conscientiousness,temp$scl90_anxiety, method = "spearman"))
@@ -175,7 +176,6 @@ report_table(cor.test(temp$bfi10_openness,temp$scl90_anxiety, method = "spearman
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # stats
 if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
-if (!require(report)) {install.packages("report")}; library(report)
 chat <- stats_one_panel(ratings=ratings1,dep_var="chat-again",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
 m.chat.int <- chat$regressions$m.int
 m.chat.anx <- chat$regressions$m.chat1
@@ -205,6 +205,17 @@ unde <- stats_one_panel(ratings=ratings1,dep_var="understood",ind_var="scl90_anx
 m.unde.int <- unde$regressions$m.int
 m.unde.anx <- unde$regressions$m.chat1
 m.unde.nan <- unde$regressions$m.chat2
+
+# Correction Methods 
+hb_corr <- data.frame(chat=m.chat.int$p[4],diff=m.diff.int$p[4],dist=m.dist.int$p[4],
+                      enjo=m.enjo.int$p[4],simi=m.simi.int$p[4],unde=m.unde.int$p[4])
+hb_corr <- hb_corr[order(hb_corr)]
+# Holm-Bonferroni Method
+hb_corr < .05/6:1
+# Bonferroni Method
+hb_corr < .05/6
+
+
 
 # combine
 exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
@@ -300,7 +311,7 @@ m.enjo.dif <- enjo$regressions$m.int
 m.enjo.ext <- enjo$regressions$m.chat1
 m.enjo.int <- enjo$regressions$m.chat2
 
-simi <- stats_one_panel(ratings=ratings2,dep_var="different",ind_var="bfi44_extraversion",chats=c("Extrovert","Introvert"))
+simi <- stats_one_panel(ratings=ratings2,dep_var="similar",ind_var="bfi44_extraversion",chats=c("Extrovert","Introvert"))
 m.simi.dif <- simi$regressions$m.int
 m.simi.ext <- simi$regressions$m.chat1
 m.simi.int <- simi$regressions$m.chat2
@@ -309,6 +320,15 @@ unde <- stats_one_panel(ratings=ratings2,dep_var="understood",ind_var="bfi44_ext
 m.unde.dif <- unde$regressions$m.int
 m.unde.ext <- unde$regressions$m.chat1
 m.unde.int <- unde$regressions$m.chat2
+
+# Correction Methods 
+hb_corr <- data.frame(chat=m.chat.dif$p[4],diff=m.diff.dif$p[4],dist=m.dist.dif$p[4],
+                      enjo=m.enjo.dif$p[4],simi=m.simi.dif$p[4],unde=m.unde.dif$p[4])
+hb_corr <- hb_corr[order(hb_corr)]
+# Holm-Bonferroni Method
+hb_corr < .05/6:1
+# Bonferroni Method
+hb_corr < .05/6
 
 # combine
 exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11:13]),
@@ -593,6 +613,11 @@ if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 # # # # # A Panels (Likert scales and questionnaires) # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
+ann_text <- data.frame(lab="Text",scl90_anxiety = rep(.5,4), Response = rep(4.5,4),
+                       quest = factor(c("different","distant","similar","understood"), 
+                                      levels = c("chat-again","enjoy","different",
+                                                 "distant","similar","understood")),
+                       chat = c("Anxious","Non-Anxious"))
 ratings1$quest <- factor(ratings1$question, levels = c("chat-again","enjoy","different",
                                                        "distant","similar","understood"))
 ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
@@ -602,6 +627,7 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
        col = "GPT-4 type:", shape = "GPT-4 type:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
+  geom_text(data = ann_text,label = "*",col="black", size = 10) +
   scale_shape_manual(values = c(17, 19)) +
   scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
   scale_x_continuous(breaks = c(0, .5, 1), ) +
@@ -615,10 +641,15 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
                "distant" = "I felt distant\n from them",
                "understood" = "I felt that they\n understood me"))) +
   theme_classic() + 
-    theme(legend.position = "bottom",
-          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+  theme(legend.position = "bottom",
+        legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
+ann_text <- data.frame(lab="Text",bfi44_extraversion = rep(.5,4), Response = rep(4.5,4),
+                       quest = factor(c("similar"), 
+                                      levels = c("chat-again","enjoy","different",
+                                                 "distant","similar","understood")),
+                       chat = c("Extrovert","Introvert"))
 ratings2$quest <- factor(ratings2$question, levels = c("chat-again","enjoy","different",
                                                        "distant","similar","understood"))
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
@@ -628,6 +659,7 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
        col = "GPT-4 type:", shape = "GPT-4 type:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
+  geom_text(data = ann_text,label = "*",col="black", size = 10) +
   scale_shape_manual(values = c(17, 19)) +
   scale_colour_manual(values = c("#009E73","#CC79A7")) + 
   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
@@ -698,8 +730,8 @@ combine2.lf$variable<- as.character(combine2.lf$variable)
 combine1.lf$who <- factor(substr(combine1.lf$variable,1,4),levels = c("bots","user"))
 combine2.lf$who <- factor(substr(combine2.lf$variable,1,4),levels = c("bots","user"))
 # add a nicer names
-levels(combine1.lf$who) <- c("GPT-4 Texts","User Texts")
-levels(combine2.lf$who) <- c("GPT-4 Texts","User Texts")
+levels(combine1.lf$who) <- c("GPT-4 Texts","Participants Texts")
+levels(combine2.lf$who) <- c("GPT-4 Texts","Participants Texts")
 # add the sentiment on column variable (created with the columns in melt)
 combine1.lf$sentiment <- substr(combine1.lf$variable,6,nchar(combine1.lf$variable))
 combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variable))
@@ -716,17 +748,17 @@ levels(influence2$chat) <- c("Extrovert","Introvert")
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="GPT-4 Texts",]))
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
-anova(lmer(prop ~ sentiment * chat * scl90_anxiety + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="User Texts",]))
-summary(lmer(prop ~ sentiment * chat * scl90_anxiety + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="User Texts",]))
+anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="Participants Texts",]))
+summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="Participants Texts",]))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
-# report_table(t.test(user_Positive~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Neutral~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Negative~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Mixed~chat,combine1[combine1.lf$who=="User Texts",], paired = TRUE))
+report_table(t.test(user_Positive~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
+report_table(t.test(user_Neutral~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
+report_table(t.test(user_Negative~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
+report_table(t.test(user_Mixed~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
 
-ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
-                       lab = "Text", who = factor("User Texts",levels = c("Bot Texts","User Texts")),
+ann_text <- data.frame(sentiment = c(2,4), prop = c(.25,.45),
+                       lab = "Text", who = factor("Participants Texts",levels = c("GPT-4 Texts","Participants Texts")),
                        chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
@@ -735,10 +767,11 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
          col = "GPT-4 type:", shape = "GPT-4 type:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
-    geom_violin(position = position_dodge(0.5)) +
+    # geom_violin(position = position_dodge(0.5)) +
+    geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
     # geom_text(data = ann_text,label = "*", col="black", size = 10) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
+    scale_colour_manual(values = c("#0072B2", "#D55E00")) +
     scale_shape_manual(values = c(17,19)) +
     scale_y_continuous(breaks = c(0,.5,1)) +
     facet_wrap(who ~ ., ncol = 2) + 
@@ -754,8 +787,8 @@ ann_text <- data.frame(sentiment = c(2,4), count = c(.25,.45),
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="GPT-4 Texts",]))
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
-anova(lmer(prop ~ sentiment * chat * bfi44_extraversion + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="User Texts",]))
-summary(lmer(prop ~ sentiment * chat * bfi44_extraversion + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="User Texts",]))
+anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="Participants Texts",]))
+summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="Participants Texts",]))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
 # report_table(t.test(user_Positive~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
@@ -769,7 +802,8 @@ summary(lmer(prop ~ sentiment * chat * bfi44_extraversion + (1|Participant.Priva
          col = "GPT-4 type:", shape = "GPT-4 type:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
-    geom_violin(position = position_dodge(0.5)) +
+    # geom_violin(position = position_dodge(0.5)) +
+    geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
     scale_shape_manual(values = c(17,19)) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) +
@@ -842,21 +876,21 @@ levels(combine1.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 #     theme(legend.position = "bottom",
 #           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 # )
-(figure2C <- ggplot(combine1.lf, aes(x=scl90_anxiety,y=diff,col=diff)) + 
+if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
+(figure2C <- ggplot(combine1.lf, aes(x=scl90_anxiety,y=diff,fill=diff)) + 
     labs(title = "Anxiety and Sentiment",
          y=expression(Prop.[Anxious]-Prop.[Non*`-`*Anxious]), x = "Anxiety (SCL-90R)",
          col = "Sentiment:") +
     geom_hline(yintercept = 0) +
-    coord_cartesian(ylim = c(-.5,.5)) +
-    geom_point(alpha=.2) +
+    coord_cartesian(ylim = c(-.5,.8)) +
+    geom_point(alpha=.4, shape=21, col="black") +
     geom_smooth(method = "lm", col="black", se=F) +
-    # scale_colour_manual(values = c("#0072B2", "#D55E00")) +
-    scale_colour_gradient2(low="#D55E00",mid="grey10",high="#0072B2",midpoint=0,
-                           limits=c(-.5,.5), breaks=seq(-.5,.5, by=.1)) +
-    scale_y_continuous(breaks = c(-.5,0,.5)) +
+    scale_fill_gradient2(low="#D55E00",mid="white",high="#0072B2",midpoint=0,
+                         limits=range(combine1.lf$diff), 
+                         breaks=seq(min(combine1.lf$diff),max(combine1.lf$diff), by=.1)) +
+    scale_y_continuous(breaks = c(-.5,0,.8)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    # annotate("text",x=.8,y=.3,label="*",col="red",size=10) +
-    stat_cor(col="black",label.y=.45) +
+    stat_cor(col="black",label.y=.75) +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
@@ -886,21 +920,20 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 #     theme(legend.position = "bottom",
 #           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 # )
-(figure3C <- ggplot(combine2.lf, aes(x=bfi44_extraversion,y=diff,col=diff)) + 
+(figure3C <- ggplot(combine2.lf, aes(x=bfi44_extraversion,y=diff,fill=diff)) + 
     labs(title = "Extraversion and Sentiment",
          y=expression(Prop.[Extraversion]-Prop.[Intraversion]), x = "Extraversion (BFI-44)",
          col = "Sentiment:") +
     geom_hline(yintercept = 0) +
-    coord_cartesian(ylim = c(-.5,.5)) +
-    geom_point(alpha=.2) +
+    coord_cartesian(ylim = c(-.4,.55)) +
+    geom_point(alpha=.4, shape=21, col="black") +
     geom_smooth(method = "lm", col="black", se=F) +
-    # scale_colour_manual(values = c("#0072B2", "#D55E00")) +
-    scale_colour_gradient2(low="#CC79A7",mid="grey10",high="#009E73",midpoint=0,
-                           limits=c(-.5,.5), breaks=seq(-.5,.5, by=.1)) +
-    scale_y_continuous(breaks = c(-.5,0,.5)) +
+    scale_fill_gradient2(low="#CC79A7",mid="white",high="#009E73",midpoint=0,
+                         limits=range(combine2.lf$diff), 
+                         breaks=seq(min(combine2.lf$diff),max(combine2.lf$diff), by=.1)) +
+    scale_y_continuous(breaks = c(-.4,0,.5)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    # annotate("text",x=.8,y=.3,label="*",col="red",size=10) +
-    stat_cor(col="black",label.y=.45) +
+    stat_cor(col="black",label.y=.5) +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
@@ -1037,7 +1070,6 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # Combine Figures # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
 # fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
 #                             labels = c("A","B")))
 fig2 <- annotate_figure(ggarrange(figure2A,
@@ -1057,12 +1089,12 @@ fig3 <- annotate_figure(ggarrange(figure3A,
 if (print_fig == 1) {
   # ggsave("figures/fig2_v4.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
   #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig2_v5.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig2_v6.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
   
   # ggsave("figures/fig3_v4.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
   #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig3_v5.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig3_v6.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
 }
 
