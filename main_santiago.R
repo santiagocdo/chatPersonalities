@@ -7,7 +7,9 @@ print_fig <- 0
 # interaction (chat1 and chat2) via One Reach (thanks Daniel!)
 # behaviours in ratings
 ratings1 <- read.csv("experiment1/cleaned/ratings.csv")
+qual1 <- read.csv("experiment1/cleaned/qualitative.csv")
 ratings2 <- read.csv("experiment2/cleaned/ratings.csv")
+qual2 <- read.csv("experiment2/cleaned/qualitative.csv")
 # file with gorilla IDs and OneReach IDs
 task1 <- read.csv("experiment1/cleaned/task.csv")
 task1 <- task1[order(task1$Participant.Private.ID),]
@@ -46,6 +48,7 @@ bfi44 <- quest$bfi
 
 # add questionnaires to ratings
 ratings1 <- addQuestionnaireToDataFrame_e1(ratings1, scl90, bfi10)
+qual1 <- addQuestionnaireToDataFrame_e1(qual1, scl90, bfi10)
 ratings2 <- addQuestionnaireToDataFrame_e2(ratings2, bfi44)
 
 # add chat as factor with specific order
@@ -168,6 +171,26 @@ report_table(cor.test(temp$bfi10_agreeableness,temp$scl90_anxiety, method = "spe
 report_table(cor.test(temp$bfi10_conscientiousness,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_neuroticism,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_openness,temp$scl90_anxiety, method = "spearman"))
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Statistical Analysis: Preference Alex vs Pat# # # # # # # # # # # #### 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+pref1 <- qual1[!is.na(qual1$pref_anx),]
+pref1$non_bot_name <- ifelse(pref1$anx_bot_name=="pat","alex","pat")
+pref1$bot_name_first <- ifelse(pref1$order=="Anxious First",pref1$anx_bot_name,pref1$non_bot_name)
+table(pref1$Response,pref1$bot_name_first)
+chisq.test(table(pref1$Response,pref1$bot_name_first))
+
+pref1$pref_anx <- ifelse(pref1$pref_anx,1,0)
+summary(glm(pref_anx ~ scl90_anxiety, family = binomial, pref1))
+wilcox.test(scl90_anxiety~pref_anx, pref1)
+library(ggplot2)
+ggplot(pref1, aes(x=as.factor(pref_anx),y=scl90_anxiety)) + geom_boxplot() +
+  ggpubr::geom_signif(comparisons = list(c("0","1")), test = "wilcox.test", 
+                      step_increase = 0.075, map_signif_level = TRUE, tip_length = 0)
+
 
 
 
@@ -622,9 +645,9 @@ ratings1$quest <- factor(ratings1$question, levels = c("chat-again","enjoy","dif
                                                        "distant","similar","understood"))
 ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
 (figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat)) +
-  labs(title = "Users' Judgements", 
+  labs(title = "Participants' Judgements", 
        y="Likert Scale", x="Anxiety (SCL-90R)",
-       col = "GPT-4 type:", shape = "GPT-4 type:") +
+       col = "LLM type:", shape = "LLM type:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
   geom_text(data = ann_text,label = "*",col="black", size = 10) +
@@ -654,9 +677,9 @@ ratings2$quest <- factor(ratings2$question, levels = c("chat-again","enjoy","dif
                                                        "distant","similar","understood"))
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
 (figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat)) +
-  labs(title = "Users' Judgements", 
+  labs(title = "Participants' Judgements", 
        y="Likert Scale", x="Extraversion (BFI-44)",
-       col = "GPT-4 type:", shape = "GPT-4 type:") +
+       col = "LLM type:", shape = "LLM type:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
   geom_text(data = ann_text,label = "*",col="black", size = 10) +
@@ -747,30 +770,35 @@ levels(influence2$chat) <- c("Extrovert","Introvert")
 
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="GPT-4 Texts",]))
+report_table(t.test(bots_Positive~chat,combine1[,], paired = TRUE))
+report_table(t.test(bots_Neutral~chat,combine1[,], paired = TRUE))
+report_table(t.test(bots_Negative~chat,combine1[,], paired = TRUE))
+report_table(t.test(bots_Mixed~chat,combine1[,], paired = TRUE))
+
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="Participants Texts",]))
 summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine1.lf[combine1.lf$who=="Participants Texts",]))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
-report_table(t.test(user_Positive~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
-report_table(t.test(user_Neutral~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
-report_table(t.test(user_Negative~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
-report_table(t.test(user_Mixed~chat,combine1[combine1.lf$who=="Participants Texts",], paired = TRUE))
+report_table(t.test(user_Positive~chat,combine1[,], paired = TRUE))
+report_table(t.test(user_Neutral~chat,combine1[,], paired = TRUE))
+report_table(t.test(user_Negative~chat,combine1[,], paired = TRUE))
+report_table(t.test(user_Mixed~chat,combine1[,], paired = TRUE))
 
-ann_text <- data.frame(sentiment = c(2,4), prop = c(.25,.45),
+ann_text <- data.frame(sentiment = c(2,4), prop = c(.8,.9),
                        lab = "Text", who = factor("Participants Texts",levels = c("GPT-4 Texts","Participants Texts")),
                        chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
-         col = "GPT-4 type:", shape = "GPT-4 type:") +
+         col = "LLM type:", shape = "LLM type:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
     # geom_violin(position = position_dodge(0.5)) +
     geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
-    # geom_text(data = ann_text,label = "*", col="black", size = 10) +
+    geom_text(data = ann_text,label = "*", col="black", size = 10) +
     scale_colour_manual(values = c("#0072B2", "#D55E00")) +
     scale_shape_manual(values = c(17,19)) +
     scale_y_continuous(breaks = c(0,.5,1)) +
@@ -786,15 +814,20 @@ ann_text <- data.frame(sentiment = c(2,4), prop = c(.25,.45),
 
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="GPT-4 Texts",]))
+report_table(t.test(bots_Positive~chat,combine2[,], paired = TRUE))
+report_table(t.test(bots_Neutral~chat,combine2[,], paired = TRUE))
+report_table(t.test(bots_Negative~chat,combine2[,], paired = TRUE))
+report_table(t.test(bots_Mixed~chat,combine2[,], paired = TRUE))
+
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
 anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="Participants Texts",]))
 summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), combine2.lf[combine2.lf$who=="Participants Texts",]))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
-# report_table(t.test(user_Positive~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Neutral~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Negative~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
-# report_table(t.test(user_Mixed~chat,combine2[combine2.lf$who=="User Texts",], paired = TRUE))
+report_table(t.test(user_Positive~chat,combine2[,], paired = TRUE))
+report_table(t.test(user_Neutral~chat,combine2[,], paired = TRUE))
+report_table(t.test(user_Negative~chat,combine2[,], paired = TRUE))
+report_table(t.test(user_Mixed~chat,combine2[,], paired = TRUE))
 
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
@@ -844,8 +877,8 @@ if (!require(reshape2)) {install.packages("reshape2")}; library(reshape2)
 combine1.lf <- melt(combine1.wf, measure.vars = c("mixed","negative","neutral","positive"))
 combine2.lf <- melt(combine2.wf, measure.vars = c("mixed","negative","neutral","positive"))
 # change column names
-colnames(combine1.lf)[50:51] <- c("sentiment","diff")
-colnames(combine2.lf)[41:42] <- c("sentiment","diff")
+colnames(combine1.lf)[(ncol(combine1.lf)-1):ncol(combine1.lf)] <- c("sentiment","diff")
+colnames(combine2.lf)[(ncol(combine2.lf)-1):ncol(combine2.lf)] <- c("sentiment","diff")
 
 # stats experiment 1
 anova(lmer(diff ~ sentiment * scl90_anxiety + (1|Participant.Private.ID), combine1.lf))
@@ -981,89 +1014,6 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 #        x="Previous(t-1)",y="Current(t)",fill="P(x)",label="P(x)") + 
 #   geom_tile() + geom_text(col="red") +
 #   facet_grid(chatType~direction) + theme_classic()
-
-
-
-# # melt combine experiments 1 and 2
-# combine1.lf <- melt(combine1, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
-# combine2.lf <- melt(combine2, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
-# # change column name
-# colnames(combine1.lf)[ncol(combine1.lf)] <- c("rating") 
-# colnames(combine2.lf)[ncol(combine2.lf)] <- c("rating") 
-# 
-# plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
-#   combine.lf$x_axis <- combine.lf[,x_var]
-#   library(ggpubr)
-#   return(ggplot(combine.lf, aes(x=x_axis,y=rating,col=chatType)) + 
-#            labs(title=title,x = x_label, y = "Likert Scale") +
-#            geom_point(alpha=0.2,col="grey") +
-#            geom_smooth(method = "lm",se=F) + stat_cor() + 
-#            scale_y_continuous(breaks = 1:5, limits = c(1, 5),
-#                               labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
-#            facet_wrap(variable~., labeller = labeller(
-#              variable = c("chat-again" = "I would chat with\n them again",
-#                           "different" = "I felt that they were\n different from me",
-#                           "similar" = "I felt that we\n are similar",
-#                           "enjoy" = "I enjoyed our\n conversation",
-#                           "distant" = "I felt distant\n from them",
-#                           "understood" = "I felt that they\n understood me"))) + 
-#            theme_classic())
-# }
-# 
-# plotWhatMakesLikert(combine1.lf,title="Exp. 1: Num. Interactions",
-#                     x_var="num_interactions",x_label="Number of Intearactions")
-# plotWhatMakesLikert(combine1.lf,title="Exp. 1: User mirror Sentiment",
-#                     x_var="gpt_user_mirror",x_label="p(Bot --> User)")
-# plotWhatMakesLikert(combine1.lf,title="Exp. 1: Bot mirror Sentiment",
-#                     x_var="user_gpt_mirror",x_label="p(User --> Bot)")
-# plotWhatMakesLikert(combine1.lf,title="Exp. 1: GPT Average Word",
-#                     x_var="bots_mean_words",x_label="Bot Mean Words")
-# plotWhatMakesLikert(combine1.lf,title="Exp. 1: User Average Word",
-#                     x_var="user_mean_words",x_label="User Mean Words")
-# 
-# plotWhatMakesLikert(combine2.lf,title="Exp. 2: Num. Interactions",
-#                     x_var="num_interactions",x_label="Number of Intearactions")
-# plotWhatMakesLikert(combine2.lf,title="Exp. 2: User mirror Sentiment",
-#                     x_var="gpt_user_mirror",x_label="p(Bot --> User)")
-# plotWhatMakesLikert(combine2.lf,title="Exp. 2: Bot mirror Sentiment",
-#                     x_var="user_gpt_mirror",x_label="p(User --> Bot)")
-# plotWhatMakesLikert(combine2.lf,title="Exp. 2: GPT Average Word",
-#                     x_var="bots_mean_words",x_label="Bot Mean Words")
-# plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
-#                     x_var="user_mean_words",x_label="User Mean Words")
-# 
-# 
-# 
-# summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine1))
-# 
-# summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror + 
-#              bots_mean_words + user_mean_words, combine2))
-# 
-# m <- lm(understood ~ bots_Mixed + bots_Negative + bots_Neutral + bots_Positive +
-#              user_Mixed + user_Negative + user_Neutral + user_Positive, combine2)
-# summary(m)
-# step(m)
 
 
 
@@ -1287,22 +1237,97 @@ figure <- ggarrange(ggarrange(figureA,figureB,figureC,figureD, ncol=4,widths = c
                             axis.title.y = element_blank())
 )
 
-# # # How can the sentiment analysis moderate anxiety and understanding? # # #
-
-# More negatives messages from users impact in more negative messages from the bot?
-
-# longer user_mean_words
 
 
+#### ## ## ## ## # # # # # # # # Exploratory # # # # # # # # ## ## ## ## ####
+
+# melt combine experiments 1 and 2
+combine1.lf <- melt(combine1, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
+combine2.lf <- melt(combine2, measure.vars = c("chat-again","different","similar","enjoy","distant","understood"))
+# change column name
+colnames(combine1.lf)[ncol(combine1.lf)] <- c("rating")
+colnames(combine2.lf)[ncol(combine2.lf)] <- c("rating")
+
+plotWhatMakesLikert <- function (combine.lf, title, x_var, x_label) {
+  combine.lf$x_axis <- combine.lf[,x_var]
+  library(ggpubr)
+  return(ggplot(combine.lf, aes(x=x_axis,y=rating,col=chatType)) +
+           labs(title=title,x = x_label, y = "Likert Scale") +
+           geom_point(alpha=0.2,col="grey") +
+           geom_smooth(method = "lm",se=F) + stat_cor() +
+           scale_y_continuous(breaks = 1:5, limits = c(1, 5),
+                              labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+           facet_wrap(variable~., labeller = labeller(
+             variable = c("chat-again" = "I would chat with\n them again",
+                          "different" = "I felt that they were\n different from me",
+                          "similar" = "I felt that we\n are similar",
+                          "enjoy" = "I enjoyed our\n conversation",
+                          "distant" = "I felt distant\n from them",
+                          "understood" = "I felt that they\n understood me"))) +
+           theme_classic())
+}
+
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: Num. Interactions",
+                    x_var="num_interactions",x_label="Number of Intearactions")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: User mirror Sentiment",
+                    x_var="gpt_user_mirror",x_label="p(Bot --> User)")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: Bot mirror Sentiment",
+                    x_var="user_gpt_mirror",x_label="p(User --> Bot)")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: GPT Average Word",
+                    x_var="bots_mean_words",x_label="Bot Mean Words")
+plotWhatMakesLikert(combine1.lf,title="Exp. 1: User Average Word",
+                    x_var="user_mean_words",x_label="User Mean Words")
+
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: Num. Interactions",
+                    x_var="num_interactions",x_label="Number of Interactions")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: User mirror Sentiment",
+                    x_var="gpt_user_mirror",x_label="p(Bot --> User)")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: Bot mirror Sentiment",
+                    x_var="user_gpt_mirror",x_label="p(User --> Bot)")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: GPT Average Word",
+                    x_var="bots_mean_words",x_label="Bot Mean Words")
+plotWhatMakesLikert(combine2.lf,title="Exp. 2: User Average Word",
+                    x_var="user_mean_words",x_label="User Mean Words")
 
 
 
-# 17/12/2024
-# Effect sizes Positive versus Negative
-# Stats for interactions extro vs introvert in addition to the correlations
-# accounting for multiple comparisons
+summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
+summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine1))
 
-# Same script for the 2 experiments
-# Exp1 extroversion
+summary(lm(`chat-again` ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(different ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(similar ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(enjoy ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(distant ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
+summary(lm(understood ~ num_interactions + gpt_user_mirror + user_gpt_mirror +
+             bots_mean_words + user_mean_words, combine2))
 
-# omnibus test, reversing likerts to test an overall interaction
+m <- lm(understood ~ bots_Mixed + bots_Negative + bots_Neutral + bots_Positive +
+             user_Mixed + user_Negative + user_Neutral + user_Positive, combine2)
+summary(m)
+step(m)
+
+summary(lmer(user_mean_words~scl90_anxiety*chatType+(1|Participant.Private.ID), REML=F,combine1.lf))
+summary(lmer(user_mean_words~bfi44_extraversion*chatType+(1|Participant.Private.ID), REML=F,combine2.lf))
+summary(lmer(user_mean_words~bfi44_extraversion+(1|Participant.Private.ID), REML=F,combine2.lf))
+
+ggarrange(ggplot(combine1.lf, aes(x=scl90_anxiety,y=user_mean_words,col=chatType)) + 
+            stat_cor(method = "spearman") +stat_smooth(method = "lm"),
+          ggplot(combine2.lf, aes(x=bfi44_extraversion,y=user_mean_words,col=chatType)) + 
+            stat_cor(method = "spearman") +stat_smooth(method = "lm"))
+.

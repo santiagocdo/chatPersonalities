@@ -1,7 +1,7 @@
 rm(list=ls(all=TRUE))
 
 # print csv?
-print_csv <- 1
+print_csv <- 0
 
 
 
@@ -210,6 +210,18 @@ AB_dat$chat1_first[grepl("hu1g", AB_dat$Tree.Node.Key)] <- "no"
 # gorilla experiment
 AB_dat$gorillaExp <- "AB"
 
+# add chat condition column
+AB_dat$chatCondition <- NA
+# add chat condition label
+AB_dat$chatCondition[grepl("ncut", AB_dat$Tree.Node.Key)] <- "pat_anx"
+AB_dat$chatCondition[grepl("hu1g", AB_dat$Tree.Node.Key)] <- "pat_anx"
+AB_dat$chatCondition[grepl("4uru", AB_dat$Tree.Node.Key)] <- "alex_anx"
+AB_dat$chatCondition[grepl("mghz", AB_dat$Tree.Node.Key)] <- "alex_anx"
+AB_dat$chatCondition[grepl("vjth", AB_dat$Tree.Node.Key)] <- "alex_non"
+AB_dat$chatCondition[grepl("4nrv", AB_dat$Tree.Node.Key)] <- "alex_non"
+AB_dat$chatCondition[grepl("ppql", AB_dat$Tree.Node.Key)] <- "pat_non"
+AB_dat$chatCondition[grepl("tvu5", AB_dat$Tree.Node.Key)] <- "pat_non"
+
 
 
 
@@ -254,6 +266,14 @@ A_dat$chat1_first[grepl("mrfa", A_dat$Tree.Node.Key)] <- "yes"
 A_dat$chat1_first[grepl("xy27", A_dat$Tree.Node.Key)] <- "no"
 # gorilla experiment
 A_dat$gorillaExp <- "A"
+
+# add chat condition column
+A_dat$chatCondition <- NA
+# add chat condition label
+A_dat$chatCondition[grepl("keg8", A_dat$Tree.Node.Key)] <- "pat_anx"
+A_dat$chatCondition[grepl("vs28", A_dat$Tree.Node.Key)] <- "pat_anx"
+A_dat$chatCondition[grepl("mrfa", A_dat$Tree.Node.Key)] <- "alex_non"
+A_dat$chatCondition[grepl("xy27", A_dat$Tree.Node.Key)] <- "alex_non"
 
 
 
@@ -300,6 +320,15 @@ B_dat$chat1_first[grepl("ses1", B_dat$Tree.Node.Key)] <- "no"
 # gorilla experiment
 B_dat$gorillaExp <- "B"
 
+# add chat condition column
+B_dat$chatCondition <- NA
+# add chat condition label
+B_dat$chatCondition[grepl("p8dx", B_dat$Tree.Node.Key)] <- "alex_anx"
+B_dat$chatCondition[grepl("ocuq", B_dat$Tree.Node.Key)] <- "alex_anx"
+B_dat$chatCondition[grepl("19sb", B_dat$Tree.Node.Key)] <- "pat_non"
+B_dat$chatCondition[grepl("ses1", B_dat$Tree.Node.Key)] <- "pat_non"
+
+
 
 
 
@@ -312,7 +341,7 @@ B_dat$arm <- B_dat$randomiser.bl99
 # relevant columns
 relCols <- c("Participant.Public.ID","Participant.Private.ID","Participant.Status",
              "arm","Response","chat","chatType","counterbalance","chat1_first",
-             "gorillaExp")
+             "gorillaExp","chatCondition")
 # combine
 dat <- rbind(AB_dat[,relCols],A_dat[,relCols],B_dat[,relCols])
 # remove irrelevant rows
@@ -339,6 +368,8 @@ for (i in 1:length(AB_tasks)) {
   }
 }
 
+
+
 # counterbalance A
 A_tasks <- c("4a4q","ewzl")
 for (i in 1:length(A_tasks)) {
@@ -350,6 +381,8 @@ for (i in 1:length(A_tasks)) {
     A_dat <- rbind(A_dat,temp)
   }
 }
+
+
 
 # counterbalance B
 B_tasks <- c("gjc4","gbf9")
@@ -363,10 +396,14 @@ for (i in 1:length(B_tasks)) {
   }
 }
 
+
+
 # gorilla experiment
 AB_dat$gorillaExp <- "AB"
 A_dat$gorillaExp <- "A"
 B_dat$gorillaExp <- "B"
+
+
 
 # # # combine # # # ####
 # rename shared column with arm
@@ -425,6 +462,17 @@ likert$question[grepl("different", likert$Question.Key)] <- "different"
 likert$question[grepl("chat-again", likert$Question.Key)] <- "chat-again"
 likert$question <- as.factor(likert$question)
 
+# add chat condition
+likert$chat_condition <- NA
+likert$chat_condition[grepl("7ewr", likert$Tree.Node.Key)] <- "pat_anx"
+likert$chat_condition[grepl("6eoj", likert$Tree.Node.Key)] <- "alex_non"
+likert$chat_condition[grepl("wcll", likert$Tree.Node.Key)] <- "alex_anx"
+likert$chat_condition[grepl("eupm", likert$Tree.Node.Key)] <- "pat_non"
+likert$chat_condition[grepl("4a4q", likert$Tree.Node.Key)] <- "pat_anx"
+likert$chat_condition[grepl("ewzl", likert$Tree.Node.Key)] <- "alex_non"
+likert$chat_condition[grepl("gjc4", likert$Tree.Node.Key)] <- "alex_anx"
+likert$chat_condition[grepl("gbf9", likert$Tree.Node.Key)] <- "pat_non"
+
 # remove last irrelevant column
 likert$Tree.Node.Key <- NULL
 
@@ -432,6 +480,17 @@ likert$Tree.Node.Key <- NULL
 qualitative <- likert[grepl("response-",likert$Question.Key),]
 # remove columns
 qualitative$chatType <- qualitative$question <- NULL
+# all to lower
+qualitative$Response[grepl("response-1",qualitative$Question.Key)] <- 
+  tolower(qualitative$Response[grepl("response-1",qualitative$Question.Key)])
+# name of anxious bot
+qualitative$anx_bot_name <- dplyr::recode(qualitative$chat_condition,"alex_anx"="alex",
+                                          "alex_non"="pat","pat_anx"="pat","pat_non"="alex")
+# prefer anxious?
+qualitative$pref_anx <- NA
+qualitative$pref_anx[grepl("response-1-1",qualitative$Question.Key)] <- 
+  qualitative$Response[grepl("response-1-1",qualitative$Question.Key)] == qualitative$anx_bot_name[grepl("response-1-1",qualitative$Question.Key)]
+
 
 # get quantitative rows
 likert <- likert[grepl("quantised",likert$Question.Key),]
