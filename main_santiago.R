@@ -50,6 +50,7 @@ bfi44 <- quest$bfi
 ratings1 <- addQuestionnaireToDataFrame_e1(ratings1, scl90, bfi10)
 qual1 <- addQuestionnaireToDataFrame_e1(qual1, scl90, bfi10)
 ratings2 <- addQuestionnaireToDataFrame_e2(ratings2, bfi44)
+qual2 <- addQuestionnaireToDataFrame_e2(qual2, bfi44)
 
 # add chat as factor with specific order
 ratings1$chat <- as.factor(ratings1$chatType)
@@ -191,6 +192,19 @@ ggplot(pref1, aes(x=as.factor(pref_anx),y=scl90_anxiety)) + geom_boxplot() +
   ggpubr::geom_signif(comparisons = list(c("0","1")), test = "wilcox.test", 
                       step_increase = 0.075, map_signif_level = TRUE, tip_length = 0)
 
+pref2 <- qual2[!is.na(qual2$pref_ext),]
+pref2$non_bot_name <- ifelse(pref2$anx_bot_name=="pat","alex","pat")
+pref2$bot_name_first <- ifelse(pref2$order=="Extrovert First",pref2$anx_bot_name,pref2$non_bot_name)
+table(pref2$Response,pref2$bot_name_first)
+chisq.test(table(pref2$Response,pref2$bot_name_first))
+
+pref2$pref_ext <- ifelse(pref2$pref_ext,1,0)
+summary(glm(pref_ext ~ bfi44_extraversion, family = binomial, pref2))
+wilcox.test(bfi44_extraversion~pref_ext, pref2)
+library(ggplot2)
+ggplot(pref2, aes(x=as.factor(pref_ext),y=bfi44_extraversion)) + geom_boxplot() +
+  ggpubr::geom_signif(comparisons = list(c("0","1")), test = "wilcox.test",
+                      step_increase = 0.075, map_signif_level = TRUE, tip_length = 0)
 
 
 
