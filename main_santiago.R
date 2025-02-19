@@ -1344,4 +1344,15 @@ ggarrange(ggplot(combine1.lf, aes(x=scl90_anxiety,y=user_mean_words,col=chatType
             stat_cor(method = "spearman") +stat_smooth(method = "lm"),
           ggplot(combine2.lf, aes(x=bfi44_extraversion,y=user_mean_words,col=chatType)) + 
             stat_cor(method = "spearman") +stat_smooth(method = "lm"))
-.
+
+
+
+
+
+
+
+
+
+
+
+
