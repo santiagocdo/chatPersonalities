@@ -208,6 +208,15 @@ ggplot(pref2, aes(x=as.factor(pref_ext),y=bfi44_extraversion)) + geom_boxplot() 
 
 
 
+a<-ggplot(pref1, aes(x=scl90_anxiety)) + labs(x="Anxiety (SCL-90R)") + 
+  geom_histogram(bins=15,col="black",fill="white")
+b<-ggplot(pref2, aes(x=bfi44_extraversion)) + labs(x="Extroversion (BFI-44)") + 
+  geom_histogram(bins=15,col="black",fill="white")
+library(ggpubr)
+ggarrange(a,b,labels=c("A","B"))
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # Statistical Analysis: Ratings - Questionnaires# # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -244,13 +253,13 @@ m.unde.anx <- unde$regressions$m.chat1
 m.unde.nan <- unde$regressions$m.chat2
 
 # Correction Methods 
-hb_corr <- data.frame(chat=m.chat.int$p[4],diff=m.diff.int$p[4],dist=m.dist.int$p[4],
+hb_corr_1 <- data.frame(chat=m.chat.int$p[4],diff=m.diff.int$p[4],dist=m.dist.int$p[4],
                       enjo=m.enjo.int$p[4],simi=m.simi.int$p[4],unde=m.unde.int$p[4])
-hb_corr <- hb_corr[order(hb_corr)]
+hb_corr_1 <- hb_corr_1[order(hb_corr_1)]
 # Holm-Bonferroni Method
-hb_corr < .05/6:1
+hb_corr_1 < .05/6:1
 # Bonferroni Method
-hb_corr < .05/6
+hb_corr_1 < .05/6
 
 
 
@@ -273,6 +282,7 @@ exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11
               data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
               data.frame(quest="understood",effect="Anxious",m.unde.anx[2,9:11]),
               data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,9:11]))
+p_vals_1 <- c("p < .001", "p = .003", "p < .001", "p < .001")
 
 
 
@@ -359,13 +369,13 @@ m.unde.ext <- unde$regressions$m.chat1
 m.unde.int <- unde$regressions$m.chat2
 
 # Correction Methods 
-hb_corr <- data.frame(chat=m.chat.dif$p[4],diff=m.diff.dif$p[4],dist=m.dist.dif$p[4],
-                      enjo=m.enjo.dif$p[4],simi=m.simi.dif$p[4],unde=m.unde.dif$p[4])
-hb_corr <- hb_corr[order(hb_corr)]
+hb_corr_2 <- data.frame(chat=m.chat.dif$p[4],diff=m.diff.dif$p[4],dist=m.dist.dif$p[4],
+                        enjo=m.enjo.dif$p[4],simi=m.simi.dif$p[4],unde=m.unde.dif$p[4])
+hb_corr_2 <- hb_corr_2[order(hb_corr_2)]
 # Holm-Bonferroni Method
-hb_corr < .05/6:1
+hb_corr_2 < .05/6:1
 # Bonferroni Method
-hb_corr < .05/6
+hb_corr_2 < .05/6
 
 # combine
 exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11:13]),
@@ -386,6 +396,8 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11
               data.frame(quest="understood",effect="Interaction",m.unde.dif[4,11:13]),
               data.frame(quest="understood",effect="Extrovert",m.unde.ext[2,9:11]),
               data.frame(quest="understood",effect="Introvert",m.unde.int[2,9:11]))
+p_vals_2 <- c("p = .004")
+
 
 
 
@@ -651,21 +663,25 @@ if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 ann_text <- data.frame(lab="Text",scl90_anxiety = rep(.5,4), Response = rep(4.5,4),
-                       quest = factor(c("different","distant","similar","understood"), 
-                                      levels = c("chat-again","enjoy","different",
-                                                 "distant","similar","understood")),
+                       quest = factor(c("similar","understood","different","distant"), 
+                                      levels = c("similar","understood","chat-again",
+                                                 "enjoy","different","distant")),
                        chat = c("Anxious","Non-Anxious"))
-ratings1$quest <- factor(ratings1$question, levels = c("chat-again","enjoy","different",
-                                                       "distant","similar","understood"))
+ratings1$quest <- factor(ratings1$question, levels = c("similar","understood","chat-again",
+                                                       "enjoy","different","distant"))
 ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
-(figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat)) +
+(figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat,
+                                  linetype=chat)) +
   labs(title = "Participants' Judgements", 
        y="Likert Scale", x="Anxiety (SCL-90R)",
-       col = "LLM type:", shape = "LLM type:") +
+       col = "LLM type:", shape = "LLM type:",
+       linetype = "LLM type:") +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
-  geom_text(data = ann_text,label = "*",col="black", size = 10) +
+  geom_text(data = ann_text,label = c("***","**","***","***"),col="black", size = 10) +
+  # geom_text(data = ann_text, label = p_vals_1, col="black", size = 3) +
   scale_shape_manual(values = c(17, 19)) +
+  # scale_linetype_manual(values = c("solid","dashed")) +
   scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
   scale_x_continuous(breaks = c(0, .5, 1), ) +
   scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
@@ -684,19 +700,22 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
 
 ann_text <- data.frame(lab="Text",bfi44_extraversion = rep(.5,4), Response = rep(4.5,4),
                        quest = factor(c("similar"), 
-                                      levels = c("chat-again","enjoy","different",
-                                                 "distant","similar","understood")),
+                                      levels = c("similar","understood","chat-again",
+                                                 "enjoy","different","distant")),
                        chat = c("Extrovert","Introvert"))
-ratings2$quest <- factor(ratings2$question, levels = c("chat-again","enjoy","different",
-                                                       "distant","similar","understood"))
+ratings2$quest <- factor(ratings2$question, levels = c("similar","understood","chat-again",
+                                                       "enjoy","different","distant"))
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
-(figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat)) +
+(figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat,
+                                  linetype=chat)) +
   labs(title = "Participants' Judgements", 
-       y="Likert Scale", x="Extraversion (BFI-44)",
-       col = "LLM type:", shape = "LLM type:") +
+       y="Likert Scale", x="Extroversion (BFI-44)",
+       col = "LLM type:", shape = "LLM type:",
+       linetype = "LLM type:",) +
   geom_point(alpha = .1, stroke = 0, size = 1.5) +
   geom_smooth(method="lm", se = F, size = 1) +
-  geom_text(data = ann_text,label = "*",col="black", size = 10) +
+  geom_text(data = ann_text,label = c("**"),col="black", size = 10) +
+  # geom_text(data = ann_text, label = p_vals_2, col="black", size = 3) +
   scale_shape_manual(values = c(17, 19)) +
   scale_colour_manual(values = c("#009E73","#CC79A7")) + 
   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
@@ -952,7 +971,7 @@ anova(lmer(diff ~ sentiment * bfi44_extraversion + (1|Participant.Private.ID), c
 levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 # (figure3C <- ggplot(combine2.lf, aes(x=bfi44_extraversion,y=diff,col=sentiment)) +
 #     labs(title = "Exp. 2: Extraversion and Sentiment",
-#          y=expression(Prop.[Extraversion]-Prop.[Intraversion]), x = "Extraversion (BFI-44)",
+#          y=expression(Prop.[Extroversion]-Prop.[Intraversion]), x = "Extroversion (BFI-44)",
 #          col = "Sentiment:") +
 #     geom_hline(yintercept = 0) +
 #     coord_cartesian(ylim = c(-.5,.5)) +
@@ -968,8 +987,8 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 #           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 # )
 (figure3C <- ggplot(combine2.lf, aes(x=bfi44_extraversion,y=diff,fill=diff)) + 
-    labs(title = "Extraversion and Sentiment",
-         y=expression(Prop.[Extraversion]-Prop.[Intraversion]), x = "Extraversion (BFI-44)",
+    labs(title = "Extroversion and Sentiment",
+         y=expression(Prop.[Extroversion]-Prop.[Intraversion]), x = "Extroversion (BFI-44)",
          col = "Sentiment:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(-.4,.55)) +
@@ -1053,12 +1072,12 @@ fig3 <- annotate_figure(ggarrange(figure3A,
 if (print_fig == 1) {
   # ggsave("figures/fig2_v4.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
   #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig2_v6.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig2_v7.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
   
   # ggsave("figures/fig3_v4.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
   #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig3_v6.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig3_v7.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
 }
 
@@ -1135,7 +1154,7 @@ if (print_fig == 1) {
 ratings1$bfi10_extraversion <- ratings1$bfi10_extraversion/max(ratings1$bfi10_extraversion)
 (figureB <- ggplot(ratings1, aes(x=bfi10_extraversion ,y=Response,col=chat,shape=chat)) +
     labs(title = "Exp. 1", 
-         y="Likert Scale", x="Extraversion",
+         y="Likert Scale", x="Extroversion",
          col = "Chatbot", shape = "Chatbot") +
     geom_point(alpha = .1, stroke = 0, size = 1.5) +
     geom_smooth(method="lm", se = F, size = 1) +
@@ -1155,7 +1174,7 @@ ratings1$bfi10_extraversion <- ratings1$bfi10_extraversion/max(ratings1$bfi10_ex
 )
 (figureC <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat)) +
     labs(title = "Exp. 2", 
-         y="Likert Scale", x="Extraversion",
+         y="Likert Scale", x="Extroversion",
          col = "Chatbot", shape = "Chatbot") +
     geom_point(alpha = .1, stroke = 0, size = 1.5) +
     geom_smooth(method="lm", se = F, size = 1) +
