@@ -818,9 +818,10 @@ report_table(t.test(user_Neutral~chat,combine1[,], paired = TRUE))
 report_table(t.test(user_Negative~chat,combine1[,], paired = TRUE))
 report_table(t.test(user_Mixed~chat,combine1[,], paired = TRUE))
 
-ann_text <- data.frame(sentiment = c(2,4), prop = c(.8,.9),
-                       lab = "Text", who = factor("Participants Texts",levels = c("GPT-4 Texts","Participants Texts")),
-                       chat = c("Anxious","Non-Anxious"))
+ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95),
+                       who = factor(c(rep("GPT-4 Texts",4),rep("Participants Texts",2)),
+                                                    levels = c("GPT-4 Texts","Participants Texts")),
+                       lab = "Text", chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
@@ -831,7 +832,8 @@ ann_text <- data.frame(sentiment = c(2,4), prop = c(.8,.9),
     # geom_violin(position = position_dodge(0.5)) +
     geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
-    geom_text(data = ann_text,label = "*", col="black", size = 10) +
+    geom_text(data = ann_text,col="black", size = 7,
+              label = c("***","**",rep("***",2),"**","***")) +
     scale_colour_manual(values = c("#0072B2", "#D55E00")) +
     scale_shape_manual(values = c(17,19)) +
     scale_y_continuous(breaks = c(0,.5,1)) +
@@ -862,6 +864,10 @@ report_table(t.test(user_Neutral~chat,combine2[,], paired = TRUE))
 report_table(t.test(user_Negative~chat,combine2[,], paired = TRUE))
 report_table(t.test(user_Mixed~chat,combine2[,], paired = TRUE))
 
+ann_text <- data.frame(sentiment = c(2,3,4), prop = c(.2,.7,.95),
+                       who = factor(rep("GPT-4 Texts",3),
+                                    levels = c("GPT-4 Texts","Participants Texts")),
+                       lab = "Text", chat = c("Extrovert","Introvert","Introvert"))
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
@@ -871,6 +877,8 @@ report_table(t.test(user_Mixed~chat,combine2[,], paired = TRUE))
     # geom_violin(position = position_dodge(0.5)) +
     geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
+    geom_text(data = ann_text,col="black", size = 7,
+              label = rep("***",3)) +
     scale_shape_manual(values = c(17,19)) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) +
     scale_y_continuous(breaks = c(0,.5,1)) +
@@ -956,11 +964,13 @@ if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
                          breaks=seq(min(combine1.lf$diff),max(combine1.lf$diff), by=.1)) +
     scale_y_continuous(breaks = c(-.5,0,.8)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    stat_cor(col="black",label.y=.75) +
+    stat_cor(col="black",label.y=.75,method="pearson") +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
 )
+cor.test(combine1.lf$diff[combine1.lf$sentiment=="Negative"],
+         combine1.lf$scl90_anxiety[combine1.lf$sentiment=="Negative"],method="spearman")
 
 
 
@@ -999,7 +1009,7 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
                          breaks=seq(min(combine2.lf$diff),max(combine2.lf$diff), by=.1)) +
     scale_y_continuous(breaks = c(-.4,0,.5)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    stat_cor(col="black",label.y=.5) +
+    stat_cor(col="black",label.y=.5,method="pearson") +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
