@@ -649,7 +649,7 @@ if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 #           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 # )
 # if (print_fig == 1) {
-#   ggsave("figures/fig4_v3.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
+#   ggsave("figures/fig4.pdf", fig4, dpi = 1200, scale = 1, units = "cm",
 #          width = 16, height = 12, bg = "white")
 # }
 
@@ -1080,14 +1080,9 @@ fig3 <- annotate_figure(ggarrange(figure3A,
                   top = text_grob("Experiment 2", color = "black", face = "bold", size = 14))
 # fig3
 if (print_fig == 1) {
-  # ggsave("figures/fig2_v4.pdf", fig2, dpi = 2400, scale = .9, units = "cm",
-  #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig2_v7.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig2.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
-  
-  # ggsave("figures/fig3_v4.pdf", fig3, dpi = 2400, scale = .9, units = "cm",
-  #        width = 24, height = 16, bg = "white")
-  ggsave("figures/fig3_v7.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig3.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 24, bg = "white")
 }
 
