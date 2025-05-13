@@ -220,8 +220,37 @@ ggarrange(a,b,labels=c("A","B"))
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # Statistical Analysis: Ratings - Questionnaires# # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# stats
 if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
+# stats
+ratings1$aff_score <- ratings1$Response - 3
+ratings1$aff_score <- ifelse(ratings1$quest=="different"|ratings1$quest=="distant",
+                             -1*ratings1$aff_score,ratings1$aff_score) 
+ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) + 
+  geom_smooth(method="lm",se=F) +
+  facet_wrap(.~quest)
+ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) + 
+  geom_smooth(method="lm",se=F)
+# # interaction questionnaire with chat-type
+# m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat+(1|Participant.Private.ID), ratings1[,]))
+# # effect chat 1
+# m.chat1 <- report_table(lmer(aff_score ~ scl90_anxiety+(1|Participant.Private.ID), ratings1[ratings1$chat == "Anxious",]))
+# # effect chat 2
+# m.chat2 <- report_table(lmer(aff_score ~ scl90_anxiety+(1|Participant.Private.ID), ratings1[ratings1$chat == "Non-Anxious",]))
+library(dplyr)
+ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,scl90_anxiety,chat) %>%
+  summarise(aff_score=mean(aff_score))
+ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
+# interaction questionnaire with chat-type
+m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat+(1|Participant.Private.ID), ratings1_wf[,]))
+# effect chat 1
+m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Anxious",]))
+# effect chat 2
+m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Non-Anxious",]))
+
+
+
+
+
 chat <- stats_one_panel(ratings=ratings1,dep_var="chat-again",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
 m.chat.int <- chat$regressions$m.int
 m.chat.anx <- chat$regressions$m.chat1
@@ -254,7 +283,7 @@ m.unde.nan <- unde$regressions$m.chat2
 
 # Correction Methods 
 hb_corr_1 <- data.frame(chat=m.chat.int$p[4],diff=m.diff.int$p[4],dist=m.dist.int$p[4],
-                      enjo=m.enjo.int$p[4],simi=m.simi.int$p[4],unde=m.unde.int$p[4])
+                        enjo=m.enjo.int$p[4],simi=m.simi.int$p[4],unde=m.unde.int$p[4])
 hb_corr_1 <- hb_corr_1[order(hb_corr_1)]
 # Holm-Bonferroni Method
 hb_corr_1 < .05/6:1
@@ -264,25 +293,26 @@ hb_corr_1 < .05/6
 
 
 # combine
-exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
-              data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,9:11]),
-              data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,9:11]),
-              data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
-              data.frame(quest="different",effect="Anxious",m.diff.anx[2,9:11]),
-              data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,9:11]),
-              data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
-              data.frame(quest="distant",effect="Anxious",m.dist.anx[2,9:11]),
-              data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,9:11]),
-              data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),
-              data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,9:11]),
-              data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,9:11]),
-              data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
-              data.frame(quest="similar",effect="Anxious",m.simi.anx[2,9:11]),
-              data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,9:11]),
-              data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
-              data.frame(quest="understood",effect="Anxious",m.unde.anx[2,9:11]),
-              data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,9:11]))
+exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,c(11:13,8)]),
+              data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,c(9:11,8)]),
+              data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,c(9:11,8)]),
+              data.frame(quest="different",effect="Interaction",m.diff.int[4,c(11:13,8)]),
+              data.frame(quest="different",effect="Anxious",m.diff.anx[2,c(9:11,8)]),
+              data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,c(9:11,8)]),
+              data.frame(quest="distant",effect="Interaction",m.dist.int[4,c(11:13,8)]),
+              data.frame(quest="distant",effect="Anxious",m.dist.anx[2,c(9:11,8)]),
+              data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,c(9:11,8)]),
+              data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,c(11:13,8)]),
+              data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,c(9:11,8)]),
+              data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,c(9:11,8)]),
+              data.frame(quest="similar",effect="Interaction",m.simi.int[4,c(11:13,8)]),
+              data.frame(quest="similar",effect="Anxious",m.simi.anx[2,c(9:11,8)]),
+              data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,c(9:11,8)]),
+              data.frame(quest="understood",effect="Interaction",m.unde.int[4,c(11:13,8)]),
+              data.frame(quest="understood",effect="Anxious",m.unde.anx[2,c(9:11,8)]),
+              data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,c(9:11,8)]))
 p_vals_1 <- c("p < .001", "p = .003", "p < .001", "p < .001")
+exp1$p <- pValuesCategories(exp1$p)
 
 
 
@@ -317,24 +347,54 @@ m.unde.anx <- unde$regressions$m.chat1
 m.unde.nan <- unde$regressions$m.chat2
 
 # combine
-exp1_sm <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,11:13]),
-                 data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,9:11]),
-                 data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,9:11]),
-                 data.frame(quest="different",effect="Interaction",m.diff.int[4,11:13]),
-                 data.frame(quest="different",effect="Anxious",m.diff.anx[2,9:11]),
-                 data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,9:11]),
-                 data.frame(quest="distant",effect="Interaction",m.dist.int[4,11:13]),
-                 data.frame(quest="distant",effect="Anxious",m.dist.anx[2,9:11]),
-                 data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,9:11]),
-                 data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,11:13]),
-                 data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,9:11]),
-                 data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,9:11]),
-                 data.frame(quest="similar",effect="Interaction",m.simi.int[4,11:13]),
-                 data.frame(quest="similar",effect="Anxious",m.simi.anx[2,9:11]),
-                 data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,9:11]),
-                 data.frame(quest="understood",effect="Interaction",m.unde.int[4,11:13]),
-                 data.frame(quest="understood",effect="Anxious",m.unde.anx[2,9:11]),
-                 data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,9:11]))
+exp1_sm <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,c(11:13,8)]),
+                 data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,c(9:11,8)]),
+                 data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,c(9:11,8)]),
+                 data.frame(quest="different",effect="Interaction",m.diff.int[4,c(11:13,8)]),
+                 data.frame(quest="different",effect="Anxious",m.diff.anx[2,c(9:11,8)]),
+                 data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,c(9:11,8)]),
+                 data.frame(quest="distant",effect="Interaction",m.dist.int[4,c(11:13,8)]),
+                 data.frame(quest="distant",effect="Anxious",m.dist.anx[2,c(9:11,8)]),
+                 data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,c(9:11,8)]),
+                 data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,c(11:13,8)]),
+                 data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,c(9:11,8)]),
+                 data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,c(9:11,8)]),
+                 data.frame(quest="similar",effect="Interaction",m.simi.int[4,c(11:13,8)]),
+                 data.frame(quest="similar",effect="Anxious",m.simi.anx[2,c(9:11,8)]),
+                 data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,c(9:11,8)]),
+                 data.frame(quest="understood",effect="Interaction",m.unde.int[4,c(11:13,8)]),
+                 data.frame(quest="understood",effect="Anxious",m.unde.anx[2,c(9:11,8)]),
+                 data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,c(9:11,8)]))
+exp1_sm$p <- pValuesCategories(exp1_sm$p)
+
+
+
+# stats
+ratings2$aff_score <- ratings2$Response - 3
+ratings2$aff_score <- ifelse(ratings2$quest=="different"|ratings2$quest=="distant",
+                             -1*ratings2$aff_score,ratings2$aff_score) 
+ggplot(ratings2, aes(x=bfi44_extraversion,y=aff_score,col=chat)) + 
+  geom_smooth(method="lm",se=F) +
+  facet_wrap(.~quest)
+ggplot(ratings2, aes(x=bfi44_extraversion,y=aff_score,col=chat)) + 
+  geom_smooth(method="lm",se=F)
+# # interaction questionnaire with chat-type
+# m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat+(1|Participant.Private.ID), ratings2[,]))
+# # effect chat 1
+# m.chat1 <- report_table(lmer(aff_score ~ bfi44_extraversion+(1|Participant.Private.ID), ratings2[ratings2$chat == "Extrovert",]))
+# # effect chat 2
+# m.chat2 <- report_table(lmer(aff_score ~ bfi44_extraversion+(1|Participant.Private.ID), ratings2[ratings2$chat == "Introvert",]))
+ratings2_wf <- ratings2 %>% group_by(Participant.Private.ID,bfi44_extraversion,chat) %>%
+  summarise(aff_score=mean(aff_score))
+ratings2_wf$bfi44_extraversion <- ratings2_wf$bfi44_extraversion/max(ratings2_wf$bfi44_extraversion)
+# interaction questionnaire with chat-type
+m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat+(1|Participant.Private.ID), ratings2_wf[,]))
+# effect chat 1
+m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
+# effect chat 2
+m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Introvert",]))
+
+
 
 
 
@@ -378,26 +438,26 @@ hb_corr_2 < .05/6:1
 hb_corr_2 < .05/6
 
 # combine
-exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,11:13]),
-              data.frame(quest="chat-again",effect="Extrovert",m.chat.ext[2,9:11]),
-              data.frame(quest="chat-again",effect="Introvert",m.chat.int[2,9:11]),
-              data.frame(quest="different",effect="Interaction",m.diff.dif[4,11:13]),
-              data.frame(quest="different",effect="Extrovert",m.diff.ext[2,9:11]),
-              data.frame(quest="different",effect="Introvert",m.diff.int[2,9:11]),
-              data.frame(quest="distant",effect="Interaction",m.dist.dif[4,11:13]),
-              data.frame(quest="distant",effect="Extrovert",m.dist.ext[2,9:11]),
-              data.frame(quest="distant",effect="Introvert",m.dist.int[2,9:11]),
-              data.frame(quest="enjoy",effect="Interaction",m.enjo.dif[4,11:13]),
-              data.frame(quest="enjoy",effect="Extrovert",m.enjo.ext[2,9:11]),
-              data.frame(quest="enjoy",effect="Introvert",m.enjo.int[2,9:11]),
-              data.frame(quest="similar",effect="Interaction",m.simi.dif[4,11:13]),
-              data.frame(quest="similar",effect="Extrovert",m.simi.ext[2,9:11]),
-              data.frame(quest="similar",effect="Introvert",m.simi.int[2,9:11]),
-              data.frame(quest="understood",effect="Interaction",m.unde.dif[4,11:13]),
-              data.frame(quest="understood",effect="Extrovert",m.unde.ext[2,9:11]),
-              data.frame(quest="understood",effect="Introvert",m.unde.int[2,9:11]))
+exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,c(11:13,8)]),
+              data.frame(quest="chat-again",effect="Extrovert",m.chat.ext[2,c(9:11,8)]),
+              data.frame(quest="chat-again",effect="Introvert",m.chat.int[2,c(9:11,8)]),
+              data.frame(quest="different",effect="Interaction",m.diff.dif[4,c(11:13,8)]),
+              data.frame(quest="different",effect="Extrovert",m.diff.ext[2,c(9:11,8)]),
+              data.frame(quest="different",effect="Introvert",m.diff.int[2,c(9:11,8)]),
+              data.frame(quest="distant",effect="Interaction",m.dist.dif[4,c(11:13,8)]),
+              data.frame(quest="distant",effect="Extrovert",m.dist.ext[2,c(9:11,8)]),
+              data.frame(quest="distant",effect="Introvert",m.dist.int[2,c(9:11,8)]),
+              data.frame(quest="enjoy",effect="Interaction",m.enjo.dif[4,c(11:13,8)]),
+              data.frame(quest="enjoy",effect="Extrovert",m.enjo.ext[2,c(9:11,8)]),
+              data.frame(quest="enjoy",effect="Introvert",m.enjo.int[2,c(9:11,8)]),
+              data.frame(quest="similar",effect="Interaction",m.simi.dif[4,c(11:13,8)]),
+              data.frame(quest="similar",effect="Extrovert",m.simi.ext[2,c(9:11,8)]),
+              data.frame(quest="similar",effect="Introvert",m.simi.int[2,c(9:11,8)]),
+              data.frame(quest="understood",effect="Interaction",m.unde.dif[4,c(11:13,8)]),
+              data.frame(quest="understood",effect="Extrovert",m.unde.ext[2,c(9:11,8)]),
+              data.frame(quest="understood",effect="Introvert",m.unde.int[2,c(9:11,8)]))
 p_vals_2 <- c("p = .004")
-
+exp2$p <- pValuesCategories(exp2$p)
 
 
 
@@ -661,75 +721,140 @@ if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # A Panels (Likert scales and questionnaires) # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-ann_text <- data.frame(lab="Text",scl90_anxiety = rep(.5,4), Response = rep(4.5,4),
+ann_text <- data.frame(lab="Text",scl90_anxiety = rep(.5,4), Response = c(4.5,4),
                        quest = factor(c("similar","understood","different","distant"), 
                                       levels = c("similar","understood","chat-again",
                                                  "enjoy","different","distant")),
                        chat = c("Anxious","Non-Anxious"))
+ann_text_anx <- data.frame(lab="Text",scl90_anxiety = c(.94,.95,.94,.95), Response = c(4.5,4.3,1.5,1.5),
+                           quest = factor(c("similar","understood","different","distant"),
+                                          levels = c("similar","understood","chat-again",
+                                                     "enjoy","different","distant")),
+                       chat = c("Anxious","Non-Anxious"))
+ann_text_non <- data.frame(lab="Text",scl90_anxiety = c(.95), Response = c(4.4),
+                           quest = factor(c("different"),
+                                          levels = c("similar","understood","chat-again",
+                                                     "enjoy","different","distant")),
+                           chat = c("Anxious","Non-Anxious"))
+
 ratings1$quest <- factor(ratings1$question, levels = c("similar","understood","chat-again",
                                                        "enjoy","different","distant"))
-ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety) 
-(figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat,
+ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
+# (figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat,
+#                                   linetype=chat)) +
+#   labs(title = "Participants' Judgements", 
+#        y="Likert Scale", x="Anxiety (SCL-90R)",
+#        col = "LLM type:", shape = "LLM type:",
+#        linetype = "LLM type:") +
+#   geom_point(alpha = .1, stroke = 0, size = 1.5) +
+#   geom_smooth(method="lm", se = F, size = 1) +
+#   geom_text(data = ann_text,label = c("***","**","***","***"),col="black", size = 10) +
+#   # geom_text(data = ann_text, label = p_vals_1, col="black", size = 3) +
+#   geom_text(data=ann_text_anx, label =  c("***","**","***","**"),col="#0072B2", size = 7) +
+#   geom_text(data=ann_text_non, label =  c("*"),col="#D55E00", size = 7) +
+#   scale_shape_manual(values = c(17, 19)) +
+#   # scale_linetype_manual(values = c("solid","dashed")) +
+#   scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
+#   scale_x_continuous(breaks = c(0, .5, 1), ) +
+#   scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+#   coord_cartesian(ylim = c(1, 5)) +
+#   facet_wrap(. ~ quest, ncol = 2, labeller = labeller(
+#     quest = c("chat-again" = "I would chat with\n them again",
+#               "different" = "I felt that they were\n different from me",
+#                "similar" = "I felt that we\n are similar",
+#                "enjoy" = "I enjoyed our\n conversation",
+#                "distant" = "I felt distant\n from them",
+#                "understood" = "I felt that they\n understood me"))) +
+#   theme_classic() + 
+#   theme(legend.position = "bottom",
+#         legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+# )
+(figure2A <- ggplot(ratings1_wf, aes(x=scl90_anxiety,y=aff_score,col=chat,shape=chat,
                                   linetype=chat)) +
-  labs(title = "Participants' Judgements", 
-       y="Likert Scale", x="Anxiety (SCL-90R)",
-       col = "LLM type:", shape = "LLM type:",
-       linetype = "LLM type:") +
-  geom_point(alpha = .1, stroke = 0, size = 1.5) +
-  geom_smooth(method="lm", se = F, size = 1) +
-  geom_text(data = ann_text,label = c("***","**","***","***"),col="black", size = 10) +
-  # geom_text(data = ann_text, label = p_vals_1, col="black", size = 3) +
-  scale_shape_manual(values = c(17, 19)) +
-  # scale_linetype_manual(values = c("solid","dashed")) +
-  scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
-  scale_x_continuous(breaks = c(0, .5, 1), ) +
-  scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
-  coord_cartesian(ylim = c(1, 5)) +
-  facet_wrap(. ~ quest, ncol = 2, labeller = labeller(
-    quest = c("chat-again" = "I would chat with\n them again",
-              "different" = "I felt that they were\n different from me",
-               "similar" = "I felt that we\n are similar",
-               "enjoy" = "I enjoyed our\n conversation",
-               "distant" = "I felt distant\n from them",
-               "understood" = "I felt that they\n understood me"))) +
-  theme_classic() + 
-  theme(legend.position = "bottom",
-        legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+    labs(title = "Participants' Judgements", 
+         y="Affiliation Score", x="Anxiety (SCL-90R)",
+         col = "LLM type:", shape = "LLM type:",
+         linetype = "LLM type:") +
+    # geom_jitter(height = .05, alpha = .1, stroke = 0, size = 1.5) +
+    geom_point(alpha = .1, stroke = 0, size = 1.5) +
+    geom_smooth(method="lm", se = F, size = 1) +
+    annotate("text",x=c(.5,.95),y=c(1.5,1.6),label=c("***","***"),col=c("black","#0072B2"),
+             size=c(10,7)) +
+    scale_shape_manual(values = c(17, 19)) +
+    # scale_linetype_manual(values = c("solid","dashed")) +
+    scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
+    scale_x_continuous(breaks = c(0, .5, 1), ) +
+    # scale_y_continuous(breaks = c(-2:2), labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+    scale_y_continuous(breaks = c(-2:2), labels = c("-2","","0","","+2")) +
+    coord_cartesian(ylim = c(-2, 2)) +
+    theme_classic() + 
+    theme(legend.position = c(.8,.15),
+          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
+
+
 
 ann_text <- data.frame(lab="Text",bfi44_extraversion = rep(.5,4), Response = rep(4.5,4),
                        quest = factor(c("similar"), 
                                       levels = c("similar","understood","chat-again",
                                                  "enjoy","different","distant")),
                        chat = c("Extrovert","Introvert"))
+ann_text_ext <- data.frame(lab="Text",bfi44_extraversion = c(.95,.95,.95,.95), Response = c(4.5,4.5,4.5,1.5),
+                           quest = factor(c("similar","chat-again","enjoy","different"),
+                                          levels = c("similar","understood","chat-again",
+                                                     "enjoy","different","distant")),
+                           chat = c("Extrovert","Introvert"))
+
 ratings2$quest <- factor(ratings2$question, levels = c("similar","understood","chat-again",
                                                        "enjoy","different","distant"))
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
-(figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat,
+# (figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat,
+#                                   linetype=chat)) +
+#   labs(title = "Participants' Judgements", 
+#        y="Likert Scale", x="Extroversion (BFI-44)",
+#        col = "LLM type:", shape = "LLM type:",
+#        linetype = "LLM type:",) +
+#   geom_point(alpha = .1, stroke = 0, size = 1.5) +
+#   geom_smooth(method="lm", se = F, size = 1) +
+#   geom_text(data = ann_text,label = c("**"),col="black", size = 10) +
+#   # geom_text(data = ann_text, label = p_vals_2, col="black", size = 3) +
+#   geom_text(data = ann_text_ext,label = c("**","*","*","*"),col="#009E73", size = 7) +
+#   scale_shape_manual(values = c(17, 19)) +
+#   scale_colour_manual(values = c("#009E73","#CC79A7")) + 
+#   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
+#   scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+#   coord_cartesian(ylim = c(1, 5)) +
+#   facet_wrap(. ~ quest, ncol = 2, labeller = labeller(
+#     quest = c("chat-again" = "I would chat with\n them again",
+#               "different" = "I felt that they were\n different from me",
+#               "similar" = "I felt that we\n are similar",
+#               "enjoy" = "I enjoyed our\n conversation",
+#               "distant" = "I felt distant\n from them",
+#               "understood" = "I felt that they\n understood me"))) +
+#   theme_classic() + 
+#     theme(legend.position = "bottom",
+#           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+# )
+(figure3A <- ggplot(ratings2_wf, aes(x=bfi44_extraversion,y=aff_score,col=chat,shape=chat,
                                   linetype=chat)) +
-  labs(title = "Participants' Judgements", 
-       y="Likert Scale", x="Extroversion (BFI-44)",
-       col = "LLM type:", shape = "LLM type:",
-       linetype = "LLM type:",) +
-  geom_point(alpha = .1, stroke = 0, size = 1.5) +
-  geom_smooth(method="lm", se = F, size = 1) +
-  geom_text(data = ann_text,label = c("**"),col="black", size = 10) +
-  # geom_text(data = ann_text, label = p_vals_2, col="black", size = 3) +
-  scale_shape_manual(values = c(17, 19)) +
-  scale_colour_manual(values = c("#009E73","#CC79A7")) + 
-  scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-  scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
-  coord_cartesian(ylim = c(1, 5)) +
-  facet_wrap(. ~ quest, ncol = 2, labeller = labeller(
-    quest = c("chat-again" = "I would chat with\n them again",
-              "different" = "I felt that they were\n different from me",
-              "similar" = "I felt that we\n are similar",
-              "enjoy" = "I enjoyed our\n conversation",
-              "distant" = "I felt distant\n from them",
-              "understood" = "I felt that they\n understood me"))) +
-  theme_classic() + 
-    theme(legend.position = "bottom",
+    labs(title = "Participants' Judgements", 
+         y="Affiliation Score", x="Extroversion (BFI-44)",
+         col = "LLM type:", shape = "LLM type:",
+         linetype = "LLM type:") +
+    # geom_jitter(height = .05, alpha = .1, stroke = 0, size = 1.5) +
+    geom_point(alpha = .1, stroke = 0, size = 1.5) +
+    geom_smooth(method="lm", se = F, size = 1) +
+    annotate("text",x=c(.5,.95),y=c(1.5,1.3),label=c("***","***"),col=c("black","#009E73"),
+             size=c(10,7)) +
+    scale_shape_manual(values = c(17, 19)) +
+    # scale_linetype_manual(values = c("solid","dashed")) +
+    scale_colour_manual(values = c("#009E73","#CC79A7")) + 
+    scale_x_continuous(breaks = c(0, .5, 1), ) +
+    # scale_y_continuous(breaks = c(-2:2), labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
+    scale_y_continuous(breaks = c(-2:2), labels = c("-2","","0","","+2")) +
+    coord_cartesian(ylim = c(-2, 2),xlim = c(0,1)) +
+    theme_classic() + 
+    theme(legend.position = c(.2,.15),
           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 )
 
@@ -823,6 +948,27 @@ ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95)
                                                     levels = c("GPT-4 Texts","Participants Texts")),
                        lab = "Text", chat = c("Anxious","Non-Anxious"))
 # visualize the average of count for each sentiment and for each chat personality
+# (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
+#     labs(title = "Sentiment Analysis",
+#          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
+#          col = "LLM type:", shape = "LLM type:") +
+#     geom_hline(yintercept = 0) +
+#     coord_cartesian(ylim = c(0,1)) +
+#     # geom_violin(position = position_dodge(0.5)) +
+#     geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
+#     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
+#     geom_text(data = ann_text,col="black", size = 7,
+#               label = c("***","**",rep("***",2),"**","***")) +
+#     scale_colour_manual(values = c("#0072B2", "#D55E00")) +
+#     scale_shape_manual(values = c(17,19)) +
+#     scale_y_continuous(breaks = c(0,.5,1)) +
+#     facet_wrap(who ~ ., ncol = 2) + 
+#     theme_classic() +
+#     # guides(color = guide_legend(nrow = 2)) +
+#     theme(legend.position = "bottom", #c(.3,.89),
+#           axis.text.x = element_text(angle = 45, hjust = 1),
+#           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
+# )
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
@@ -837,12 +983,15 @@ ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95)
     scale_colour_manual(values = c("#0072B2", "#D55E00")) +
     scale_shape_manual(values = c(17,19)) +
     scale_y_continuous(breaks = c(0,.5,1)) +
-    facet_wrap(who ~ ., ncol = 2) + 
+    facet_wrap(. ~ who, nrow = 2) + 
     theme_classic() +
     # guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = "bottom", #c(.3,.89),
-          axis.text.x = element_text(angle = 45, hjust = 1),
+    guides(shape = guide_legend(nrow = 2),
+           color = guide_legend(nrow = 2)) +
+    theme(legend.position = "bottom", legend.box = "vertical", #c(.3,.89),
+          axis.text.x = element_text(angle = 30, hjust = 1),
           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
+  
 )
 
 
@@ -868,10 +1017,31 @@ ann_text <- data.frame(sentiment = c(2,3,4), prop = c(.2,.7,.95),
                        who = factor(rep("GPT-4 Texts",3),
                                     levels = c("GPT-4 Texts","Participants Texts")),
                        lab = "Text", chat = c("Extrovert","Introvert","Introvert"))
+# (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
+#     labs(title = "Sentiment Analysis",
+#          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
+#          col = "GPT-4 type:", shape = "GPT-4 type:") +
+#     geom_hline(yintercept = 0) +
+#     coord_cartesian(ylim = c(0,1)) +
+#     # geom_violin(position = position_dodge(0.5)) +
+#     geom_boxplot(alpha=.3,position = position_dodge(0.5)) +
+#     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
+#     geom_text(data = ann_text,col="black", size = 7,
+#               label = rep("***",3)) +
+#     scale_shape_manual(values = c(17,19)) +
+#     scale_colour_manual(values = c("#009E73","#CC79A7")) +
+#     scale_y_continuous(breaks = c(0,.5,1)) +
+#     facet_wrap(who ~ ., ncol = 2) + 
+#     theme_classic() +
+#     # guides(color = guide_legend(nrow = 2)) +
+#     theme(legend.position = "bottom", #c(.3,.89),
+#           axis.text.x = element_text(angle = 45, hjust = 1),
+#           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
+# )
 (figure3B <- ggplot(combine2.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
-         col = "GPT-4 type:", shape = "GPT-4 type:") +
+         col = "LLM type:", shape = "LLM type:") +
     geom_hline(yintercept = 0) +
     coord_cartesian(ylim = c(0,1)) +
     # geom_violin(position = position_dodge(0.5)) +
@@ -882,11 +1052,13 @@ ann_text <- data.frame(sentiment = c(2,3,4), prop = c(.2,.7,.95),
     scale_shape_manual(values = c(17,19)) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) +
     scale_y_continuous(breaks = c(0,.5,1)) +
-    facet_wrap(who ~ ., ncol = 2) + 
+    facet_wrap(. ~ who, nrow = 2) + 
     theme_classic() +
     # guides(color = guide_legend(nrow = 2)) +
-    theme(legend.position = "bottom", #c(.3,.89),
-          axis.text.x = element_text(angle = 45, hjust = 1),
+    guides(shape = guide_legend(nrow = 2),
+           color = guide_legend(nrow = 2)) +
+    theme(legend.position = "bottom", legend.box = "vertical", #c(.3,.89),
+          axis.text.x = element_text(angle = 30, hjust = 1),
           legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
 )
 
@@ -964,7 +1136,7 @@ if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
                          breaks=seq(min(combine1.lf$diff),max(combine1.lf$diff), by=.1)) +
     scale_y_continuous(breaks = c(-.5,0,.8)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    stat_cor(col="black",label.y=.75,method="pearson") +
+    stat_cor(col="black",label.y=.75,method="pearson",r.accuracy=.01,p.accuracy=.001) +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
@@ -1009,7 +1181,7 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
                          breaks=seq(min(combine2.lf$diff),max(combine2.lf$diff), by=.1)) +
     scale_y_continuous(breaks = c(-.4,0,.5)) +
     scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
-    stat_cor(col="black",label.y=.5,method="pearson") +
+    stat_cor(col="black",label.y=.5,method="pearson",r.accuracy=.01,p.accuracy=.001) +
     theme_classic() +
     facet_wrap(sentiment~., ncol=2) +
     theme(legend.position = "none")
@@ -1065,25 +1237,35 @@ levels(combine2.lf$sentiment) <- c("Mixed","Negative","Neutral","Positive")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # fig2 <- ggarrange(ggarrange(figure2A,figure2B, ncol=2, widths = c(2,1),
 #                             labels = c("A","B")))
-fig2 <- annotate_figure(ggarrange(figure2A,
-                  ggarrange(figure2B,figure2C, nrow=2, heights = c(1, 1.2),
-                            labels = c("B","C")),
-                  ncol=2, widths = c(1, 1), labels = c("A","")),
-                  top = text_grob("Experiment 1", color = "black", face = "bold", size = 14))
+# fig2 <- annotate_figure(ggarrange(figure2A,
+#                   ggarrange(figure2B,figure2C, nrow=2, heights = c(1, 1.2),
+#                             labels = c("B","C")),
+#                   ncol=2, widths = c(1, 1), labels = c("A","")),
+#                   top = text_grob("Experiment 1", color = "black", face = "bold", size = 14))
+fig2 <- annotate_figure(ggarrange(figure2A,figure2B,figure2C,
+                                  ncol=3, widths = c(3, 2, 3), labels = c("A","B","C")),
+                        top = text_grob("Experiment 1", color = "black", face = "bold", size = 14))
 # fig2
 # fig3 <- ggarrange(ggarrange(figure3A,figure3B, ncol=2, widths = c(2,1),
 #                             labels = c("A","B")))
-fig3 <- annotate_figure(ggarrange(figure3A,
-                  ggarrange(figure3B,figure3C, nrow=2, heights = c(1, 1.2),
-                            labels = c("B","C")),
-                  ncol=2, widths = c(1, 1), labels = c("A","")),
-                  top = text_grob("Experiment 2", color = "black", face = "bold", size = 14))
+# fig3 <- annotate_figure(ggarrange(figure3A,
+#                   ggarrange(figure3B,figure3C, nrow=2, heights = c(1, 1.2),
+#                             labels = c("B","C")),
+#                   ncol=2, widths = c(1, 1), labels = c("A","")),
+#                   top = text_grob("Experiment 2", color = "black", face = "bold", size = 14))
+fig3 <- annotate_figure(ggarrange(figure3A,figure3B,figure3C,
+                                  ncol=3, widths = c(3, 2, 3), labels = c("A","B","C")),
+                        top = text_grob("Experiment 2", color = "black", face = "bold", size = 14))
 # fig3
 if (print_fig == 1) {
+  # ggsave("figures/fig2.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
+  #        width = 24, height = 24, bg = "white")
   ggsave("figures/fig2.pdf", fig2, dpi = 2400, scale = .85, units = "cm",
-         width = 24, height = 24, bg = "white")
+         width = 30, height = 15, bg = "white")
+  # ggsave("figures/fig3.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
+  #        width = 24, height = 24, bg = "white")
   ggsave("figures/fig3.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
-         width = 24, height = 24, bg = "white")
+         width = 30, height = 15, bg = "white")
 }
 
 

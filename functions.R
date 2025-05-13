@@ -4,6 +4,11 @@ outersect <- function(x, y) {
          setdiff(y, x)))
 }
 
+# absolute p values to categories (*, **, ***, ns)
+pValuesCategories <- function (temp) {ifelse(temp <= .05 & temp > .01,"*",
+                                             ifelse(temp <= .01 & temp > .001,"**",
+                                                    ifelse(temp <= .001,"***","")))}
+
 # score questionnaires Experiment 1
 scoreQuestionnaires_e1 <- function(scl90, bfi10) {
   # # # # # # # # # # # # # # # SCL90-R # # # # # # # # # # # # # # #
