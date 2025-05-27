@@ -1,10 +1,21 @@
 # chatPersonalities
-This repository contains the R analysis scripts for the collaboration beween OneReach(R) and the Computational Psychopathology Research Group at Oxford.
+This repository contains the R analysis scripts for the collaboration beween OneReach(R) and the Computational Psychopathology Research Group at Oxford. Manuscript here: https://osf.io/preprints/psyarxiv/mqunw_v1.
+
+
+# 1. Reproduce Figures and Analysis
+
+- open <code>main.R</code>, this script uses the cleaned data from the folders <code>experiment1/</code> and <code>experiment2/</code>
+- this script also calls <code>functions.R</code> to scored the psychological questionnaires.
+- the output of this script are Figures 2 and Figure 3, as well as Figure S1 and Figure S2. 
+- the statistics reported in the manuscript are within this script.
 
 
 
-# Experiment 1 (anxiety)
-## Notes
+# 2. Cleaning Raw Data
+
+## Experiment 1 (anxiety)
+
+### Notes
 * Chat 1 is always Anxious.
 * Chat 2 is always Normal.
 
@@ -17,7 +28,7 @@ The names assigned to the chatbots are what is counterbalanced. In Counterbalanc
 
 
 
-## Counterbalance A only: 
+### Counterbalance A only: 
 Link: https://app.gorilla.sc/admin/project/93613
 
 N = 36
@@ -38,7 +49,7 @@ Nodes names:
 
 
 
-## Counterbalance B only: 
+### Counterbalance B only: 
 
 Link: https://app.gorilla.sc/admin/project/115811
 
@@ -60,7 +71,7 @@ Nodes names:
 
 
 
-## Counterbalance AB: 
+### Counterbalance AB: 
 
 Link: https://app.gorilla.sc/admin/project/122806 "oneReach_counterbalance A and B"
 
@@ -88,8 +99,9 @@ Nodes names:
 
 
  
-# Experiment 2 (extraversion)
-## Notes
+## Experiment 2 (extraversion)
+
+### Notes
 * Chat 1 is always Extrovert.
 * Chat 2 is always Introvert.
 
@@ -102,7 +114,7 @@ The names assigned to the chatbots are what is counterbalanced. In Counterbalanc
 
 
 
-## Counterbalance AB: 
+### Counterbalance AB: 
 
 link: https://app.gorilla.sc/admin/project/122806 "oneReach_exp2_counterbalance B"
 
