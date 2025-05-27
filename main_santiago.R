@@ -187,7 +187,7 @@ chisq.test(table(pref1$Response,pref1$bot_name_first))
 pref1$pref_anx <- ifelse(pref1$pref_anx,1,0)
 summary(glm(pref_anx ~ scl90_anxiety, family = binomial, pref1))
 wilcox.test(scl90_anxiety~pref_anx, pref1)
-library(ggplot2)
+if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 ggplot(pref1, aes(x=as.factor(pref_anx),y=scl90_anxiety)) + geom_boxplot() +
   ggpubr::geom_signif(comparisons = list(c("0","1")), test = "wilcox.test", 
                       step_increase = 0.075, map_signif_level = TRUE, tip_length = 0)
@@ -201,7 +201,6 @@ chisq.test(table(pref2$Response,pref2$bot_name_first))
 pref2$pref_ext <- ifelse(pref2$pref_ext,1,0)
 summary(glm(pref_ext ~ bfi44_extraversion, family = binomial, pref2))
 wilcox.test(bfi44_extraversion~pref_ext, pref2)
-library(ggplot2)
 ggplot(pref2, aes(x=as.factor(pref_ext),y=bfi44_extraversion)) + geom_boxplot() +
   ggpubr::geom_signif(comparisons = list(c("0","1")), test = "wilcox.test",
                       step_increase = 0.075, map_signif_level = TRUE, tip_length = 0)
@@ -212,7 +211,7 @@ a<-ggplot(pref1, aes(x=scl90_anxiety)) + labs(x="Anxiety (SCL-90R)") +
   geom_histogram(bins=15,col="black",fill="white")
 b<-ggplot(pref2, aes(x=bfi44_extraversion)) + labs(x="Extroversion (BFI-44)") + 
   geom_histogram(bins=15,col="black",fill="white")
-library(ggpubr)
+if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
 ggarrange(a,b,labels=c("A","B"))
 
 
@@ -236,7 +235,7 @@ ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) +
 # m.chat1 <- report_table(lmer(aff_score ~ scl90_anxiety+(1|Participant.Private.ID), ratings1[ratings1$chat == "Anxious",]))
 # # effect chat 2
 # m.chat2 <- report_table(lmer(aff_score ~ scl90_anxiety+(1|Participant.Private.ID), ratings1[ratings1$chat == "Non-Anxious",]))
-library(dplyr)
+if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,scl90_anxiety,chat) %>%
   summarise(aff_score=mean(aff_score))
 ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
@@ -247,7 +246,16 @@ m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$ch
 # effect chat 2
 m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Non-Anxious",]))
 
-
+if (!require(pwr)) {install.packages("pwr")}; library(pwr)
+# Example values
+R2 <- 0.1176  # R-squared value from the linear regression
+alpha <- 0.05  # Significance level
+n <- 89  # Total number of observations
+u <- 1  # Number of predictors
+# Calculate the effect size
+f2 <- R2 / (1 - R2)
+# Calculate the power
+pwr.f2.test(u = u, v = n - u - 1, f2 = f2, sig.level = alpha)
 
 
 
@@ -394,7 +402,15 @@ m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_
 # effect chat 2
 m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Introvert",]))
 
-
+# Example values
+R2 <- 0.06206  # R-squared value from the linear regression
+alpha <- 0.05  # Significance level
+n <- 97  # Total number of observations
+u <- 1  # Number of predictors
+# Calculate the effect size
+f2 <- R2 / (1 - R2)
+# Calculate the power
+pwr.f2.test(u = u, v = n - u - 1, f2 = f2, sig.level = alpha)
 
 
 
@@ -778,7 +794,7 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
     # geom_jitter(height = .05, alpha = .1, stroke = 0, size = 1.5) +
     geom_point(alpha = .1, stroke = 0, size = 1.5) +
     geom_smooth(method="lm", se = F, size = 1) +
-    annotate("text",x=c(.5,.95),y=c(1.5,1.6),label=c("***","***"),col=c("black","#0072B2"),
+    annotate("text",x=c(.5,.95),y=c(1.5,1.6),label=c("**","**"),col=c("black","#0072B2"),
              size=c(10,7)) +
     scale_shape_manual(values = c(17, 19)) +
     # scale_linetype_manual(values = c("solid","dashed")) +
@@ -810,7 +826,7 @@ ratings2$quest <- factor(ratings2$question, levels = c("similar","understood","c
 ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_extraversion)
 # (figure3A <- ggplot(ratings2, aes(x=bfi44_extraversion,y=Response,col=chat,shape=chat,
 #                                   linetype=chat)) +
-#   labs(title = "Participants' Judgements", 
+#   labs(title = "Participants' Judgements",
 #        y="Likert Scale", x="Extroversion (BFI-44)",
 #        col = "LLM type:", shape = "LLM type:",
 #        linetype = "LLM type:",) +
@@ -820,7 +836,7 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
 #   # geom_text(data = ann_text, label = p_vals_2, col="black", size = 3) +
 #   geom_text(data = ann_text_ext,label = c("**","*","*","*"),col="#009E73", size = 7) +
 #   scale_shape_manual(values = c(17, 19)) +
-#   scale_colour_manual(values = c("#009E73","#CC79A7")) + 
+#   scale_colour_manual(values = c("#009E73","#CC79A7")) +
 #   scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
 #   scale_y_continuous(breaks = 1:5, labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
 #   coord_cartesian(ylim = c(1, 5)) +
@@ -831,7 +847,7 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
 #               "enjoy" = "I enjoyed our\n conversation",
 #               "distant" = "I felt distant\n from them",
 #               "understood" = "I felt that they\n understood me"))) +
-#   theme_classic() + 
+#   theme_classic() +
 #     theme(legend.position = "bottom",
 #           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
 # )
@@ -844,7 +860,7 @@ ratings2$bfi44_extraversion <- ratings2$bfi44_extraversion/max(ratings2$bfi44_ex
     # geom_jitter(height = .05, alpha = .1, stroke = 0, size = 1.5) +
     geom_point(alpha = .1, stroke = 0, size = 1.5) +
     geom_smooth(method="lm", se = F, size = 1) +
-    annotate("text",x=c(.5,.95),y=c(1.5,1.3),label=c("***","***"),col=c("black","#009E73"),
+    annotate("text",x=c(.5,.95),y=c(1.5,1.3),label=c("*","*"),col=c("black","#009E73"),
              size=c(10,7)) +
     scale_shape_manual(values = c(17, 19)) +
     # scale_linetype_manual(values = c("solid","dashed")) +
@@ -1312,6 +1328,9 @@ if (print_fig == 1) {
 
 
 
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -1432,30 +1451,6 @@ figureD <- figureD + theme(legend.position = "none")
 figure <- ggarrange(ggarrange(figureA,figureB,figureC,figureD, ncol=4,widths = c(1,1,1,1.2)),
                     legend,nrow=2,heights = c(10,1))
 
-# ggsave("figures/figure.pdf", figure, dpi = 2400, scale = 1, units = "cm",
-#        width = 20, height = 20, bg = "white")
-
-
-(figureD <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
-    labs(title = "Stats", y = "Effect Size") +
-    geom_hline(yintercept = 0, col="grey") +
-    geom_point(size=2, position = position_dodge(.6)) +
-    geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
-                  width=.4, position = position_dodge(.5)) +
-    scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
-    coord_flip() +
-    facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
-      quest = c("chat-again" = "chat again",
-                "different" = "felt different",
-                "distant" = "felt distant",
-                "enjoy" = "enjoyed",
-                "similar" = "felt similar",
-                "understood" = "felt understood"))) +
-    theme_classic() + theme(legend.position = "bottom",
-                            legend.title = element_blank(),
-                            axis.title.y = element_blank())
-)
 
 
 
