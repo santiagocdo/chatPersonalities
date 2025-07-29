@@ -53,7 +53,7 @@ qual2 <- addQuestionnaireToDataFrame_e2(qual2, bfi44)
 
 # add chat as factor with specific order
 ratings1$chat <- as.factor(ratings1$chatType)
-levels(ratings1$chat) <- c("Anxious","Non-Anxious")
+levels(ratings1$chat) <- c("Anxious","Nonanxious")
 ratings2$chat <- as.factor(ratings2$chatType)
 levels(ratings2$chat) <- c("Extrovert","Introvert")
 
@@ -110,8 +110,8 @@ length(unique(demo1$Participant.Private.ID))
 length(unique(demo2$Participant.Private.ID))
 
 # use cleaning function to extract summary information for the interactions
-combine1 <- summariseChatInteraction_v2(task=task1, chat=chat1, ratings=ratings1)
-combine2 <- summariseChatInteraction_v2(task=task2, chat=chat2, ratings=ratings2)
+combine1 <- summariseChatInteraction(task=task1, chat=chat1, ratings=ratings1)
+combine2 <- summariseChatInteraction(task=task2, chat=chat2, ratings=ratings2)
 
 # rows are conditional probabilities of the sentiment analysis, thus cells from 
 # the transition matrices
@@ -129,7 +129,7 @@ length(table(combine2$Participant.Private.ID))
 
 # add chat as factor with specific order
 combine1$chat <- as.factor(combine1$chatType)
-levels(combine1$chat) <- c("Anxious","Non-Anxious")
+levels(combine1$chat) <- c("Anxious","Nonanxious")
 combine2$chat <- as.factor(combine2$chatType)
 levels(combine2$chat) <- c("Extrovert","Introvert")
 
@@ -191,6 +191,17 @@ ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) +
 
 # affiliation score average (primary outcome)
 if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
+# ratings1$sex <- ratings1$age <- NA
+# for (i in 1:nrow(demo1)) {
+#   ratings1$sex[ratings1$Participant.Private.ID==demo1$Participant.Private.ID[i]] <- demo1$sex[i]
+#   ratings1$age[ratings1$Participant.Private.ID==demo1$Participant.Private.ID[i]] <- demo1$age[i]
+# }
+# ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,sex,age,chat,order,
+#                                      scl90_anxiety,scl90_OCD,scl90_depression,scl90_interSens,scl90_psychotic,scl90_paranoidId,scl90_angerHost,scl90_phobic,
+#                                      bfi10_extraversion,bfi10_agreeableness,bfi10_conscientiousness,bfi10_neuroticism,bfi10_openness) %>%
+#   summarise(aff_score=mean(aff_score))
+# write.csv(ratings1_wf,"ejercicio1.csv", row.names = F)
+# write.csv(ratings1, "ejercicio2.csv", row.names = F)
 ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,scl90_anxiety,chat) %>%
   summarise(aff_score=mean(aff_score))
 ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
@@ -201,37 +212,37 @@ m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat+(1|Participant.Priva
 # effect chat 1
 m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Anxious",]))
 # effect chat 2
-m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Non-Anxious",]))
+m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Nonanxious",]))
 
 
 
 # individual items analysis
-chat <- stats_one_panel(ratings=ratings1,dep_var="chat-again",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+chat <- stats_one_panel(ratings=ratings1,dep_var="chat-again",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.chat.int <- chat$regressions$m.int
 m.chat.anx <- chat$regressions$m.chat1
 m.chat.nan <- chat$regressions$m.chat2
 
-diff <- stats_one_panel(ratings=ratings1,dep_var="different",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+diff <- stats_one_panel(ratings=ratings1,dep_var="different",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.diff.int <- diff$regressions$m.int
 m.diff.anx <- diff$regressions$m.chat1
 m.diff.nan <- diff$regressions$m.chat2
 
-dist <- stats_one_panel(ratings=ratings1,dep_var="distant",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+dist <- stats_one_panel(ratings=ratings1,dep_var="distant",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.dist.int <- dist$regressions$m.int
 m.dist.anx <- dist$regressions$m.chat1
 m.dist.nan <- dist$regressions$m.chat2
 
-enjo <- stats_one_panel(ratings=ratings1,dep_var="enjoy",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+enjo <- stats_one_panel(ratings=ratings1,dep_var="enjoy",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.enjo.int <- enjo$regressions$m.int
 m.enjo.anx <- enjo$regressions$m.chat1
 m.enjo.nan <- enjo$regressions$m.chat2
 
-simi <- stats_one_panel(ratings=ratings1,dep_var="similar",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+simi <- stats_one_panel(ratings=ratings1,dep_var="similar",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.simi.int <- simi$regressions$m.int
 m.simi.anx <- simi$regressions$m.chat1
 m.simi.nan <- simi$regressions$m.chat2
 
-unde <- stats_one_panel(ratings=ratings1,dep_var="understood",ind_var="scl90_anxiety",chats=c("Anxious","Non-Anxious"))
+unde <- stats_one_panel(ratings=ratings1,dep_var="understood",ind_var="scl90_anxiety",chats=c("Anxious","Nonanxious"))
 m.unde.int <- unde$regressions$m.int
 m.unde.anx <- unde$regressions$m.chat1
 m.unde.nan <- unde$regressions$m.chat2
@@ -250,24 +261,25 @@ hb_corr_1 < .05/6
 # combine
 exp1 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.int[4,c(11:13,8)]),
               data.frame(quest="chat-again",effect="Anxious",m.chat.anx[2,c(9:11,8)]),
-              data.frame(quest="chat-again",effect="Non-Anxious",m.chat.nan[2,c(9:11,8)]),
+              data.frame(quest="chat-again",effect="Nonanxious",m.chat.nan[2,c(9:11,8)]),
               data.frame(quest="different",effect="Interaction",m.diff.int[4,c(11:13,8)]),
               data.frame(quest="different",effect="Anxious",m.diff.anx[2,c(9:11,8)]),
-              data.frame(quest="different",effect="Non-Anxious",m.diff.nan[2,c(9:11,8)]),
+              data.frame(quest="different",effect="Nonanxious",m.diff.nan[2,c(9:11,8)]),
               data.frame(quest="distant",effect="Interaction",m.dist.int[4,c(11:13,8)]),
               data.frame(quest="distant",effect="Anxious",m.dist.anx[2,c(9:11,8)]),
-              data.frame(quest="distant",effect="Non-Anxious",m.dist.nan[2,c(9:11,8)]),
+              data.frame(quest="distant",effect="Nonanxious",m.dist.nan[2,c(9:11,8)]),
               data.frame(quest="enjoy",effect="Interaction",m.enjo.int[4,c(11:13,8)]),
               data.frame(quest="enjoy",effect="Anxious",m.enjo.anx[2,c(9:11,8)]),
-              data.frame(quest="enjoy",effect="Non-Anxious",m.enjo.nan[2,c(9:11,8)]),
+              data.frame(quest="enjoy",effect="Nonanxious",m.enjo.nan[2,c(9:11,8)]),
               data.frame(quest="similar",effect="Interaction",m.simi.int[4,c(11:13,8)]),
               data.frame(quest="similar",effect="Anxious",m.simi.anx[2,c(9:11,8)]),
-              data.frame(quest="similar",effect="Non-Anxious",m.simi.nan[2,c(9:11,8)]),
+              data.frame(quest="similar",effect="Nonanxious",m.simi.nan[2,c(9:11,8)]),
               data.frame(quest="understood",effect="Interaction",m.unde.int[4,c(11:13,8)]),
               data.frame(quest="understood",effect="Anxious",m.unde.anx[2,c(9:11,8)]),
-              data.frame(quest="understood",effect="Non-Anxious",m.unde.nan[2,c(9:11,8)]))
+              data.frame(quest="understood",effect="Nonanxious",m.unde.nan[2,c(9:11,8)]))
 p_vals_1 <- c("p < .001", "p = .003", "p < .001", "p < .001")
 exp1$p <- pValuesCategories(exp1$p)
+# write.csv(exp1, "figures/stats_exp1.csv", row.names = F)
 
 
 
@@ -359,6 +371,10 @@ exp2 <- rbind(data.frame(quest="chat-again",effect="Interaction",m.chat.dif[4,c(
               data.frame(quest="understood",effect="Introvert",m.unde.int[2,c(9:11,8)]))
 p_vals_2 <- c("p = .004")
 exp2$p <- pValuesCategories(exp2$p)
+# write.csv(exp2, "figures/stats_exp2.csv", row.names = F)
+
+
+
 
 
 
@@ -401,17 +417,17 @@ ratings1$scl90_anxiety <- ratings1$scl90_anxiety/max(ratings1$scl90_anxiety)
 #                        quest = factor(c("similar","understood","different","distant"), 
 #                                       levels = c("similar","understood","chat-again",
 #                                                  "enjoy","different","distant")),
-#                        chat = c("Anxious","Non-Anxious"))
+#                        chat = c("Anxious","Nonanxious"))
 # ann_text_anx <- data.frame(lab="Text",scl90_anxiety = c(.94,.95,.94,.95), Response = c(4.5,4.3,1.5,1.5),
 #                            quest = factor(c("similar","understood","different","distant"),
 #                                           levels = c("similar","understood","chat-again",
 #                                                      "enjoy","different","distant")),
-#                            chat = c("Anxious","Non-Anxious"))
+#                            chat = c("Anxious","Nonanxious"))
 # ann_text_non <- data.frame(lab="Text",scl90_anxiety = c(.95), Response = c(4.4),
 #                            quest = factor(c("different"),
 #                                           levels = c("similar","understood","chat-again",
 #                                                      "enjoy","different","distant")),
-#                            chat = c("Anxious","Non-Anxious"))
+#                            chat = c("Anxious","Nonanxious"))
 # (figure2A <- ggplot(ratings1, aes(x=scl90_anxiety,y=Response,col=chat,shape=chat,
 #                                   linetype=chat)) +
 #   labs(title = "Participants' Judgements",
@@ -574,7 +590,7 @@ combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variabl
 # add chat as factor with specific order
 # influence
 influence1$chat <- as.factor(influence1$chatType)
-levels(influence1$chat) <- c("Anxious","Non-Anxious")
+levels(influence1$chat) <- c("Anxious","Nonanxious")
 influence2$chat <- as.factor(influence2$chatType)
 levels(influence2$chat) <- c("Extrovert","Introvert")
 
@@ -602,7 +618,7 @@ report_table(t.test(user_Mixed~chat,combine1[,], paired = TRUE))
 ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95),
                        who = factor(c(rep("GPT-4 Texts",4),rep("Participants Texts",2)),
                                                     levels = c("GPT-4 Texts","Participants Texts")),
-                       lab = "Text", chat = c("Anxious","Non-Anxious"))
+                       lab = "Text", chat = c("Anxious","Nonanxious"))
 # visualize the average of count for each sentiment and for each chat personality
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
@@ -687,7 +703,7 @@ ann_text <- data.frame(sentiment = c(2,3,4), prop = c(.2,.7,.95),
 # difference between GPT-4 types, to simplify statistical analysis with triple order interaction
 # experiment 1
 combine1.wf <- combine1[combine1$chat == "Anxious",]
-temp <- combine1[combine1$chat == "Non-Anxious",]
+temp <- combine1[combine1$chat == "Nonanxious",]
 combine1.wf$mixed <- combine1.wf$user_Mixed - temp$user_Mixed
 combine1.wf$negative <- combine1.wf$user_Negative - temp$user_Negative
 combine1.wf$neutral <- combine1.wf$user_Neutral - temp$user_Neutral
@@ -788,23 +804,69 @@ if (print_fig == 1) {
 
 
 
-# combine experiment 1 and experiment 2
-exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
-exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Non-Anxious","Anxious")))
-# exps <- exps[exps$exp != "E1-Ext.",]
-exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
+# # combine experiment 1 and experiment 2
+# exps <- rbind(data.frame(exp="Exp. 1",exp1),data.frame(exp="Exp. 2",exp2))
+# exps$effect <- factor(exps$effect, levels = rev(c("Interaction","Introvert","Extrovert","Nonanxious","Anxious")))
+# # exps <- exps[exps$exp != "E1-Ext.",]
+# exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 2","Exp. 1"))
+# # change factor order
+# exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
+#                                             "enjoy","distant","understood"))
+# (figS1 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
+#     labs(title = "Experiments Summary and Statistics",
+#          y = "Effect Size") +
+#     geom_hline(yintercept = 0, col="grey") +
+#     geom_point(size=2, position = position_dodge(.6)) +
+#     geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
+#                   width=.4, position = position_dodge(.6)) +
+#     scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
+#     scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
+#     coord_flip() +
+#     facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
+#       quest = c("chat-again" = "I would chat with\n them again",
+#                 "different" = "I felt that they were\n different from me",
+#                 "similar" = "I felt that we\n are similar",
+#                 "enjoy" = "I enjoyed our\n conversation",
+#                 "distant" = "I felt distant\n from them",
+#                 "understood" = "I felt that they\n understood me"))) +
+#     theme_classic() + 
+#     theme(legend.position = "bottom",
+#           legend.title = element_blank(),
+#           axis.title.y = element_blank(),
+#           legend.background = element_rect(colour='black',fill='white',linetype='solid'))
+# )
+# if (print_fig == 1) {
+#   ggsave("figures/figS1.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
+#          width = 16, height = 12, bg = "white")
+# }
+
+
+
+# read effect sizes csvs for all experiments (including the one from script main_e3.R)
+exp1 <- read.csv("figures/stats_exp1.csv")
+exp2 <- read.csv("figures/stats_exp2.csv")
+exp3 <- read.csv("figures/stats_exp3.csv")
+# combine experiment 1, 2, and 3
+exps <- rbind(data.frame(exp="Exp. 1",exp1),
+              data.frame(exp="Exp. 2",exp2),
+              data.frame(exp="Exp. 3",exp3))
+exps$effect <- factor(exps$effect, levels = c("Interaction","Anxious","Nonanxious",
+                                              "Extrovert","Introvert","Self-Antiself"))
+exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 3","Exp. 2","Exp. 1"))
 # change factor order
 exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
                                             "enjoy","distant","understood"))
 (figS1 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
-    labs(title = "Experiments Summary and Statistics",
+    labs(title = "Experiments Summary and Effect Sizes",
          y = "Effect Size") +
     geom_hline(yintercept = 0, col="grey") +
     geom_point(size=2, position = position_dodge(.6)) +
     geom_errorbar(aes(ymin=Std_Coefficient_CI_low, ymax=Std_Coefficient_CI_high), 
                   width=.4, position = position_dodge(.6)) +
-    scale_shape_manual(values = c(17, 19, 17, 19, 15)) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00","#009E73","#CC79A7","black")) + 
+    scale_y_continuous(breaks = c(-.6,0,.6)) +
+    scale_shape_manual(values = c(15, 17, 19, 17, 19, 17)) +
+    scale_colour_manual(values = c("black","#0072B2", "#D55E00",
+                                   "#009E73","#CC79A7","grey")) + 
     coord_flip() +
     facet_wrap(. ~ quest, ncol = 3, labeller = labeller(
       quest = c("chat-again" = "I would chat with\n them again",
@@ -814,11 +876,13 @@ exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
                 "distant" = "I felt distant\n from them",
                 "understood" = "I felt that they\n understood me"))) +
     theme_classic() + 
+    guides(color = guide_legend(nrow = 1, byrow = TRUE),
+           shape = guide_legend(nrow = 1, byrow = TRUE)) + 
     theme(legend.position = "bottom",
+          # legend.box = "horizontal",
           legend.title = element_blank(),
           axis.title.y = element_blank(),
-          legend.background = element_rect(colour='black',fill='white',linetype='solid'))
-)
+          legend.background = element_rect(colour='black',fill='white',linetype='solid')))
 if (print_fig == 1) {
   ggsave("figures/figS1.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
          width = 16, height = 12, bg = "white")
