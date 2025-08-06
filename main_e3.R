@@ -7,13 +7,13 @@ rm(list = ls())
 # read
 bfi <- read.csv("experiment3/2025_gpt_bfi_scores.csv")
 
-# opposite scores
+# from likert 1 to 5, to likert -2 to 2 (see inverse scores)
 bfi$extraversion_score <- bfi$extraversion_score - 3
 bfi$agreeableness_score <- bfi$agreeableness_score - 3
 bfi$conscientiousness_score <- bfi$conscientiousness_score - 3
 bfi$openness_score <- bfi$openness_score - 3
 bfi$neuroticism_score <- bfi$neuroticism_score - 3
-
+# inverse scores by multiplying by -1 (note: 0 does not have inverse)
 bfi$extraversion_score_inv <- -1 * bfi$extraversion_score
 bfi$agreeableness_score_inv <- -1 * bfi$agreeableness_score
 bfi$conscientiousness_score_inv <- -1 * bfi$conscientiousness_score
@@ -88,7 +88,8 @@ ggplot(ratings3, aes(x=chat,y=Response)) +
   facet_wrap(rating~.)
 # invert different and distant
 ratings3$likerts <- ifelse(grepl("different",ratings3$rating) |
-                             grepl("distant",ratings3$rating),-1*ratings3$Response,ratings3$Response)
+                             grepl("distant",ratings3$rating),
+                           -1*ratings3$Response,ratings3$Response)
 
 
 
@@ -135,12 +136,12 @@ m.simi <- report_table(lmer(Response ~ chat + (1|participant_ID), ratings3[ratin
 m.unde <- report_table(lmer(Response ~ chat + (1|participant_ID), ratings3[ratings3$rating=="understood",]))
 
 # combine
-exp3 <- rbind(data.frame(quest="chat-again",effect="Self-Antiself",m.chat[2,c(11:13,8)]),
-              data.frame(quest="different",effect="Self-Antiself",m.diff[2,c(11:13,8)]),
-              data.frame(quest="distant",effect="Self-Antiself",m.dist[2,c(11:13,8)]),
-              data.frame(quest="enjoy",effect="Self-Antiself",m.enjo[2,c(11:13,8)]),
-              data.frame(quest="similar",effect="Self-Antiself",m.simi[2,c(11:13,8)]),
-              data.frame(quest="understood",effect="Self-Antiself",m.unde[2,c(11:13,8)]))
+exp3 <- rbind(data.frame(quest="chat-again",effect="Mirror-Inverse",m.chat[2,c(11:13,8)]),
+              data.frame(quest="different",effect="Mirror-Inverse",m.diff[2,c(11:13,8)]),
+              data.frame(quest="distant",effect="Mirror-Inverse",m.dist[2,c(11:13,8)]),
+              data.frame(quest="enjoy",effect="Mirror-Inverse",m.enjo[2,c(11:13,8)]),
+              data.frame(quest="similar",effect="Mirror-Inverse",m.simi[2,c(11:13,8)]),
+              data.frame(quest="understood",effect="Mirror-Inverse",m.unde[2,c(11:13,8)]))
 # write.csv(exp3, "figures/stats_exp3.csv", row.names = F)
 
 
@@ -166,8 +167,8 @@ report_table(t.test(likerts~chat,ratings3_wf,paired=T))
 summary(lm(likerts ~ chat, ratings3_wf))
 report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 if (!require(ggsignif)) {install.packages("ggsignif")}; library(ggsignif)
-ratings3_wf$condition2 <- factor(ifelse(ratings3_wf$chat=="mirror","Self","Antiself"),
-                            levels = c("Self","Antiself"))
+ratings3_wf$condition2 <- factor(ifelse(ratings3_wf$chat=="mirror","Mirror","Inverse"),
+                            levels = c("Mirror","Inverse"))
 (fig4A <- ggplot(ratings3_wf, aes(x=condition2,y=likerts, col=condition2, shape=condition2)) + 
     labs(title="Participants' Judgements",x="Condition", y="Affiliation Score") + 
     geom_boxplot() + stat_summary() + 
@@ -175,7 +176,7 @@ ratings3_wf$condition2 <- factor(ifelse(ratings3_wf$chat=="mirror","Self","Antis
     scale_colour_manual(values = c("black", "grey50")) + 
     scale_y_continuous(breaks = c(-2,-1,0,1,2), limits = c(-2,2.5),
                        labels = c("-2","","0","","+2")) +
-    geom_signif(comparisons = list(c("Self", "Antiself")),
+    geom_signif(comparisons = list(c("Mirror", "Inverse")),
                 map_signif_level = TRUE, col="black",textsize = 5) +
     theme_classic() + theme(legend.position = "none"))
 
@@ -210,6 +211,7 @@ wide_format <- wf_m; rm(wf_m, wf_i)
 # make it long format
 tmp <- melt(wide_format, measure.vars = scores)
 tmp$variable <- factor(tmp$variable, levels = scores)
+summary(aov(value~variable+Error(participant_ID/variable),tmp))
 (fig4C <- ggplot(tmp, aes(x=value,y=variable)) + 
     labs(subtitle = "Distributions", x = "Score", y = "Personalities") + 
     scale_y_discrete(labels=c("Extraversion","Agreeableness","Conscientiousness",
@@ -227,7 +229,7 @@ tm$Parameter <- factor(tm$Parameter, levels = scores)
 # second part of figure 4C
 # tm$condition <- ifelse(tm$Std_Coefficient > 0, "mirror","inverse")
 (fig4D <- ggplot(tm, aes(x=Std_Coefficient,y=Parameter)) + #col=condition
-    labs(subtitle = "    Self - Antiself", x = "Effect Size") +
+    labs(subtitle = "    Mirror - Inverse", x = "Effect Size") +
     geom_vline(xintercept = 0) +
     geom_errorbar(aes(xmin = Std_Coefficient_CI_low,
                       xmax=Std_Coefficient_CI_high), width=.2) + #col=c("black","black","black","#00BFC4","black")
@@ -281,7 +283,7 @@ combine.lf$variable<- as.character(combine.lf$variable)
 # split string to get the first 4 character (user or bots)
 combine.lf$who <- factor(substr(combine.lf$variable,1,4),levels = c("bots","user"))
 # add a nicer names
-levels(combine.lf$who) <- c("GPT-4 Texts","Participants Texts")
+levels(combine.lf$who) <- c("GPT-4.1 Texts","Participants Texts")
 # add the sentiment on column variable (created with the columns in melt)
 combine.lf$sentiment <- substr(combine.lf$variable,6,nchar(combine.lf$variable))
 
@@ -290,7 +292,9 @@ combine.lf$sentiment <- substr(combine.lf$variable,6,nchar(combine.lf$variable))
 # # # # Figure 4D # # # #
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID), 
-           combine.lf[combine.lf$who=="GPT-4 Texts",])))
+           combine.lf[combine.lf$who=="GPT-4.1 Texts",])))
+aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
+    combine.lf[combine.lf$who=="GPT-4.1 Texts",])
 report_table(t.test(bots_Positive~botcondition, combine[,], paired = TRUE))
 report_table(t.test(bots_Neutral~botcondition, combine[,], paired = TRUE))
 report_table(t.test(bots_Negative~botcondition, combine[,], paired = TRUE))
@@ -299,6 +303,8 @@ report_table(t.test(bots_Mixed~botcondition, combine[,], paired = TRUE))
 # aim 2, GPT4 Texts are different between conditions (chatbots)
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
                         combine.lf[combine.lf$who=="Participants Texts",])))
+aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
+    combine.lf[combine.lf$who=="Participants Texts",])
 report_table(t.test(user_Positive~botcondition, combine[,], paired = TRUE))
 report_table(t.test(user_Neutral~botcondition, combine[,], paired = TRUE))
 report_table(t.test(user_Negative~botcondition, combine[,], paired = TRUE))
@@ -307,12 +313,12 @@ report_table(t.test(user_Mixed~botcondition, combine[,], paired = TRUE))
 
 
 ann_text <- data.frame(sentiment = c(1,2,4,1,2,4), prop = c(.9,.7,.9,.6,.7,.8),
-                       who = factor(c(rep("GPT-4 Texts",3),rep("Participants Texts",3)),
-                                    levels = c("GPT-4 Texts","Participants Texts")),
-                       lab = "Text", condition2 = c("Self","Antiself"))
+                       who = factor(c(rep("GPT-4.1 Texts",3),rep("Participants Texts",3)),
+                                    levels = c("GPT-4.1 Texts","Participants Texts")),
+                       lab = "Text", condition2 = c("Mirror","Inverse"))
 # visualize the average of count for each sentiment and for each chat personality
-combine.lf$condition2 <- factor(ifelse(combine.lf$botcondition=="mirror","Self","Antiself"),
-                                levels = c("Self","Antiself"))
+combine.lf$condition2 <- factor(ifelse(combine.lf$botcondition=="mirror","Mirror","Inverse"),
+                                levels = c("Mirror","Inverse"))
 (fig4E <- ggplot(combine.lf, aes(x=sentiment,y=prop,col=condition2,shape=condition2)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
