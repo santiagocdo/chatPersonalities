@@ -219,25 +219,64 @@ summary(aov(value~variable+Error(participant_ID/variable),tmp))
     geom_violin() + theme_classic() +#geom_boxplot(alpha=.1) + 
     stat_summary())
 
+# wide_format$dif_mir_inv <- wide_format$dif_mir_inv*-1
+# run univariate models
+tm1 <- as.data.frame(report_table(lm(dif_mir_inv ~ neuroticism_score, wide_format)))
+tm1 <- tm1[!is.na(tm1$Coefficient),]; tm1 <- tm1[-1,]
+tm2 <- as.data.frame(report_table(lm(dif_mir_inv ~ openness_score, wide_format)))
+tm2 <- tm2[!is.na(tm2$Coefficient),]; tm2 <- tm2[-1,]
+tm3 <- as.data.frame(report_table(lm(dif_mir_inv ~ conscientiousness_score, wide_format)))
+tm3 <- tm3[!is.na(tm3$Coefficient),]; tm3 <- tm3[-1,]
+tm4 <- as.data.frame(report_table(lm(dif_mir_inv ~ agreeableness_score, wide_format)))
+tm4 <- tm4[!is.na(tm4$Coefficient),]; tm4 <- tm4[-1,]
+tm5 <- as.data.frame(report_table(lm(dif_mir_inv ~ extraversion_score, wide_format)))
+tm5 <- tm5[!is.na(tm5$Coefficient),]; tm5 <- tm5[-1,]
+# combine simple models
+tm0 <- rbind(tm1,tm2,tm3,tm4,tm5)
+tm0$Parameter <- rev(scores)
+
+# run multivariate model
 m <- lm(dif_mir_inv ~ neuroticism_score+openness_score+conscientiousness_score+
           agreeableness_score+extraversion_score, wide_format)
-report_table(m)
 tm <- as.data.frame(report_table(m))
 tm <- tm[!is.na(tm$Coefficient),]; tm <- tm[-1,]
 tm$Parameter <- rev(scores)#factor(tm$Parameter, levels = )
+
+summary(step(m))
+m0 <- lm(dif_mir_inv ~ neuroticism_score+agreeableness_score+extraversion_score, wide_format)
+tm0 <- as.data.frame(report_table(m0))
+tm0 <- tm0[!is.na(tm0$Coefficient),]; tm0 <- tm0[-1,]
+tm0$Parameter <- c("neuroticism_score","agreeableness_score","extraversion_score")
+# mA <- lm(dif_mir_inv ~ agreeableness_score, wide_format)
+# mAE <- lm(dif_mir_inv ~ agreeableness_score+extraversion_score, wide_format)
+# mNAE <- lm(dif_mir_inv ~ neuroticism_score+agreeableness_score+extraversion_score, wide_format)
+# anova(mA,mAE,mNAE); BIC(mA,mAE,mNAE)
+
+
+tm <- rbind(data.frame(type="full",tm),
+            data.frame(type="reduced",tm0))
+tm$significance <- ifelse(tm$p < .05/5, "p<.01", "ns")
 tm$Parameter <- factor(tm$Parameter, levels = scores)
 # second part of figure 4C
 # tm$condition <- ifelse(tm$Std_Coefficient > 0, "mirror","inverse")
-(fig4D <- ggplot(tm, aes(x=Std_Coefficient,y=Parameter)) + #col=condition
-    labs(subtitle = "    Mirror - Inverse", x = "Effect Size") +
+(fig4D <- ggplot(tm, aes(x=Std_Coefficient,y=Parameter,shape=type)) + #col=condition
+    labs(subtitle = "    Mirror - Inverse", x = "Std. Coef.", shape="Model type:") +
     geom_vline(xintercept = 0) +
     geom_errorbar(aes(xmin = Std_Coefficient_CI_low,
-                      xmax=Std_Coefficient_CI_high), width=.2) + #col=c("black","black","black","#00BFC4","black")
+                      xmax=Std_Coefficient_CI_high), width=.4, 
+                  position = position_dodge(.8)) + #col=c("black","black","black","#00BFC4","black")
     scale_x_continuous(breaks = c(-.3,0,.3,.6)) +
-    geom_point(size=3) + theme_classic() +
+    scale_shape_manual(values = c(21,19)) +
+    geom_point(size=3, fill="white", position = position_dodge(.8)) + 
+    theme_classic() +
     theme(axis.text.y = element_blank(),
           axis.title.y = element_blank(),
-          legend.position = "none"))
+          legend.position = c(.17,.15),
+          # legend.title = element_blank(),
+          legend.title = element_text(size = 7),
+          legend.background = element_rect(fill = "transparent", color = NA),
+          legend.key.size = unit(.2, "cm"), # Adjust size of legend keys
+          legend.text = element_text(size = 7)))# Adjust size of legend tex
 
 
 
@@ -355,7 +394,7 @@ fig4CD <- ggarrange(fig4C, fig4D,ncol=2, labels=c("C","D"), align = "h", widths 
   top = text_grob("Experiment 3", color = "black", face = "bold", size = 14)))
 
 if (print_fig == 1) {
-  ggsave("figures/fig4.pdf", fig4, dpi = 2400, scale = .85, units = "cm",
+  ggsave("figures/fig4_v2.pdf", fig4, dpi = 2400, scale = .85, units = "cm",
          width = 24, height = 16, bg = "white")
 }
 
@@ -371,8 +410,11 @@ if (print_fig == 1) {
 wide_format <- wide_format[order(wide_format$dif_mir_inv),]
 wide_format$participant_ID <- factor(wide_format$participant_ID,
                                      levels = wide_format$participant_ID)
-ggplot(wide_format, aes(x=dif_mir_inv, y=as.factor(participant_ID))) + 
-  geom_bar(stat = "identity")
+(figS3 <-ggplot(wide_format, aes(x=dif_mir_inv, y=as.factor(participant_ID))) + 
+    labs(x="Mirror - Inverse\n(0 > more affiliation for mirror)",
+         y="Participant ID (n=100)") +
+    geom_bar(stat = "identity") + 
+    theme(axis.text.y = element_blank()))
 
 # sentiments with affiliation only inverse
 comb_inv <- combine[combine$botcondition == "inverse",]
