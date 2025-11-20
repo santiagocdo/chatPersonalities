@@ -55,6 +55,9 @@ mean(inter$participant_age); sd(inter$participant_age); range(inter$participant_
 # # # # # # # # # # Ratings # # # # # # # # # # # # # # # # # # # # # # # # ####
 # ratings to conditions
 ratings3 <- read.csv("experiment3/2025_gpt_pcq_bfi.csv")
+# round(cor(ratings3[,c("chat_again_inverse","different_inverse",
+#                       "enjoy_inverse","similar_inverse",
+#                       "understood_inverse","distant_inverse")]),2)
 # good participants, or participants to be included
 participant_ID <- unique(ratings3$participant_ID)
 
@@ -164,6 +167,7 @@ m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 # # # # Figure 4A # # # #
 # preregistered analysis
 report_table(t.test(likerts~chat,ratings3_wf,paired=T))
+wilcox.test(likerts~chat,ratings3_wf,paired=T)
 summary(lm(likerts ~ chat, ratings3_wf))
 report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 if (!require(ggsignif)) {install.packages("ggsignif")}; library(ggsignif)

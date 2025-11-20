@@ -4,6 +4,9 @@ rm(list=ls(all=TRUE))
 # print figures? if yes, then 1
 print_fig <- 0
 
+if (!require(gtools)) {install.packages("gtools")}; library(gtools)
+if (!require(reshape2)) {install.packages("reshape2")}; library(reshape2)
+
 # interaction (chat1 and chat2) via One Reach (thanks Daniel!)
 # behaviours in ratings
 ratings1 <- read.csv("experiment1/cleaned/ratings.csv")
@@ -207,6 +210,11 @@ ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,scl90_anxiety,chat) 
 ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
 
 if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
+# normal residuals?
+m <- lmer(aff_score ~ scl90_anxiety * chat+(1|Participant.Private.ID), ratings1_wf[,])
+# we can reject the hypothesis that the data is drawn from a normal distribution
+hist(resid(m)); ks.test(resid(m), "pnorm", mean=mean(resid(m)), sd=sd(resid(m)))
+
 # interaction questionnaire with chat-type
 m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat+(1|Participant.Private.ID), ratings1_wf[,]))
 # effect chat 1
@@ -250,7 +258,7 @@ m.unde.nan <- unde$regressions$m.chat2
 # Correction Methods 
 hb_corr_1 <- data.frame(chat=m.chat.int$p[4],diff=m.diff.int$p[4],dist=m.dist.int$p[4],
                         enjo=m.enjo.int$p[4],simi=m.simi.int$p[4],unde=m.unde.int$p[4])
-hb_corr_1 <- hb_corr_1[order(hb_corr_1)]
+hb_corr_1 <- hb_corr_1[order(unlist(hb_corr_1))]
 # Holm-Bonferroni Method
 hb_corr_1 < .05/6:1
 # Bonferroni Method
@@ -344,7 +352,7 @@ m.unde.int <- unde$regressions$m.chat2
 # Correction Methods 
 hb_corr_2 <- data.frame(chat=m.chat.dif$p[4],diff=m.diff.dif$p[4],dist=m.dist.dif$p[4],
                         enjo=m.enjo.dif$p[4],simi=m.simi.dif$p[4],unde=m.unde.dif$p[4])
-hb_corr_2 <- hb_corr_2[order(hb_corr_2)]
+hb_corr_2 <- hb_corr_2[order(unlist(hb_corr_2))]
 # Holm-Bonferroni Method
 hb_corr_2 < .05/6:1
 # Bonferroni Method
@@ -620,6 +628,7 @@ ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95)
                                                     levels = c("GPT-4 Texts","Participants Texts")),
                        lab = "Text", chat = c("Anxious","Nonanxious"))
 # visualize the average of count for each sentiment and for each chat personality
+if (!require(Hmisc)) {install.packages("Hmisc")}; library(Hmisc)
 (figure2B <- ggplot(combine1.lf, aes(x=sentiment,y=prop,col=chat,shape=chat)) + 
     labs(title = "Sentiment Analysis",
          y="Prop. (Sentiment ea Condition)", x = "Text Sentiment Category",
@@ -799,7 +808,8 @@ if (print_fig == 1) {
   ggsave("figures/fig3.pdf", fig3, dpi = 2400, scale = .85, units = "cm",
          width = 30, height = 15, bg = "white")
 }
-
+# write.csv(ratings1, "experiment1/cleaned/ratings_final.csv", row.names = F)
+# write.csv(ratings2, "experiment2/cleaned/ratings_final.csv", row.names = F)
 
 
 
