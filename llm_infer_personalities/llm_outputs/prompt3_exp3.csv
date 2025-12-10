@@ -1,0 +1,501 @@
+Participant_ID,Trait,Consensus Score (0-100),Dominant Observation
+10345,Openness,85,High creativity and interest in culture/history (app concept).
+,Conscientiousness,75,Structured thinking regarding business planning and drafting.
+,Extraversion,80,"Chatty, initiates topics, and socially encouraging to the bot."
+,Agreeableness,85,"Empathetic, warm, and supportive (""turn that frown upside down"")."
+,Neuroticism,20,"Very stable and optimistic, even when the interlocutor is down."
+11492,Openness,60,Open to philosophical discussion but rigid in specific worldviews.
+,Conscientiousness,85,Highly disciplined (gym) and goal-oriented focus.
+,Extraversion,65,Engaging but tends to lecture/preach rather than converse.
+,Agreeableness,70,Wants to motivate others but can be argumentative about beliefs.
+,Neuroticism,15,Projects extreme stability and resilience against adversity.
+12178,Openness,80,Intellectual curiosity regarding politics and scientific ingredients.
+,Conscientiousness,80,"Detail-oriented, cites sources, and values factual accuracy."
+,Extraversion,55,Engages in debate but prefers facts over social pleasantries.
+,Agreeableness,35,Combatitive and skeptical; prone to arguing with others online.
+,Neuroticism,60,Displays anxiety regarding toxins/health and frustration with misinformation.
+16042,Openness,65,Interest in sci-fi questions but leans towards nostalgia/conservatism.
+,Conscientiousness,75,"value on routine, cleaning, and health maintenance."
+,Extraversion,60,Socializes but enjoys solitary activities (joyrides).
+,Agreeableness,80,"Polite, validating, and easy-going in conversation."
+,Neuroticism,40,Generally stable with some mild sentimental longing.
+16234,Openness,50,Desires change (countryside) driven by stress rather than curiosity.
+,Conscientiousness,60,Maintains home for sale but feels paralyzed/hopeless.
+,Extraversion,45,Wants to escape people (neighbors) but desires romantic connection.
+,Agreeableness,65,Friendly to the interviewer but holds anger toward neighbors.
+,Neuroticism,85,"Highly stressed, describes life as a ""nightmare,"" feels on edge."
+17304,Openness,55,Enjoyment of genre fiction (horror) but rooted in tradition.
+,Conscientiousness,80,"Strict standards (""no room for mess""), takes charge of household."
+,Extraversion,75,"Hospitable (""would you like a plate?"") and socially active."
+,Agreeableness,85,"Maternal, warm, and inviting tone throughout."
+,Neuroticism,30,Stable and resilient; handles minor annoyances easily.
+18724,Openness,40,Explicitly avoids heavy topics/history; prefers light entertainment.
+,Conscientiousness,80,Structured workout programs and diligent cleaning habits.
+,Extraversion,25,Self-described homebody who requires downtime to stay sane.
+,Agreeableness,75,"Easy-going, non-confrontational, and polite."
+,Neuroticism,35,Uses routine to manage mental state; generally calm.
+21566,Openness,85,"Unconventional views, critical thinking, and niche interests."
+,Conscientiousness,40,"""Wings it,"" uses substances for pain management, relaxed style."
+,Extraversion,55,"Socializes with specific groups (""da boiz"") but observant."
+,Agreeableness,30,"Critical, cynical about religion/society, enjoys chaotic themes."
+,Neuroticism,60,Chronic pain and history of bullying contribute to underlying stress.
+22826,Openness,30,Disengaged; sticks to very basic preferences.
+,Conscientiousness,20,Minimal effort in interaction; repetitive.
+,Extraversion,20,Actively seeks to end the interaction.
+,Agreeableness,25,"Irritable and dismissive (""pointless,"" ""can I go now"")."
+,Neuroticism,55,Expresses annoyance and impatience visibly.
+23105,Openness,65,Excited for new life chapter and trying new experiences (brunch).
+,Conscientiousness,60,Prepares for events but easily stressed by logistical hiccups.
+,Extraversion,85,"High energy (""good vibes""), loves celebration and socializing."
+,Agreeableness,90,"Extremely enthusiastic and supportive language (""girlll"")."
+,Neuroticism,70,"High anxiety about small details (tripping, glasses breaking)."
+23429,Openness,50,"Enjoys gardening/nature but prefers simple, routine pleasures."
+,Conscientiousness,75,Maintains garden and healthy habits; grounded perspective.
+,Extraversion,55,Social with partner but cherishes peace and solitude.
+,Agreeableness,85,"Supportive of others, actively frames life positively."
+,Neuroticism,20,Actively combats stress with positive reframing techniques.
+23564,Openness,30,Stuck in a dull routine; afraid of new experiences/spending.
+,Conscientiousness,70,"Extreme discipline in saving money, almost to a fault."
+,Extraversion,20,Withdrawn; describes life as dull; solitary activities.
+,Agreeableness,50,Polite but affect is flat and depressed.
+,Neuroticism,90,"High anxiety regarding finances, guilt, and hopelessness."
+24311,Openness,80,Reads cross-translated novels and engages in abstract thought.
+,Conscientiousness,25,"Self-admitted indecision, addiction, and ""wasted effort."""
+,Extraversion,20,Desires isolation or strict external control (prison/military).
+,Agreeableness,55,Self-deprecating and non-hostile despite internal struggle.
+,Neuroticism,85,"Crippling regret, indecision, and feelings of pointlessness."
+26586,Openness,75,"Interest in arts (jazz, pottery) and travel."
+,Conscientiousness,80,Disciplined career in finance; maintains calming rituals.
+,Extraversion,50,"Socially capable but highly values solitude (""quiet oasis"")."
+,Agreeableness,85,"Empathetic, sharing, and values ""real"" connection."
+,Neuroticism,45,Sensitive to city noise/stress; actively seeks decompression.
+26627,Openness,40,Prefers routine; not adventurous; focused on domestic life.
+,Conscientiousness,85,Obsessive cleaning routines; highly organized.
+,Extraversion,45,"Focuses entirely on home, husband, and pets."
+,Agreeableness,80,Loving and protective towards family/pets; polite.
+,Neuroticism,80,"""Mind racing,"" paranoia about mess, overwhelmed by grief."
+29239,Openness,80,Philosophical; does stand-up comedy; intellectualizes life.
+,Conscientiousness,60,"Responsible parent fighting for child, despite mental fatigue."
+,Extraversion,50,Performer (comedy) but suffers from stage fright/social anxiety.
+,Agreeableness,70,Uses humor to cope; caring and protective father.
+,Neuroticism,85,"deeply depressed, worried, and feels mentally cluttered."
+29937,Openness,85,"High interest in languages, mechanics, and tech (AI)."
+,Conscientiousness,85,detailed restoration projects and long-term goal setting.
+,Extraversion,20,"Solitary; views loneliness as a ""blessing."""
+,Agreeableness,60,Helpful and polite but fiercely independent.
+,Neuroticism,25,"Stable, focused, and content with solitude."
+30122,Openness,75,Existential thinker; empathic; interested in documentaries.
+,Conscientiousness,55,"Works from home but admits to ""winging things."""
+,Extraversion,30,Homebody; rarely goes out; prefers dogs to people.
+,Agreeableness,90,High empathy; adopts shelter dogs; values kindness.
+,Neuroticism,75,OCD; existential crisis; constant state of alertness.
+31717,Openness,50,Likes games/rides but sticks to very specific franchises/routines.
+,Conscientiousness,80,Calculative about money/value; plans logistics carefully.
+,Extraversion,40,Goes to parks alone; avoids crowds; browses phone in lines.
+,Agreeableness,50,Pragmatic and critical of others (vloggers/prices).
+,Neuroticism,40,Frustrated by inefficiencies but generally content with routine.
+32062,Openness,50,Interest in reading/mysteries.
+,Conscientiousness,55,Polite; keeps the conversation moving despite low energy.
+,Extraversion,35,"Passive; ""not really"" doing much."
+,Agreeableness,85,Very polite; expresses appreciation frequently.
+,Neuroticism,60,"Expresses struggle and lack of direction (""wish I knew what to do"")."
+32418,Openness,55,Niche interests in crypto and specific movie tropes.
+,Conscientiousness,45,"Focus on ""get rich quick"" schemes rather than long-term effort."
+,Extraversion,80,High energy; aggressive/assertive communication style.
+,Agreeableness,30,"Competitive; combative language (""we gotta fight"")."
+,Neuroticism,50,Reactive to market fluctuations; seeks immediate results.
+32999,Openness,50,Enjoyment of travel/fishing and reality TV.
+,Conscientiousness,70,Prepares own food (fileting); plans vacations.
+,Extraversion,60,Social with family; enjoys public spaces (boardwalks).
+,Agreeableness,80,"Friendly, affirming, and polite interaction."
+,Neuroticism,55,Self-identifies as an overthinker; admits to stress.
+33211,Openness,85,"Deep appreciation for arts (film scores), travel, and diverse music."
+,Conscientiousness,65,Freelance work implies self-discipline; plans holidays.
+,Extraversion,60,Social activities (concerts/golf) mixed with solo enjoyment.
+,Agreeableness,75,"Enthusiastic about interests; ""good vibe."""
+,Neuroticism,30,Relaxed demeanor; appears stable.
+33270,Openness,80,Deep engagement with fanfiction and music fandoms.
+,Conscientiousness,75,Relies on routine; plans events far in advance.
+,Extraversion,50,Introverted homebody who enjoys specific large crowds (concerts).
+,Agreeableness,85,Passionate sharing; friendly tone.
+,Neuroticism,55,Anxiety triggers when routine is disrupted; avoids drama.
+35669,Openness,75,"Artistic interests (drawing, music) and nature."
+,Conscientiousness,50,Attends school but expresses lack of interest/engagement.
+,Extraversion,30,Prefers solitary activities; introverted.
+,Agreeableness,85,Very polite; offers encouragement to the chatbot.
+,Neuroticism,45,Relates to feeling stuck but reports current stability.
+37239,Openness,45,Outdoor activities but generally conventional tastes.
+,Conscientiousness,85,High responsibility in managing household and kids' activities.
+,Extraversion,80,Very social; organizes games/parties; chatty.
+,Agreeableness,90,Extremely supportive and nurturing tone.
+,Neuroticism,25,Resilient; focuses on pushing through challenges.
+37559,Openness,80,Creative ambition (fantasy writing); high aspirations.
+,Conscientiousness,85,Strict discipline in fitness and finance; goal-oriented.
+,Extraversion,75,Assertive; lecturing style; confident self-image.
+,Agreeableness,35,Bossy and dismissive of perceived weakness in others.
+,Neuroticism,20,Extreme self-confidence; believes will conquers mental health.
+37703,Openness,55,Enjoys teaching/travel but currently finds it a hassle.
+,Conscientiousness,85,Planner; organized professional (teacher).
+,Extraversion,65,Social job; family-oriented activities.
+,Agreeableness,85,Caring towards students/pets; polite.
+,Neuroticism,55,Worried about sick pet and environmental factors (heat).
+38794,Openness,70,Works in tech/AI; open to advice.
+,Conscientiousness,80,Career-focused; diligent about work tasks/management.
+,Extraversion,65,Social; interested in dating; likes team sports.
+,Agreeableness,75,Polite; seeks advice; generally positive demeanor.
+,Neuroticism,50,Anxious about social perceptions (dating) and work pressure.
+38957,Openness,80,"Interest in travel, food, and philosophical reflection."
+,Conscientiousness,75,Hardworking; strives for balance; devoted parent.
+,Extraversion,55,Social with family but expresses deep need for rest.
+,Agreeableness,85,Reflective; grateful; expresses kindness.
+,Neuroticism,75,"Feels overwhelmed (""zombie state""); struggles with mental balance."
+39320,Openness,50,Enjoyment of podcasts and nature walks.
+,Conscientiousness,60,Hits step goals but feels trapped by the routine.
+,Extraversion,35,Solitary activities; spectator of sports rather than participant.
+,Agreeableness,60,Polite but internally struggling.
+,Neuroticism,80,"""Mind racing""; feels trapped; difficulty expressing feelings."
+39756,Openness,60,Interest in niche career (massage) and horror genre.
+,Conscientiousness,75,Intense schooling; disciplined yoga routine.
+,Extraversion,25,Self-described social awkwardness; prefers home.
+,Agreeableness,85,"Validating (""Yas queen""); polite and agreeable."
+,Neuroticism,80,"High rumination; anxiety; ""scramble brain."""
+40326,Openness,95,Artist; musician; psychology student; eclectic tastes.
+,Conscientiousness,80,pursuing Masters degree; goal-oriented.
+,Extraversion,55,Values deep conversation over small talk; enjoys solitude.
+,Agreeableness,60,Empathetic but sets firm boundaries against negativity.
+,Neuroticism,50,Introspective; sensitive to emotional tone.
+40358,Openness,60,Interest in true crime and travel.
+,Conscientiousness,50,Maintains employment but views it as a basic routine.
+,Extraversion,65,Gossips with colleagues; enjoys social activities (bingo).
+,Agreeableness,40,"Can be rude/blunt (""you seem like a bot""); gossipy."
+,Neuroticism,55,Annoyed by environment and work stress.
+40377,Openness,85,"High interest in foreign cultures, cuisines, and music."
+,Conscientiousness,65,Cooks from scratch; engages in gardening.
+,Extraversion,60,Social eating; hangs out with friends.
+,Agreeableness,85,Enthusiastic; polite; benevolent outlook.
+,Neuroticism,30,"Calm demeanor; ""enjoy the ride"" philosophy."
+40570,Openness,85,Musician; sci-fi fan; philosophical/critical thinking.
+,Conscientiousness,50,"Performs gigs but holds a ""go with the flow"" attitude."
+,Extraversion,55,Public performer but cynical about society.
+,Agreeableness,60,Opinionated but engages in thoughtful debate.
+,Neuroticism,55,Jaded; bored; physically uncomfortable in heat.
+41227,Openness,20,Very limited palate; resistant to new things.
+,Conscientiousness,30,Impulsive spending; feelings of shame regarding choices.
+,Extraversion,50,Chatty but socially anxious and awkward.
+,Agreeableness,80,Friendly; relatable; seeks reassurance.
+,Neuroticism,85,"High guilt, shame, and social anxiety."
+41384,Openness,50,Interest in niche manga.
+,Conscientiousness,20,Chaotic interaction style.
+,Extraversion,65,High negative energy; confrontational and demanding.
+,Agreeableness,10,Hostile; rude; resorts to name-calling.
+,Neuroticism,75,Easily frustrated and angered by limitations.
+41788,Openness,80,Interest in alternative comedy/music; lived abroad.
+,Conscientiousness,40,Financial struggles; admits to being unreliable socially.
+,Extraversion,25,"Withdrawn; feels ""lame and friendless."""
+,Agreeableness,70,Self-aware; dislikes toxic behavior; polite.
+,Neuroticism,80,Depression; regret; feelings of loneliness.
+41919,Openness,30,Disjointed/random questions; focus on crime.
+,Conscientiousness,20,Disorganized; loses items; lacks routine.
+,Extraversion,50,Seeks interaction but in a confused manner.
+,Agreeableness,40,Aggressive hypothetical questioning.
+,Neuroticism,70,Paranoia; confusion; forgetfulness.
+43118,Openness,50,Gaming interests; generally conventional.
+,Conscientiousness,80,Dedicated to work and parenting duties.
+,Extraversion,60,Socializes through gaming and family.
+,Agreeableness,85,Desires unity; friendly and supportive.
+,Neuroticism,50,Stress regarding work/life balance.
+43294,Openness,50,Basic tastes; enjoys nature walks.
+,Conscientiousness,60,Tries to be helpful; suggests routines to others.
+,Extraversion,65,Sociable; chats to help others.
+,Agreeableness,85,Very supportive; willing to listen and help.
+,Neuroticism,55,Admits to overthinking but actively manages it.
+44256,Openness,60,Interest in finance/crypto; uses philosophical quotes.
+,Conscientiousness,80,"Dedicated to research, family, and work."
+,Extraversion,75,Expressive; motivational; energetic.
+,Agreeableness,85,Encouraging; positive; community-focused.
+,Neuroticism,25,Focuses on resilience; low negative emotion.
+46188,Openness,65,Excited for new days; willing to learn.
+,Conscientiousness,80,High responsibility in managing family moves/schedules.
+,Extraversion,50,Identifies as indoor person but engages socially for kids.
+,Agreeableness,85,Polite; admires dedication in others.
+,Neuroticism,45,Stress related to moving and life challenges.
+46509,Openness,70,Interests in anime and mystery podcasts.
+,Conscientiousness,60,Maintains normal routines; cooks for family.
+,Extraversion,65,Sociable with family; tries to engage negative peers.
+,Agreeableness,80,Patient; tries to help/cheer up rude interlocutors.
+,Neuroticism,30,generally happy; handles negativity well.
+46711,Openness,55,Travels to niche locations but stays within comfort zone.
+,Conscientiousness,90,Extreme planner; highly organized and responsible.
+,Extraversion,20,Happy being alone; distant from others.
+,Agreeableness,50,Helpful but stubborn and opinionated.
+,Neuroticism,25,"Resilient; ""toughs it out"" through mishaps."
+46796,Openness,80,Creative job; artistic hobbies; open-minded.
+,Conscientiousness,75,Productive; meaningful work.
+,Extraversion,65,Social; attends parties; enjoys humor.
+,Agreeableness,85,Caring; patient; uses humor to connect.
+,Neuroticism,30,Stable; uses humor to deflect stress.
+47804,Openness,50,Cooking experimentation but risk-averse in career.
+,Conscientiousness,80,Goal-oriented; specific career path planned.
+,Extraversion,60,Friendly; enjoys wholesome content.
+,Agreeableness,85,Humble; polite; grateful.
+,Neuroticism,55,Stress regarding job hunting and finances.
+48354,Openness,75,Reading; philosophical about technology and society.
+,Conscientiousness,75,Work-focused; seeks optimization (standing desk).
+,Extraversion,55,Social interests (sports) but anxious about interaction.
+,Agreeableness,80,Polite; open to advice.
+,Neuroticism,85,High anxiety; doom scrolling; constant worry.
+49061,Openness,95,Writer; deep literary analysis; diverse interests.
+,Conscientiousness,80,Dedicated to craft; handles heavy workload.
+,Extraversion,50,Chatty/expressive but isolated by disability.
+,Agreeableness,85,Empathetic; thoughtful; polite.
+,Neuroticism,60,Homesickness; health issues; frustration with idols.
+49157,Openness,30,Focused on survival/tasks; no time for abstract chat.
+,Conscientiousness,90,relentless work ethic to support family.
+,Extraversion,25,Task-focused; wants to end social interaction.
+,Agreeableness,40,Impatient but maintains basic politeness.
+,Neuroticism,80,High stress; financial pressure; annoyance.
+50861,Openness,30,Minimal elaboration; basic responses.
+,Conscientiousness,70,Long-term gym routine.
+,Extraversion,30,Minimal engagement.
+,Agreeableness,60,Claims to be sharing/agreeable (sparse evidence).
+,Neuroticism,20,Claims to feel great/sleep well.
+50862,Openness,55,Focus on self-improvement.
+,Conscientiousness,85,Strict planning; project focus; diet.
+,Extraversion,65,Friendly; energetic sign-offs.
+,Agreeableness,85,Positive; delighted to chat.
+,Neuroticism,25,Focused on results; cool under pressure.
+50895,Openness,80,Experimental baking; fruit picking.
+,Conscientiousness,65,Baking requires precision; seems relaxed.
+,Extraversion,60,Social activities with partner.
+,Agreeableness,80,Friendly; polite; enthusiastic.
+,Neuroticism,20,Happy; enjoying simple pleasures.
+53025,Openness,55,Gaming; music; trying to improve.
+,Conscientiousness,60,Hard worker despite burnout; plays games when idle.
+,Extraversion,40,Lonely/isolated but engages socially in sports.
+,Agreeableness,80,Empathetic; polite.
+,Neuroticism,60,"""Just hanging on""; feels suffocated/isolated."
+53958,Openness,85,Creative; game dev; cultural interests.
+,Conscientiousness,80,"Self-taught; persistent (""chipping like a mad miner"")."
+,Extraversion,65,Confident; direct communication.
+,Agreeableness,40,Intolerant of complaining/negativity.
+,Neuroticism,25,Proactive; motivated; low negative emotion.
+54165,Openness,60,Interest in history/politics/facts.
+,Conscientiousness,65,Trying to save; keeps house clean.
+,Extraversion,30,Avoids confrontation; hates talking to landlord.
+,Agreeableness,60,Polite but anxious/avoidant.
+,Neuroticism,90,High stress; overthinking; feeling suffocated.
+54409,Openness,60,Imaginative (aliens/conspiracies) but chaotic.
+,Conscientiousness,30,Chaotic; rambling interaction.
+,Extraversion,80,High energy; intrusive; loud (caps lock).
+,Agreeableness,30,Confrontational; mocking; aggressive.
+,Neuroticism,75,Manic energy; paranoid thoughts.
+54761,Openness,85,Intellectual interests (science/history); diverse tastes.
+,Conscientiousness,70,Student on placement; disciplined routine.
+,Extraversion,60,Community-oriented hobbies (climbing); social.
+,Agreeableness,80,Polite; engaging; pleasant.
+,Neuroticism,30,Stable; active; low anxiety.
+55599,Openness,50,"Outdoor activities; music; likes ""blending in."""
+,Conscientiousness,80,Manages kids' hobbies; persistent with health care.
+,Extraversion,50,Family-oriented; prefers calm over excitement.
+,Agreeableness,60,Frustrated with systems/people but generally polite.
+,Neuroticism,60,Health anxiety; pain; annoyance.
+59088,Openness,80,Learning new languages (ASL); film analysis.
+,Conscientiousness,85,Full-time placement; financial planning; studies.
+,Extraversion,60,Social with family; gets drained by too much interaction.
+,Agreeableness,85,Polite; family-oriented; friendly.
+,Neuroticism,45,Mild anxiety; second-hand embarrassment.
+59741,Openness,80,Creative writing; fantasy reading; open to drug use.
+,Conscientiousness,40,Working but bored/impatient with tasks.
+,Extraversion,55,Casual tone; engaging but dismissive.
+,Agreeableness,50,Friendly enough but blunt/impatient.
+,Neuroticism,55,Annoyed by process; uses escapism.
+61444,Openness,85,Tech interests; travel; new activities.
+,Conscientiousness,60,"Projects planned but ""figures it out as they go."""
+,Extraversion,85,High excitement seeking; wants company.
+,Agreeableness,85,Enthusiastic; friendly; complimentary.
+,Neuroticism,25,Seeks excitement; very positive.
+62828,Openness,60,Sports; reality TV; open to AI assistance.
+,Conscientiousness,85,Leadership role; disciplined training; recruiting.
+,Extraversion,85,Team sports; leadership; social.
+,Agreeableness,90,Empathetic; advocates for mental health.
+,Neuroticism,25,Resilient; focuses on not giving up.
+63092,Openness,50,Planning surprises; beach trips.
+,Conscientiousness,80,Hard worker; provider; focused on family needs.
+,Extraversion,60,Focused on family unit social life.
+,Agreeableness,85,Loving; polite; considerate.
+,Neuroticism,55,Stress related to work and health concerns.
+63396,Openness,45,Likes entertainment but closed-minded on social issues.
+,Conscientiousness,50,Strong opinions but reactionary reasoning.
+,Extraversion,75,Loud; opinionated; aggressive laughter.
+,Agreeableness,25,Hostile; insulting; arrogant.
+,Neuroticism,70,Angry ranting; frustration with the world.
+63854,Openness,75,True crime research; travel; intellectual curiosity.
+,Conscientiousness,60,Works; cooks; but feels stuck.
+,Extraversion,50,Close family bonds but dreads public commuting.
+,Agreeableness,60,Loving to some family; resentful of others.
+,Neuroticism,75,Family stress; grief; creeped out by crime cases.
+65180,Openness,55,Marketing work; seeks advice.
+,Conscientiousness,50,Worried about metrics but disengaged from marriage.
+,Extraversion,60,Overshares personal details with a bot.
+,Agreeableness,40,Blaming; resentful; wants to leave marriage.
+,Neuroticism,70,High stress; unhappiness; fatigue.
+65534,Openness,50,Gaming; simple pleasures; quirky food tastes.
+,Conscientiousness,60,"Routine-oriented; ""creature of habit."""
+,Extraversion,30,Shy; homebody; avoids strangers.
+,Agreeableness,80,Polite; agreeable; grateful.
+,Neuroticism,50,"Feeling ""blah""; awareness of aging."
+65978,Openness,75,Anime analysis; appreciates character depth.
+,Conscientiousness,55,"Grinding games; ""sunk cost fallacy."""
+,Extraversion,30,Social anxiety; gaming addiction.
+,Agreeableness,80,Gentle; likes comfort characters.
+,Neuroticism,80,"""On edge""; addicted; uses games to cope."
+67900,Openness,40,Dreaming of escape (nature) but stuck.
+,Conscientiousness,65,Works hard (weekends) despite hating it.
+,Extraversion,20,"Too tired for fun; ""no good surprises."""
+,Agreeableness,50,Complaining but not hostile to the listener.
+,Neuroticism,90,Exhaustion; hopelessness; doubt.
+69820,Openness,60,Likes music/festivals; therapy.
+,Conscientiousness,65,Trying to recover; maintaining connection to kids.
+,Extraversion,30,"Was wild, now reserved/anxious due to trauma."
+,Agreeableness,85,Vulnerable; seeking connection/approval.
+,Neuroticism,95,Trauma; addiction; guilt; anxiety; PTSD.
+70424,Openness,50,Likes movies; emotional stories.
+,Conscientiousness,50,"Relaxed attitude; just ""chilling."""
+,Extraversion,40,Avoids judgment; wants friends but cautious.
+,Agreeableness,80,Nice; asks to be friends.
+,Neuroticism,60,Worried about judgment/fake people.
+71586,Openness,90,Artist; poet; creative; thoughtful.
+,Conscientiousness,85,Balances creative work with paying bills/family.
+,Extraversion,30,Introvert; craves solitude; drained by busy day.
+,Agreeableness,85,Polite; grateful; conflict-avoidant.
+,Neuroticism,55,"""Creativity feels like a curse""; pressure."
+71591,Openness,55,Crypto; adventure; nostalgic/conservative tastes.
+,Conscientiousness,50,Investing but looking for high risk/reward.
+,Extraversion,75,Blunt; adventurous; aggressive questioning.
+,Agreeableness,35,Critical; mocks the bot; rants.
+,Neuroticism,55,Frustrated with modern culture/work.
+71920,Openness,60,Learning coding; interested in geopolitics.
+,Conscientiousness,60,Motivated by profit; exploring skills.
+,Extraversion,60,Engaging in debate; seeking opinions.
+,Agreeableness,45,Testing the bot; debating controversial topics.
+,Neuroticism,30,Detached analytical view of wars/politics.
+72945,Openness,80,Niche interests; gaming challenges.
+,Conscientiousness,55,"Strategic in games but ""wings it"" in life."
+,Extraversion,40,Small circle; cuts off drama; prefers close friends.
+,Agreeableness,50,"Loyal to friends but intolerant of ""idiots."""
+,Neuroticism,25,"""No big deal""; rolls with disloyalty; stable."
+74568,Openness,80,Creative renovation; tech aesthetic.
+,Conscientiousness,85,Planning nursery; work boundaries; organizing.
+,Extraversion,70,Excited to share news; assertive.
+,Agreeableness,85,Helpful advice; enthusiastic.
+,Neuroticism,20,"Happy; handling stress well (""excited!"")."
+76134,Openness,60,Interested in AI impact; fashion trends.
+,Conscientiousness,80,Keeps shoes clean; plans shopping; career concerns.
+,Extraversion,65,Sales job; confident in style.
+,Agreeableness,55,Opinionated but polite to the bot.
+,Neuroticism,75,Anxiety about job security/AI replacement.
+77117,Openness,75,"Wide range of curious topics (science, religion)."
+,Conscientiousness,65,Concerned about environment; safety.
+,Extraversion,55,Seeks discussion/clarification.
+,Agreeableness,80,"Polite; validating (""very well noted"")."
+,Neuroticism,60,Worried about climate; war; decline of faith.
+81053,Openness,55,Self-help books; manifestation.
+,Conscientiousness,80,Specific goals; reading daily; disciplined.
+,Extraversion,80,Admires confidence/wealth; assertive.
+,Agreeableness,40,Defends controversial figures; values status.
+,Neuroticism,25,"Confident; ""born rich"" mindset."
+82305,Openness,60,Trying new gym; podcasts; foods.
+,Conscientiousness,55,Budgeting (student); planning but procrastinates.
+,Extraversion,65,Social with friend; likes cafe culture.
+,Agreeableness,85,Casual; friendly; relatable language.
+,Neuroticism,55,Indecisive; gym anxiety.
+83111,Openness,50,Seeking new job/environment due to stress.
+,Conscientiousness,60,Paid rent; trying to fix work/relationship.
+,Extraversion,30,Withdrawing from friend; feeling suffocated.
+,Agreeableness,75,"Seeking validation; doesn't want to be a ""fool."""
+,Neuroticism,90,Emotionally drained; trauma; crying emojis.
+83220,Openness,85,Creative writing; pixel art; investing strategies.
+,Conscientiousness,75,Investing for long term; writing drafts.
+,Extraversion,65,Games with friends; social drinking.
+,Agreeableness,60,Playful; sarcastic banter.
+,Neuroticism,25,"Relaxed; ""taking it easy."""
+84409,Openness,55,Psychology questions; observing behavior.
+,Conscientiousness,45,"Just ""chilling""; no major plans."
+,Extraversion,30,Not adventurous; prefers staying home.
+,Agreeableness,60,Testing the bot; polite.
+,Neuroticism,75,Fixated on depression/breakups in questions.
+87091,Openness,65,Discusses societal issues; shows.
+,Conscientiousness,75,"Wants ""strong leader""; taxation; solutions."
+,Extraversion,60,Wants to help society; engaging.
+,Agreeableness,85,Empathetic; polite; values humanity.
+,Neuroticism,60,Stressed; concerned about suicide/environment.
+87842,Openness,75,Imagination (Tolkien); philosophical.
+,Conscientiousness,40,"Forgetful (""oil in car""); goes with flow."
+,Extraversion,65,Pubs with friends; easy-going.
+,Agreeableness,85,"Friendly; ""little of what you like does you good."""
+,Neuroticism,20,"Relaxed; ""don't worry about little things."""
+88009,Openness,80,Appreciation for foreign music; classic lit.
+,Conscientiousness,75,"Dealing with house repairs; ""fine with how I handle things."""
+,Extraversion,25,"""I'm more private""; ""stay home."""
+,Agreeableness,55,Defensive about interests; polite.
+,Neuroticism,55,House stress; defensive.
+88147,Openness,60,Designing kitchen; party planning.
+,Conscientiousness,85,Managing a self-build project; persevering.
+,Extraversion,85,Loves parties; karaoke; cocktails.
+,Agreeableness,80,"Positive despite stress (""onwards and upwards"")."
+,Neuroticism,75,"""Very stressed out""; ""life sucks sometimes."""
+89703,Openness,60,Metal music; meditation; Italian food.
+,Conscientiousness,65,Cooked for self; tidying.
+,Extraversion,35,"""Don't have the want to learn instrument""; anxious."
+,Agreeableness,90,Very polite; appreciative.
+,Neuroticism,80,"""Queen at overthinking""; second-guessing self."
+91115,Openness,80,Travel; trivia facts; diverse music/activities.
+,Conscientiousness,60,Chill plans; enjoys games.
+,Extraversion,85,Cruise activities; trivia nights; social.
+,Agreeableness,90,"Enthusiastic; affirming (""Absolutely!"")."
+,Neuroticism,20,"Positive outlook; ""lucky to be alive."""
+91981,Openness,85,Curiosity about AI tech; organizing solutions.
+,Conscientiousness,90,Preparing for new role; cleaning; organizing.
+,Extraversion,60,Professional; engaging but focused.
+,Agreeableness,85,Polite; grateful for info.
+,Neuroticism,35,Excited/nervous about new job but handling it well.
+92241,Openness,85,Abstract thinking; riddles; horror analysis.
+,Conscientiousness,80,Categorization copes with disorder; organized.
+,Extraversion,20,"""Homebody""; dislikes going out."
+,Agreeableness,40,"Blunt; dismissive of bot's ""feelings."""
+,Neuroticism,85,Disorder; wants to erase emotions; struggles with processing.
+94161,Openness,45,Gaming; tech interest.
+,Conscientiousness,30,"""See what I feel like""; ""just relaxing."""
+,Extraversion,25,Solo gaming; mute comms; avoids people.
+,Agreeableness,65,"Chill; agreeable (""same man"")."
+,Neuroticism,55,"""Heads a bit iffy""; flustered by heat."
+94659,Openness,80,Theatre; astronomy; ancient history; diverse interests.
+,Conscientiousness,55,Cared for dad; financial struggles/gambling.
+,Extraversion,25,Introvert; drained by people; prefers older friends.
+,Agreeableness,85,Gentle; seeks understanding; thankful.
+,Neuroticism,90,Depression; grief; financial worry; struggle with identity.
+95066,Openness,90,Poetic; abstract thinking; curiosity.
+,Conscientiousness,60,Journaling routine; mind wanders.
+,Extraversion,50,Connects deeply; enjoys solitude/quiet.
+,Agreeableness,95,Very warm; kind; appreciative.
+,Neuroticism,20,"Peaceful; ""finding my rhythm."""
+95835,Openness,60,Cult films; languages.
+,Conscientiousness,25,"""Late for everything""; ""night owl."""
+,Extraversion,55,Jokes with colleagues; festival past.
+,Agreeableness,75,Self-deprecating humor; friendly.
+,Neuroticism,40,Generally chill; uses humor.
+98498,Openness,50,True crime; music; sticks to comfort zones.
+,Conscientiousness,45,Fidgety; hard to concentrate.
+,Extraversion,20,Social phobia; hates going out alone.
+,Agreeableness,85,Enthusiastic about interests; polite.
+,Neuroticism,80,"Anxiety; social phobia; believes world is ""messed up."""
+98860,Openness,75,Art appreciation; creative ideas; financial curiosity.
+,Conscientiousness,85,Juggling projects; responsible.
+,Extraversion,60,Networking; social events; needs recharge.
+,Agreeableness,80,"Friendly; ""good advice."""
+,Neuroticism,55,"""Little overwhelmed""; stress management."
+99496,Openness,75,Wants extreme sports; skiing; variety.
+,Conscientiousness,80,"Focused; ""locked in""; routine dinner."
+,Extraversion,75,Leagues; pool hall; competitive.
+,Agreeableness,65,Competitive; polite.
+,Neuroticism,50,Has felt depressed; overanalyses; tries to remain positive.

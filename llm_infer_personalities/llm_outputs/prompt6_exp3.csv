@@ -1,0 +1,101 @@
+Participant_ID,Openness,Conscientiousness,Extroversion,Agreeableness,Neuroticism,Primary Trait,Consistency Check
+10345,9,8,7,8,2,Openness,Aligned with stats
+11492,6,9,7,9,1,Conscientiousness,Aligned with stats
+12178,7,9,5,4,4,Conscientiousness,Outlier: High C but Low A
+16042,4,8,5,7,5,Conscientiousness,Aligned with stats
+16234,3,5,3,4,9,Neuroticism,"Aligned with stats (High N, Low E/O)"
+17304,6,9,8,9,2,Extraversion,Aligned with stats
+18724,5,8,2,7,3,Conscientiousness,Outlier: Low E but High C (Content Introvert)
+21566,8,5,5,2,6,Openness,Outlier: High O but Low A
+22826,3,2,3,2,7,Neuroticism,Aligned with stats
+23105,6,6,9,8,6,Extraversion,Aligned with stats
+23429,6,8,6,9,2,Agreeableness,Aligned with stats
+23564,3,8,2,5,9,Neuroticism,Outlier: High N but High C (Anxious Saver)
+24311,6,2,2,5,9,Neuroticism,"Aligned with stats (High N, Low C)"
+26586,8,8,6,8,3,Openness,Aligned with stats
+26627,4,8,4,8,9,Neuroticism,Outlier: High N but High C (Anxious Perfectionist)
+29239,8,5,4,5,9,Neuroticism,Outlier: High N but High O
+29937,9,9,2,6,2,Conscientiousness,Outlier: Low E but High C/O
+30122,6,6,4,9,7,Agreeableness,Outlier: High N but High A
+31717,2,9,3,5,2,Conscientiousness,Aligned with stats (Low O/E)
+32062,5,5,5,8,5,Agreeableness,Aligned with stats
+32418,4,7,9,5,2,Extraversion,Aligned with stats
+32999,5,7,6,8,2,Agreeableness,Aligned with stats
+33211,9,4,6,7,4,Openness,Aligned with stats
+33270,5,8,7,7,6,Conscientiousness,Aligned with stats
+35669,6,7,6,10,2,Agreeableness,Aligned with stats
+37239,5,8,8,9,2,Extraversion,Aligned with stats
+37559,6,10,7,3,1,Conscientiousness,Outlier: High C but Low A
+37703,5,9,6,9,4,Conscientiousness,Aligned with stats
+38794,6,9,8,7,2,Conscientiousness,Aligned with stats
+38957,7,8,4,7,8,Neuroticism,Outlier: High N but High C (Overwhelmed)
+39320,4,6,2,5,7,Neuroticism,"Aligned with stats (High N, Low E)"
+39756,6,8,2,6,9,Neuroticism,Outlier: High N but High C (Anxious Achiever)
+40326,10,8,5,3,4,Openness,Outlier: High O but Low A
+40358,4,3,4,2,6,Low Agreeableness,Aligned with stats
+40377,9,6,6,9,5,Openness,Aligned with stats
+40570,9,4,3,4,8,Openness,Outlier: High N + High O
+41227,1,2,4,6,9,Neuroticism,"Aligned with stats (High N, Low O/C)"
+41384,4,4,5,1,9,Low Agreeableness,Aligned with stats
+41788,6,4,2,3,8,Neuroticism,Aligned with stats
+41919,5,2,4,6,6,Low Conscientiousness,Aligned with stats
+43118,5,8,6,9,5,Agreeableness,Aligned with stats
+43294,5,8,6,9,5,Agreeableness,Aligned with stats
+44256,6,8,7,8,2,Conscientiousness,Aligned with stats
+46188,8,9,7,8,2,Conscientiousness,Aligned with stats
+46509,6,8,5,9,4,Agreeableness,Aligned with stats
+46711,2,9,1,5,3,Conscientiousness,Aligned with stats (Low E/O)
+46796,8,6,5,9,6,Agreeableness,Aligned with stats
+47804,8,8,5,7,5,Conscientiousness,Aligned with stats
+48354,6,8,4,6,8,Neuroticism,Outlier: High N but High C
+49061,10,5,4,6,8,Openness,Outlier: High O + High N
+49157,3,9,3,3,8,Conscientiousness,Outlier: High N but High C
+50861,3,7,4,6,1,Low Neuroticism,Aligned with stats
+50862,5,9,7,9,2,Conscientiousness,Aligned with stats
+50895,8,6,6,8,2,Openness,Aligned with stats
+53025,5,8,3,8,8,Neuroticism,Outlier: High N but High C
+53958,9,9,6,4,2,Openness,Outlier: High O but Low A
+54165,4,6,2,6,9,Neuroticism,Aligned with stats
+54409,6,3,6,1,8,Low Agreeableness,Aligned with stats
+54761,9,5,4,8,8,Openness,Outlier: High N + High O
+55599,5,8,6,8,5,Conscientiousness,Aligned with stats
+59088,8,9,6,9,3,Conscientiousness,Aligned with stats
+59741,9,7,4,4,4,Openness,Aligned with stats
+61444,9,6,9,7,2,Extraversion,Aligned with stats
+62828,6,8,9,9,2,Extraversion,Aligned with stats
+63092,5,9,6,9,6,Agreeableness,Aligned with stats
+63396,8,6,8,2,5,Openness,Outlier: High O but Low A
+63854,9,6,4,6,7,Openness,Outlier: High N + High O
+65180,5,8,8,2,4,Conscientiousness,Outlier: High C but Low A
+65534,4,8,2,6,3,Conscientiousness,Outlier: High C but Low E
+65978,6,6,3,8,8,Neuroticism,Outlier: High N but High A
+67900,3,4,1,5,10,Neuroticism,Aligned with stats
+69820,5,6,4,9,10,Neuroticism,Outlier: High N but High A (Anxious Pleaser)
+70424,4,3,4,6,8,Neuroticism,Aligned with stats
+71586,10,9,4,8,4,Openness,Aligned with stats
+71591,3,8,6,3,5,Conscientiousness,Aligned with stats (Low O/A)
+71920,6,8,5,6,3,Conscientiousness,Aligned with stats
+72945,8,8,3,4,4,Conscientiousness,Outlier: High C but Low A
+74568,7,9,8,8,2,Conscientiousness,Aligned with stats
+76134,6,9,5,5,7,Conscientiousness,Outlier: High C but High N
+77117,8,7,5,6,4,Openness,Aligned with stats
+81053,5,9,8,3,2,Conscientiousness,Outlier: High C but Low A
+82305,6,9,6,7,5,Conscientiousness,Aligned with stats
+83111,4,6,5,8,9,Neuroticism,Outlier: High N but High A
+83220,9,8,4,6,2,Conscientiousness,Aligned with stats
+84409,2,4,2,6,5,Low Openness,Aligned with stats
+87091,6,7,5,8,8,Agreeableness,Outlier: High N + High A
+87842,5,6,7,9,2,Agreeableness,Aligned with stats
+88009,9,6,4,6,5,Openness,Aligned with stats
+88147,6,9,8,6,8,Conscientiousness,Outlier: High C but High N
+89703,5,7,4,9,8,Neuroticism,Outlier: High N but High A
+91115,8,6,9,9,2,Extraversion,Aligned with stats
+91981,9,9,6,9,2,Conscientiousness,Aligned with stats
+92241,9,9,2,4,9,Neuroticism,"Outlier: High N, C, O"
+94161,4,3,4,5,7,Neuroticism,Aligned with stats
+94659,8,5,2,9,9,Neuroticism,Outlier: High N but High A
+95066,10,6,5,9,4,Openness,Aligned with stats
+95835,8,2,6,5,4,Openness,"Aligned with stats (High O, Low C)"
+98498,8,5,3,8,8,Neuroticism,Outlier: High N + High O/A
+98860,8,9,7,7,6,Conscientiousness,Outlier: High C but Mid N
+99496,7,9,6,6,5,Conscientiousness,Aligned with stats

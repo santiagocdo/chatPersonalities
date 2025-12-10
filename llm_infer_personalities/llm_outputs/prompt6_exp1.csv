@@ -1,0 +1,90 @@
+Participant_ID,Openness,Conscientiousness,Extroversion,Agreeableness,Neuroticism,Primary Trait,Consistency Check
+9804092,6,8,7,8,2,Conscientiousness,Aligned: Low N supports High C/A.
+9804125,7,3,2,2,8,Neuroticism,Aligned: High N depresses C and A.
+9804355,5,8,6,9,3,Agreeableness,Aligned: High A/C correlate with Low N.
+9804410,7,4,3,5,7,Neuroticism,Aligned: High N suppresses C/E.
+9804421,3,8,2,1,4,Conscientiousness,Outlier: High C but extremely Low A.
+9804579,8,6,4,7,4,Openness,Aligned: Neutral N allows O to surface.
+9804926,7,8,5,7,3,Conscientiousness,Aligned: High C correlates with Low N.
+9805587,5,6,6,8,3,Agreeableness,Aligned: High A supports social stability.
+10117124,5,7,6,8,4,Agreeableness,Aligned: High A/C cluster present.
+10117126,4,6,7,8,2,Extroversion,Aligned: High E correlates with High A.
+10117128,6,5,8,7,3,Extroversion,Aligned: High E/A supports Low N.
+10117133,4,8,5,4,3,Conscientiousness,Outlier: High C but Low A (Strict/Direct).
+10117140,6,8,8,9,2,Extroversion,Aligned: Strong Social Stability Cluster.
+10117146,5,6,5,6,5,Neuroticism,Aligned: Average N suppresses E peaks.
+10117148,5,7,4,8,4,Agreeableness,Aligned: High A/C correlate with Low N.
+10117150,6,7,5,7,3,Conscientiousness,Aligned: Low N allows C to function.
+10117154,7,6,3,4,7,Neuroticism,Outlier: High N but Moderate C (Game dev).
+10117165,8,9,6,7,2,Conscientiousness,Aligned: High C/O (Self-improvement focus).
+10117171,8,7,2,5,8,Neuroticism,Aligned: High N depresses E significantly.
+10117181,6,6,7,8,2,Agreeableness,Aligned: High A/E correlate with Low N.
+10117189,5,7,6,8,3,Agreeableness,Aligned: High A/C cluster present.
+10117196,5,5,6,6,3,Extroversion,"Aligned: Average profile, slight E bias."
+10117204,6,7,3,6,4,Conscientiousness,Aligned: High C (Builder games) with Low E.
+10117263,5,8,5,7,2,Conscientiousness,Aligned: High C (Routine/Exercise) Low N.
+10117266,7,7,4,6,3,Openness,Aligned: High O/C (Travel/Code) Low N.
+10117310,5,6,6,9,2,Agreeableness,Aligned: High A supports Social Stability.
+10117352,8,5,7,8,3,Openness,Aligned: High O (New environment/Nature).
+10117424,5,8,7,9,2,Agreeableness,Aligned: High A/C/E (Social Stability).
+10117478,8,7,3,2,4,Openness,Outlier: High O/C but very Low A (Critical).
+10117696,6,6,4,7,3,Agreeableness,Aligned: High A correlates with Low N.
+10117760,7,6,3,6,3,Openness,Aligned: High O/C (Cooking/Solo living).
+10117874,6,7,6,9,2,Agreeableness,Aligned: High A/C correlate with Low N.
+10117912,6,7,6,7,2,Conscientiousness,Aligned: High C (Gardening/Sports) Low N.
+10117950,9,7,4,6,3,Openness,Aligned: High O (Instruments/Theory) Low N.
+10118016,6,6,3,6,4,Conscientiousness,"Aligned: Average profile, slight C bias."
+10118261,6,6,5,8,3,Agreeableness,Aligned: High A supports Low N.
+10118268,9,6,2,2,3,Openness,Outlier: Very High O (Gnosticism) but Low A.
+10118299,7,6,3,7,4,Agreeableness,"Aligned: High A/O, Low E (Introvert/Books)."
+10269258,3,3,4,3,7,Neuroticism,Aligned: High N depresses C/A/O.
+10269277,5,6,5,8,3,Agreeableness,Aligned: High A correlates with Low N.
+10269286,4,8,6,5,3,Conscientiousness,Aligned: High C (Exercise/Health) Low N.
+10269296,6,7,7,8,3,Extroversion,Aligned: High E/A/C (Marathon runner).
+10269305,5,7,5,7,3,Conscientiousness,Aligned: High C (Work/Family duty) Low N.
+10269314,8,9,6,8,2,Conscientiousness,Aligned: High C (Business/Languages) Low N.
+10269319,6,7,6,9,2,Agreeableness,Aligned: High A/C (Dogs/Hikes) Low N.
+10269353,7,6,4,7,3,Openness,Aligned: High O (Manuals/Curiosity) Low N.
+10269413,6,6,3,5,4,Conscientiousness,"Aligned: Independent thinker, Low N."
+10269434,7,7,4,7,3,Openness,Aligned: High O (Learning guitar) Low N.
+10269440,4,8,5,4,6,Neuroticism,Outlier: High N and High C (High-functioning).
+10269445,4,6,5,7,5,Neuroticism,Aligned: N suppresses C/E slightly.
+10269450,6,7,6,8,2,Agreeableness,Aligned: High A/C (Vacation/Family).
+10269475,7,8,3,6,3,Conscientiousness,Aligned: High C (Gardening/Cooking) Low N.
+10269476,5,7,6,7,2,Conscientiousness,Aligned: High C (Active/Outdoor) Low N.
+10269598,5,8,5,6,3,Conscientiousness,Aligned: High C (Fitness/Routine) Low N.
+10269734,6,8,6,9,2,Agreeableness,Aligned: High A/C (Caregiver/Gratitude).
+10269900,8,4,7,2,4,Extroversion,Outlier: High E/O but extremely Low A (Troll).
+10269912,6,6,7,8,2,Extroversion,Aligned: High E/A (Theme parks/Fun).
+10269942,6,6,4,6,7,Neuroticism,Aligned: High N suppresses E and C.
+10270008,6,7,7,8,3,Extroversion,Aligned: High E/A/C (Concerts/Positivity).
+10270100,7,6,4,7,4,Openness,Aligned: High O (Writing/Reading) Low N.
+10270275,5,5,4,7,3,Agreeableness,Aligned: High A correlates with Low N.
+10270371,6,6,5,8,3,Agreeableness,Aligned: High A/C (Work/Positivity).
+10270474,6,6,3,5,4,Conscientiousness,"Aligned: Average profile, slight C bias."
+10270540,3,4,2,2,7,Neuroticism,Aligned: High N creates Low A/C (Angry/Rude).
+10270624,7,7,6,8,3,Agreeableness,Aligned: High A/C/O (Family/Travel).
+10270847,6,6,5,7,3,Agreeableness,Aligned: High A correlates with Low N.
+10288304,6,8,6,8,3,Conscientiousness,Aligned: High C/A (Analyst/Structure) Low N.
+10288907,6,6,5,7,3,Agreeableness,Aligned: High A correlates with Low N.
+10290591,6,7,6,8,3,Conscientiousness,Aligned: High C (Business owner) Low N.
+10291341,7,6,4,8,3,Openness,Aligned: High O (History/Crafts) Low N.
+10295692,7,6,3,6,4,Openness,Aligned: High O (Creative/Design) Low N.
+10310934,5,6,7,8,2,Extroversion,Aligned: High E/A (Sports/Friends).
+10314870,6,8,6,9,2,Agreeableness,Aligned: High A/C (Nurse/Care) Low N.
+10317326,5,8,6,7,3,Conscientiousness,Aligned: High C (Student/Ambition) Low N.
+10318720,3,2,2,1,8,Neuroticism,Aligned: High N destroys A/C (Aggressive).
+10319013,7,6,4,6,4,Openness,Aligned: High O (Gaming/Cooking) Low N.
+10320108,5,6,6,5,4,Extroversion,"Aligned: Average profile, slight E bias."
+10331151,6,8,6,8,2,Conscientiousness,Aligned: High C (Voting/Active) Low N.
+10332599,5,8,5,8,3,Conscientiousness,Aligned: High C (Work project) Low N.
+10332661,6,7,6,9,2,Agreeableness,Aligned: High A/C (Dogs/Family).
+10333863,6,7,6,8,3,Agreeableness,Aligned: High A/C (Pregnancy/Plan) Low N.
+10333977,8,5,4,2,6,Openness,Outlier: High O (Philosophy) but Low A/High N.
+10334514,4,7,5,3,7,Neuroticism,Outlier: High N but High C (Leader/Fixer).
+10346871,8,7,4,4,4,Openness,Aligned: High O (Alt Health) Low A (Skeptical).
+10347192,6,8,4,6,3,Conscientiousness,Aligned: High C (Plumbing/Self-sufficient).
+10348325,5,7,7,8,3,Extroversion,Aligned: High E/A (Social events).
+10351970,5,6,5,9,2,Agreeableness,Aligned: High A (Polite/Agreeable) Low N.
+10358415,6,5,5,4,5,Neuroticism,Aligned: Moderate N affects A (Confrontational).
+10367266,6,5,4,5,7,Neuroticism,Aligned: High N depresses C and E.

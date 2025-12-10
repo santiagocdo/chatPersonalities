@@ -34,11 +34,14 @@ c(1,1,1,1,1) %*% c(-1,-1,-1,-1,-1)
 c(-2,-2,-2,-2,-2) %*% c(2,2,2,2,2)
 
 # calculate personality (condition) distances 
-bfi$pers_distance <- NA
+bfi$pers_distance <- bfi$pers_distance2 <- NA
 for (i in 1:nrow(bfi)) {
   bfi$pers_distance[i] <- -1 * (unlist(bfi[i,scores]) %*% unlist(bfi[i,inv_scores]))
+  bfi$pers_distance2[i] <- sum((unlist(bfi[i,scores]) - unlist(bfi[i,inv_scores]))^2)
 }
 hist(bfi$pers_distance)
+plot(bfi$pers_distance, bfi$pers_distance2)
+
 
 
 
@@ -97,7 +100,7 @@ ratings3$likerts <- ifelse(grepl("different",ratings3$rating) |
 
 
 # add personality, demographics, and distances to the wide format data.frame
-ratings3$pers_distance <- ratings3$age <- ratings3$sex <- 
+ratings3$pers_distance <- ratings3$pers_distance2 <- ratings3$age <- ratings3$sex <- 
   ratings3$extraversion_score <- ratings3$agreeableness_score <- 
   ratings3$conscientiousness_score  <- ratings3$openness_score <- 
   ratings3$neuroticism_score <- NA
@@ -105,6 +108,8 @@ for (i in 1:length(participant_ID)) {
   # condition distance
   ratings3$pers_distance[ratings3$participant_ID == participant_ID[i]] <- 
     bfi$pers_distance[bfi$participant_ID==participant_ID[i]]
+  ratings3$pers_distance2[ratings3$participant_ID == participant_ID[i]] <- 
+    bfi$pers_distance2[bfi$participant_ID==participant_ID[i]]
   # demographics
   ratings3$age[ratings3$participant_ID == participant_ID[i]] <- 
     inter$participant_age[inter$participant_ID==participant_ID[i]]
@@ -154,7 +159,7 @@ if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 ratings3_wf <- as.data.frame(
   ratings3 %>% group_by(participant_ID, chat, neuroticism_score, openness_score,
                         conscientiousness_score, agreeableness_score, extraversion_score, 
-                        sex, age, pers_distance) %>% summarise(likerts=mean(likerts))
+                        sex, age, pers_distance, pers_distance2) %>% summarise(likerts=mean(likerts))
 )
 m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 
@@ -166,8 +171,8 @@ m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 
 # # # # Figure 4A # # # #
 # preregistered analysis
-report_table(t.test(likerts~chat,ratings3_wf,paired=T))
-wilcox.test(likerts~chat,ratings3_wf,paired=T)
+report_table(t.test(likerts~chat,ratings3_wf))
+wilcox.test(likerts~chat,ratings3_wf)
 summary(lm(likerts ~ chat, ratings3_wf))
 report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 if (!require(ggsignif)) {install.packages("ggsignif")}; library(ggsignif)
@@ -191,7 +196,7 @@ summary(lm(likerts ~ chat*pers_distance, ratings3_wf))
 report_table(lmer(likerts ~ chat*pers_distance + sex+age+agreeableness_score + (1|participant_ID), ratings3_wf))
 report_table(lmer(likerts ~ chat*pers_distance + (1|participant_ID), ratings3_wf))
 if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
-(fig4B <- ggplot(ratings3_wf, aes(x=pers_distance, y=likerts, col=condition2)) + 
+(fig4B <- ggplot(ratings3_wf, aes(x=pers_distance2, y=likerts, col=condition2)) + 
     labs(title="",x="Condition Distance",y="Affiliation Score") + 
     # geom_point(alpha=.2) + 
     scale_y_continuous(breaks = c(-2,-1,0,1,2), labels = c("-2","","0","","+2")) +
@@ -200,6 +205,7 @@ if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
     geom_smooth(method = "lm", se=T, fill="grey80") + 
     theme(legend.position = "none"))
 summary(lm(likerts~pers_distance*chat, ratings3_wf))
+summary(lm(likerts~pers_distance2*chat, ratings3_wf))
 
 
 
@@ -292,6 +298,10 @@ interactions <- read.csv("experiment3/gpt_data_all_bfi.csv")
 participant_ID <- intersect(participant_ID, interactions$userid)
 source("functions.R")
 tmp <- summariseChatInteraction_e3(interactions, participant_ID)
+
+# save interactions already order by timeline
+# write.csv(tmp$inters, "llm_infer_personalities/exp3_n100_interactions.csv", row.names = F)
+
 combine <- tmp$combine
 influence <- tmp$influence
 
@@ -338,20 +348,20 @@ report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
            combine.lf[combine.lf$who=="GPT-4.1 Texts",])))
 aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
     combine.lf[combine.lf$who=="GPT-4.1 Texts",])
-report_table(t.test(bots_Positive~botcondition, combine[,], paired = TRUE))
-report_table(t.test(bots_Neutral~botcondition, combine[,], paired = TRUE))
-report_table(t.test(bots_Negative~botcondition, combine[,], paired = TRUE))
-report_table(t.test(bots_Mixed~botcondition, combine[,], paired = TRUE))
+report_table(t.test(bots_Positive~botcondition, combine[,]))
+report_table(t.test(bots_Neutral~botcondition, combine[,]))
+report_table(t.test(bots_Negative~botcondition, combine[,]))
+report_table(t.test(bots_Mixed~botcondition, combine[,]))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
                         combine.lf[combine.lf$who=="Participants Texts",])))
 aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
     combine.lf[combine.lf$who=="Participants Texts",])
-report_table(t.test(user_Positive~botcondition, combine[,], paired = TRUE))
-report_table(t.test(user_Neutral~botcondition, combine[,], paired = TRUE))
-report_table(t.test(user_Negative~botcondition, combine[,], paired = TRUE))
-report_table(t.test(user_Mixed~botcondition, combine[,], paired = TRUE))
+report_table(t.test(user_Positive~botcondition, combine[,]))
+report_table(t.test(user_Neutral~botcondition, combine[,]))
+report_table(t.test(user_Negative~botcondition, combine[,]))
+report_table(t.test(user_Mixed~botcondition, combine[,]))
 
 
 
@@ -382,7 +392,7 @@ combine.lf$condition2 <- factor(ifelse(combine.lf$botcondition=="mirror","Mirror
            color = guide_legend(nrow = 2)) +
     theme(legend.position = "bottom", legend.box = "vertical", #c(.3,.89),
           axis.text.x = element_text(angle = 30, hjust = 1),
-          legend.background = element_rect(colour='black',fill=alpha("white", 0.5),linetype='solid'))
+          legend.background = element_rect(colour='black',linetype='solid')) #fill=alpha("white", 0.5)
 )
 
 
@@ -459,10 +469,10 @@ ggplot(comb_dif, aes(x=prop_dif,y=aff_score)) +
   facet_grid(who~sentiment, scales = "free")
 
 # add sentiment to wide_format with difference scores:
-wide_format$sent
-for (i in 1:length(participant_ID)) {
-  participant_ID[i]
-}
+# wide_format$sent
+# for (i in 1:length(participant_ID)) {
+#   participant_ID[i]
+# }
 
 
 
@@ -521,7 +531,9 @@ colnames(combine.lf)[(ncol(combine.lf)-1):ncol(combine.lf)] <- c("sentiment","di
 
 
 
-# # # # Sample Size Calculation # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Sample Size Calculation # # # # # # # # # # # # # # # # # # # # # #### 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 vec_mirror <- ratings3_wf$likerts[ratings3_wf$chat=="mirror"]
 vec_inverse <- ratings3_wf$likerts[ratings3_wf$chat!="mirror"]
 var.test(vec_mirror, vec_inverse, alternative = "two.sided")
@@ -529,13 +541,13 @@ var.test(vec_mirror, vec_inverse, alternative = "two.sided")
 t.test(vec_mirror, vec_inverse, var.equal = F)
 cor.test(vec_mirror, vec_inverse)
 
-library(pwr)
+if (!require(pwr)) {install.packages("pwr")}; library(pwr)
 sd_pooled <- sqrt(((sd(vec_mirror)^2) + (sd(vec_inverse)^2)) / 2)
 # Cohen's d
 effect_size <- (mean(vec_mirror) - mean(vec_inverse)) / sd_pooled
 pwr.t.test(d = .3, power = .8, sig.level = .05, type = "paired")
 
-library(pwrss)
+if (!require(pwrss)) {install.packages("pwrss")}; library(pwrss)
 pwrss.t.2means(mu1 = mean(vec_mirror), mu2 = mean(vec_inverse), 
                sd1 = sd(vec_mirror), sd2 = sd(vec_inverse), 
                paired = TRUE, paired.r = cor(vec_mirror,vec_inverse),
@@ -552,3 +564,96 @@ f2 <- r_squared / (1 - r_squared)
 
 pwr.f2.test(u = 1, f2 = f2, sig.level = .05, power = .8)
 171.5365+1+1
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # Exploratory Analysis of Influences# # # # # # # # # # # # # # # # #### 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+tmp <- influence[influence$direction!="",] %>% 
+  group_by(botcondition,to,from,direction,target) %>%
+  summarise(prob=mean(value))
+ggplot(tmp, aes(x=to,y=from,fill=prob)) +
+  geom_tile(color = "white") + 
+  scale_fill_gradient(low = "white", high = "red", limit = c(0, 1), space = "Lab", name = "Prob:") +
+  facet_grid(direction ~ botcondition) +
+  theme_minimal() + coord_fixed() + 
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1),
+        panel.grid.major = element_blank(),
+        panel.border = element_blank(),
+        legend.position = "right") 
+
+tmp <- influence[influence$direction!="",] %>% 
+  group_by(to,from,direction,target) %>%
+  summarise(prob=mean(value))
+# tmp <- influence[influence$direction!="",]
+# tmp <- tmp[tmp$chatId=="9804092Anxious",]; tmp$prob <- tmp$value
+ggplot(tmp, aes(x=to,y=from,fill=prob)) +
+  labs(x="to: interaction t",y="from: interaction t-1") +
+  geom_tile(color = "white") + 
+  geom_text(aes(label=round(prob,2)), color = "black", size = 3) + 
+  scale_fill_gradient(low = "white", high = "red", limit = c(0, 1), space = "Lab", name = "Prob:") +
+  facet_grid(.~direction) +
+  theme_minimal() + coord_fixed() + 
+  theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1),
+        panel.grid.major = element_blank(),
+        panel.border = element_blank(),
+        legend.position = "right") 
+
+
+
+rel_cols <- c("chat.again","different","similar","enjoy","distant","understood")
+combine[,rel_cols] <- combine[,rel_cols] - 3
+combine$different <- -1 * combine$different; combine$distant <- -1 * combine$distant 
+
+combine$aff_score <- rowMeans(combine[,rel_cols])
+
+# ggplot(combine, aes(x=gpt_user_mirror,y=aff_score,col=chat)) + 
+#   geom_point(alpha=.1) + stat_cor() + geom_smooth(method="lm") +
+#   facet_grid(. ~ exp)
+
+
+
+
+
+summary(lm(aff_score ~ gpt_user_mirror * chat, combine[combine$exp=="Expt. 1",]))
+summary(lm(aff_score ~ user_gpt_mirror * chat, combine[combine$exp=="Expt. 1",]))
+summary(lm(aff_score ~ gpt_user_mirror * chat, combine[combine$exp=="Expt. 2",]))
+summary(lm(aff_score ~ user_gpt_mirror * chat, combine[combine$exp=="Expt. 2",]))
+
+
+combine_lf <- melt(combine, measure.vars = c("user_gpt_mirror","gpt_user_mirror")) 
+levels(combine_lf$variable) <- c("GPT mirror User", "User mirror GPT")
+
+report_table(t.test(combine$gpt_user_mirror, combine$user_gpt_mirror))
+ggplot(combine_lf, aes(x=variable, y=value, fill=exp)) + 
+  labs(x="Influence", y="p(Mirror Sentiment)", col=NULL) +
+  geom_boxplot(alpha=.1, position = position_dodge(.7)) + 
+  geom_violin(alpha=.1, position = position_dodge(.7)) + 
+  stat_summary(position = position_dodge(.7)) +
+  scale_y_continuous(breaks = c(0,.5,1)) +
+  scale_fill_manual(values = c("Expt. 1" = "salmon", 
+                               "Expt. 2" = "turquoise")) +
+  geom_signif(comparisons = list(c("GPT mirror User", "User mirror GPT")),
+              map_signif_level = TRUE, col="black",textsize = 5) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust=1))
+
+
+
+ggplot(combine_lf, aes(x=value,y=aff_score,col=chat,linetype=chat)) + 
+  labs(x="p(Mirror Sentiment)", y="Affliation Score", 
+       col="Condition", linetype="Condition") +
+  geom_point(alpha=.1) +
+  scale_x_continuous(breaks = seq(0,1,by=.5)) +
+  scale_color_manual(values = c("#0072B2","#D55E00","#009E73","#CC79A7")) +
+  scale_linetype_manual(values = c("solid","dashed","solid","dashed")) +
+  stat_cor(p.accuracy = 0.001, size=3) + geom_smooth(method="lm",se=F) +
+  facet_grid(variable ~ exp) +
+  theme_bw()
+
+
+# summary(lm(aff_score~chat,combine[combine$exp=="Expt. 1",]))
+# summary(lm(aff_score~chat,ratings1_wf))
+# summary(lm(aff_score~chat,combine[combine$exp=="Expt. 2",]))
+# summary(lm(aff_score~chat,ratings2_wf))

@@ -40,14 +40,21 @@ scoreQuestionnaires_e1 <- function(scl90, bfi10) {
   # vector of subscales
   subscales <- unique(subsco$subScale)
   
+  reversal <- c('item.2', 'item.6', 'item.8','item.9', 'item.10')
+  for (i in 1:length(reversal)) {
+    bfi10[,reversal[i]] <- (-1*(bfi10[,reversal[i]]-4))+4
+  }
+  
   # create empty matrix
   bfi10_total <- data.frame(matrix(NA,nrow=nrow(bfi10),ncol=length(subscales)))
   colnames(bfi10_total) <- paste0("bfi10_",subscales)
   
   for (i in 1:length(subscales)) {
     tempItems <- paste0("item.",subsco$item[subsco$subScale == subscales[i]])
-    bfi10_total[,i] <- rowSums(bfi10[,tempItems])
+    # bfi10_total[,i] <- rowSums(data.frame(bfi10[,tempItems[1]],-bfi10[,tempItems[2]]))
+    bfi10_total[,i] <- rowMeans(bfi10[,tempItems])
   }
+  
   bfi10_total <- cbind(Participant.Private.ID=bfi10$Participant.Private.ID,
                        bfi10_total)
   
@@ -67,14 +74,22 @@ scoreQuestionnaires_e2 <- function(bfi44) {
   # vector of subscales
   subscales <- unique(subsco$subScale)
   
+  # https://arc.psych.wisc.edu/self-report/big-five-inventory-bfi/
+  reversal <- c('item.6', 'item.21', 'item.31','item.2', 'item.12', 'item.27',
+                'item.37',  'item.8', 'item.18', 'item.23', 'item.43', 'item.9',
+                'item.24', 'item.34', 'item.35', 'item.44')
+  for (i in 1:length(reversal)) {
+    bfi44[,reversal[i]] <- (-1*(bfi44[,reversal[i]]-3))+3
+  }
+  
   # create empty matrix
   bfi44_total <- data.frame(matrix(NA,nrow=nrow(bfi44),ncol=length(subscales)))
   colnames(bfi44_total) <- paste0("bfi44_",subscales)
-  
   for (i in 1:length(subscales)) {
     tempItems <- paste0("item.",subsco$item[subsco$subScale == subscales[i]])
-    bfi44_total[,i] <- rowSums(bfi44[,tempItems])
+    bfi44_total[,i] <- rowMeans(bfi44[,tempItems])
   }
+  
   bfi44_total <- cbind(Participant.Private.ID=bfi44$Participant.Private.ID,
                        bfi44_total)
   
@@ -83,7 +98,7 @@ scoreQuestionnaires_e2 <- function(bfi44) {
 }
 
 # add questionnaires to ratings Experiment 1
-addQuestionnaireToDataFrame_e1 <- function (dataframe,scl90,bfi10) {
+addQuestionnaireToDataFrame_e1 <- function (dataframe, scl90, bfi10) {
   # create an empty matrix
   temp <- matrix(NA,nrow=nrow(dataframe),ncol=sum(ncol(scl90)-1,ncol(bfi10)-1))
   colnames(temp) <- c(colnames(scl90)[-1],colnames(bfi10)[-1])
@@ -91,7 +106,7 @@ addQuestionnaireToDataFrame_e1 <- function (dataframe,scl90,bfi10) {
   dataframe <- cbind(dataframe,temp)
   
   # combine questionnaires
-  quests <- cbind(scl90,bfi10[-1])
+  quests <- cbind(scl90, bfi10[,-1])
   
   # vector with participants public id
   Participant.Private.ID <- unique(dataframe$Participant.Private.ID)
@@ -154,6 +169,9 @@ summariseChatInteraction <- function(task, chat, ratings) {
     temp2 <- task[task$good_ids == good_ids[i],]
     temp3 <- ratings[ratings$Participant.Private.ID == temp2$Participant.Private.ID,]
     
+    # FUNDAMENTAL # order chats by time stamp
+    temp1 <- temp1[order(temp1$usertimestamp),]
+    
     # # # sentiment analysis # # #
     sentiment <- t(matrix(rep(sentiment_label,nrow(temp1)),nrow=4))
     # remove punctuation
@@ -168,11 +186,12 @@ summariseChatInteraction <- function(task, chat, ratings) {
     targets <- paste(targets[,1],"-->",targets[,2])
     
     # transition p(bot_sentiment(t)|user_sentiment(t-1))
-    freq <- table(temp1$GPTsentiment[2:nrow(temp1)],temp1$usersentiment[1:(nrow(temp1)-1)])
+    freq <- table(temp1$GPTsentiment[2:nrow(temp1)], temp1$usersentiment[1:(nrow(temp1)-1)])
+    freq <- t(freq)
     chToUs <- reshape2::melt(freq/rowSums(freq))
     chToUs$direction <- "p(bot|user)"
-    chToUs$target<-paste(chToUs$Var2,"-->",chToUs$Var1)
-    colnames(chToUs)[1:2] <- c("to","from")
+    chToUs$target <- paste(chToUs$Var1,"-->",chToUs$Var2)
+    colnames(chToUs)[1:2] <- c("from","to")
     # Control metrics:
     # (1) If there is an odd value in Var1 OR Var2
     all_interactions <- as.character(unique(c(chToUs$to,chToUs$from)))
@@ -202,11 +221,13 @@ summariseChatInteraction <- function(task, chat, ratings) {
     
     
     # # transition p(user_sentiment(t)|bot_sentiment(t-1))
-    freq <- table(temp1$usersentiment,temp1$GPTsentiment)
+    freq <- table(temp1$usersentiment, temp1$GPTsentiment)
+    freq <- t(freq)
     usToCh <- reshape2::melt(freq/rowSums(freq))
     usToCh$direction <- "p(user|bot)"
-    usToCh$target<-paste(usToCh$Var2,"-->",usToCh$Var1)
-    colnames(usToCh)[1:2] <- c("to","from")
+    usToCh$target <- paste(usToCh$Var1,"-->",usToCh$Var2)
+    colnames(usToCh)[1:2] <- c("from","to")
+    
     # Control metrics:
     # (1) If there is an odd value in Var1 OR Var2
     all_interactions <- as.character(unique(c(usToCh$to,usToCh$from)))
@@ -232,6 +253,8 @@ summariseChatInteraction <- function(task, chat, ratings) {
                                  value=0,direction="p(bot|user)",target=temp))
     }
     remove(temp)
+    
+    
     
     # frequency of sentiment_label
     sent_bots <- data.frame(t(colSums(temp1$GPTsentiment==sentiment)))
@@ -269,6 +292,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
                               arm = temp2$arm,chatId=good_ids[i],
                               chatType = temp2$chatType,
                               rbind(chToUs,usToCh))
+      inters <- temp1
     } else {
       combine <- rbind(combine,
                        data.frame(temp2,chatId=temp1$userid[1],
@@ -280,6 +304,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
                                               arm = temp2$arm, chatId=good_ids[i],
                                               chatType = temp2$chatType,
                                               rbind(chToUs,usToCh)))
+      inters <- rbind(inters, temp1)
     }
   }
   # remove irrelevant variables
@@ -296,11 +321,11 @@ summariseChatInteraction <- function(task, chat, ratings) {
     # in one vector
     chatCode <- intersect(ratings$chatCode,combine$chatCode)
     # matrix to fill
-    toFill <- matrix(NA,nrow=nrow(combine),ncol=6)
+    toFill <- matrix(NA,nrow=nrow(combine), ncol=6)
     # correct columns
     colnames(toFill) <- levels(ratings$quest)
     # combine
-    combine <- cbind(combine,toFill); remove(toFill)
+    combine <- cbind(combine, toFill); remove(toFill)
     for (k in 1:length(chatCode)) {
       temp <- ratings[ratings$chatCode == chatCode[k],c("quest","Response")]
       rownames(temp) <- temp$quest
@@ -310,7 +335,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
   } 
   
   # output
-  return(list(combine=combine,influence=influence,ratings=ratings))
+  return(list(combine=combine,influence=influence,ratings=ratings,inters=inters))
 }
 
 # function used to extract overall information from chat interaction
@@ -330,6 +355,9 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
     # extract one chat (each Participant.Private.ID has two chats)
     temp <- interactions[interactions$participant_condition_id == participant_condition_id[i],]
     
+    # FUNDAMENTAL # order chats by time stamp
+    temp <- temp[order(temp$usertimestamp),]
+    
     # # # sentiment analysis # # #
     sentiment <- t(matrix(rep(sentiment_label,nrow(temp)),nrow=4))
     # remove punctuation
@@ -345,10 +373,11 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
     
     # transition p(bot_sentiment(t)|user_sentiment(t-1))
     freq <- table(temp$GPTsentiment[2:nrow(temp)],temp$usersentiment[1:(nrow(temp)-1)])
+    freq <- t(freq)
     chToUs <- reshape2::melt(freq/rowSums(freq))
     chToUs$direction <- "p(bot|user)"
-    chToUs$target <- paste(chToUs$Var2,"-->",chToUs$Var1)
-    colnames(chToUs)[1:2] <- c("to","from")
+    chToUs$target <- paste(chToUs$Var1,"-->",chToUs$Var2)
+    colnames(chToUs)[1:2] <- c("from","to")
     # Control metrics:
     # (1) If there is an odd value in Var1 OR Var2
     all_interactions <- as.character(unique(c(chToUs$to,chToUs$from)))
@@ -378,11 +407,13 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
     
     
     # # transition p(user_sentiment(t)|bot_sentiment(t-1))
-    freq <- table(temp$usersentiment,temp$GPTsentiment)
+    freq <- table(temp$usersentiment, temp$GPTsentiment)
+    freq <- t(freq)
     usToCh <- reshape2::melt(freq/rowSums(freq))
     usToCh$direction <- "p(user|bot)"
-    usToCh$target<-paste(usToCh$Var2,"-->",usToCh$Var1)
-    colnames(usToCh)[1:2] <- c("to","from")
+    usToCh$target <- paste(usToCh$Var1,"-->",usToCh$Var2)
+    colnames(usToCh)[1:2] <- c("from","to")
+    
     # Control metrics:
     # (1) If there is an odd value in Var1 OR Var2
     all_interactions <- as.character(unique(c(usToCh$to,usToCh$from)))
@@ -444,6 +475,7 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
       influence <- data.frame(participant_ID=temp$userid[1],
                               botcondition=temp$botpersonality[1],
                               rbind(chToUs,usToCh))
+      inters <- temp
     } else {
       combine <- rbind(combine,
                        data.frame(participant_ID=temp$userid[1],
@@ -454,6 +486,7 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
       influence <- rbind(influence,data.frame(participant_ID=temp$userid[1],
                                               botcondition=temp$botpersonality[1],
                                               rbind(chToUs,usToCh)))
+      inters <- rbind(inters, temp)
     }
   }
   
@@ -462,7 +495,7 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
   influence$to <- factor(influence$to, levels = sentiment_label)
   
   # output
-  return(list(combine=combine,influence=influence))
+  return(list(combine=combine,influence=influence,inters=inters))
 }
 
 
