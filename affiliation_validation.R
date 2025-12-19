@@ -79,8 +79,37 @@ corrplot(cor(wf3[,vars]), order = "hclust")
 par(mfrow = c(1, 1))
 
 
+tmp <- rbind(data.frame(melt(round(cor(wf1[,vars]),2)),exp="Expt. 1"),
+             data.frame(melt(round(cor(wf2[,vars]),2)),exp="Expt. 2"),
+             data.frame(melt(round(cor(wf3[,vars]),2)),exp="Expt. 3"))
+
+(p <- ggplot(tmp, aes(x = Var1, y = Var2, fill = value)) +
+    labs(x = NULL, y = NULL) +
+    geom_tile(color = "white") + # Adds a white border to tiles
+    geom_text(aes(label = value), color = "black", size = 3) + # Adds correlation values as text
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white", # Custom color scale
+                         midpoint = 0, limit = c(-1, 1), space = "Lab",
+                         name = "r") +
+    theme_minimal() +
+    coord_fixed() + # Ensures square tiles
+    facet_wrap(exp ~ .) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+          panel.grid.major = element_blank(),
+          panel.border = element_blank(),
+          legend.position = "right"))
+
+
+
+
+# # # # # Cronbach Alpha # # # # #
 if (!require(psych)) {install.packages("psych")}; library(psych)
-# Assuming your data is in a data frame called 'my_data'
+alpha1 <- alpha(wf1[,vars], check.keys=TRUE) # alpha
+alpha2 <- alpha(wf2[,vars], check.keys=TRUE)
+alpha3 <- alpha(wf3[,vars], check.keys=TRUE)
+alpha1$total; alpha2$total; alpha3$total
+
+
+# # # # # Factor Analysis # # # # # 
 # KMO should ideally be > 0.6
 KMO(wf1[,vars])
 KMO(wf2[,vars])
@@ -108,4 +137,6 @@ fa.diagram(fa_model)
 fa_model <- fa(wf3[,vars], nfactors = 1, rotate = "oblimin", fm = "minres")
 print(fa_model, cut = 0.3, digits = 2) # Print the detailed results
 fa.diagram(fa_model)
+
+
 

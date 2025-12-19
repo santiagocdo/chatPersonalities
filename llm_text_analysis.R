@@ -53,6 +53,21 @@ melt_bfi <- melt(cor(rbind(bfi_e1[,-1],bfi_e2[,-1],bfi_e3[,-1])))
 melt_bfi$value <- round(melt_bfi$value, 2)
 melt_bfi$exp <- "All"
 
+tmp <- rbind(melt_bfi1, melt_bfi2, melt_bfi3, melt_bfi)
+(p <- ggplot(tmp, aes(x = Var1, y = Var2, fill = value)) +
+  labs(x = NULL, y = NULL) +
+  geom_tile(color = "white") + # Adds a white border to tiles
+  geom_text(aes(label = value), color = "black", size = 3) + # Adds correlation values as text
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", # Custom color scale
+                       midpoint = 0, limit = c(-1, 1), space = "Lab",
+                       name = "r") +
+  theme_minimal() +
+  coord_fixed() + # Ensures square tiles
+  facet_wrap(exp ~ .) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+        panel.grid.major = element_blank(),
+        panel.border = element_blank(),
+        legend.position = "right"))
 
 
 p1 <- ggplot(melt_bfi1, aes(x = Var1, y = Var2, fill = value)) +
@@ -111,7 +126,7 @@ p4 <- ggplot(melt_bfi, aes(x = Var1, y = Var2, fill = value)) +
         panel.border = element_blank(),
         legend.position = "right")
 
-ggarrange(p1, p2, p3, p4, ncol=4, common.legend = T)
+ggarrange(p1, p2, p3, p4, ncol=2, nrow=2, common.legend = T)
 
 
 
@@ -369,3 +384,9 @@ ggplot(correls, aes(x=cor,y=dimension,col=prompt,shape=sig)) +
   scale_x_continuous(breaks = seq(-1,1,by=.5)) +
   facet_grid(. ~ exp) +
   theme_bw()
+
+
+
+
+# respond reviewer
+# Prompt to absorbent anxiety personality and then respond anxiety questionnaire.

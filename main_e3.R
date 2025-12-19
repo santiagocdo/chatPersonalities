@@ -39,7 +39,7 @@ for (i in 1:nrow(bfi)) {
   bfi$pers_distance[i] <- -1 * (unlist(bfi[i,scores]) %*% unlist(bfi[i,inv_scores]))
   bfi$pers_distance2[i] <- sum((unlist(bfi[i,scores]) - unlist(bfi[i,inv_scores]))^2)
 }
-hist(bfi$pers_distance)
+hist(bfi$pers_distance); hist(bfi$pers_distance2)
 plot(bfi$pers_distance, bfi$pers_distance2)
 
 
@@ -169,11 +169,21 @@ m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 # # # # # # # # # # Figure 4# # # # # # # # # # # # # # # # # # # # # # # # ####
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-# # # # Figure 4A # # # #
 # preregistered analysis
-report_table(t.test(likerts~chat,ratings3_wf))
-wilcox.test(likerts~chat,ratings3_wf)
+report_table(t.test(ratings3_wf$likerts[ratings3_wf$chat=="mirror"],
+                    ratings3_wf$likerts[ratings3_wf$chat=="inverse"],paired=T))
+# or 
 summary(lm(likerts ~ chat, ratings3_wf))
+
+# Null Hypothesis (H0): The sample data comes from the reference distribution (e.g., normal distribution).
+ks.test(ratings3_wf$likerts, "pnorm", mean(ratings3_wf$likerts), sd(ratings3_wf$likerts))
+# p < .05 significantly different from normal
+wilcox.test(ratings3_wf$likerts[ratings3_wf$chat=="mirror"],
+            ratings3_wf$likerts[ratings3_wf$chat=="inverse"], paired=T)
+
+
+
+# # # # Figure 4A # # # #
 report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 if (!require(ggsignif)) {install.packages("ggsignif")}; library(ggsignif)
 ratings3_wf$condition2 <- factor(ifelse(ratings3_wf$chat=="mirror","Mirror","Inverse"),
@@ -348,20 +358,28 @@ report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
            combine.lf[combine.lf$who=="GPT-4.1 Texts",])))
 aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
     combine.lf[combine.lf$who=="GPT-4.1 Texts",])
-report_table(t.test(bots_Positive~botcondition, combine[,]))
-report_table(t.test(bots_Neutral~botcondition, combine[,]))
-report_table(t.test(bots_Negative~botcondition, combine[,]))
-report_table(t.test(bots_Mixed~botcondition, combine[,]))
+report_table(t.test(combine$bots_Positive[combine$botcondition=="mirror"],
+                    combine$bots_Positive[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$bots_Neutral[combine$botcondition=="mirror"],
+                    combine$bots_Neutral[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$bots_Negative[combine$botcondition=="mirror"],
+                    combine$bots_Negative[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$bots_Mixed[combine$botcondition=="mirror"],
+                    combine$bots_Mixed[combine$botcondition=="inverse"],paired=T))
 
 # aim 2, GPT4 Texts are different between conditions (chatbots)
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
                         combine.lf[combine.lf$who=="Participants Texts",])))
 aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
     combine.lf[combine.lf$who=="Participants Texts",])
-report_table(t.test(user_Positive~botcondition, combine[,]))
-report_table(t.test(user_Neutral~botcondition, combine[,]))
-report_table(t.test(user_Negative~botcondition, combine[,]))
-report_table(t.test(user_Mixed~botcondition, combine[,]))
+report_table(t.test(combine$user_Positive[combine$botcondition=="mirror"],
+                    combine$user_Positive[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$user_Neutral[combine$botcondition=="mirror"],
+                    combine$user_Neutral[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$user_Negative[combine$botcondition=="mirror"],
+                    combine$user_Negative[combine$botcondition=="inverse"],paired=T))
+report_table(t.test(combine$user_Mixed[combine$botcondition=="mirror"],
+                    combine$user_Mixed[combine$botcondition=="inverse"],paired=T))
 
 
 
