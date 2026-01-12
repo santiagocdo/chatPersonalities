@@ -58,11 +58,22 @@ mean(inter$participant_age); sd(inter$participant_age); range(inter$participant_
 # # # # # # # # # # Ratings # # # # # # # # # # # # # # # # # # # # # # # # ####
 # ratings to conditions
 ratings3 <- read.csv("experiment3/2025_gpt_pcq_bfi.csv")
+# read task order file
+rand3 <- read.csv("experiment3/2025_gpt_randorder_bfi.csv")
 # round(cor(ratings3[,c("chat_again_inverse","different_inverse",
 #                       "enjoy_inverse","similar_inverse",
 #                       "understood_inverse","distant_inverse")]),2)
 # good participants, or participants to be included
 participant_ID <- unique(ratings3$participant_ID)
+# add chat order
+ratings3$order <- NA
+for (i in 1:length(participant_ID)) {
+  if (any(participant_ID[i] == rand3$participant_ID)) {
+    ratings3$order[ratings3$participant_ID==participant_ID[i]] <- 
+      rand3$order[rand3$participant_ID == participant_ID[i]]
+  }
+}
+ratings3$order <- ifelse(ratings3$order == 1, "Mirror First", "Inverse First")
 
 # relevant columns (personalities and anti-personalities)
 rating_cols <- c("chat_again_mirror","chat_again_inverse","different_mirror",
@@ -157,11 +168,22 @@ exp3 <- rbind(data.frame(quest="chat-again",effect="Mirror-Inverse",m.chat[2,c(1
 # score overall affiliation score
 if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 ratings3_wf <- as.data.frame(
-  ratings3 %>% group_by(participant_ID, chat, neuroticism_score, openness_score,
+  ratings3 %>% group_by(participant_ID, order, chat, neuroticism_score, openness_score,
                         conscientiousness_score, agreeableness_score, extraversion_score, 
                         sex, age, pers_distance, pers_distance2) %>% summarise(likerts=mean(likerts))
 )
 m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
+
+# order effect?
+ratings3_wf$chat2 <- factor(ifelse(ratings3_wf$chat == "inverse","Inverse","Mirror"),
+                            levels = c("Mirror","Inverse"))
+porder3 <- ggplot(ratings3_wf[!is.na(ratings3_wf$order),], aes(x=order, y=likerts, col=chat2, shape=chat2)) + 
+  labs(title="Experiment 3", y="Affiliation Score", x="Order") + 
+  scale_shape_manual(values = c(17, 19)) +
+  scale_color_manual(values = c("black", "grey50")) + stat_summary() + theme_classic() + 
+  theme(legend.position = "bottom", legend.title = element_blank())
+ggarrange(porder1, porder2, porder3, ncol=3)
+summary(lm(likerts ~ chat * order, ratings3_wf[!is.na(ratings3_wf$order),]))
 
 
 
@@ -171,7 +193,7 @@ m.aff <- report_table(lmer(likerts ~ chat + (1|participant_ID), ratings3_wf))
 
 # preregistered analysis
 report_table(t.test(ratings3_wf$likerts[ratings3_wf$chat=="mirror"],
-                    ratings3_wf$likerts[ratings3_wf$chat=="inverse"],paired=T))
+                    ratings3_wf$likerts[ratings3_wf$chat=="inverse"], paired=T))
 # or 
 summary(lm(likerts ~ chat, ratings3_wf))
 

@@ -226,10 +226,22 @@ ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) +
 #   summarise(aff_score=mean(aff_score))
 # write.csv(ratings1_wf,"ejercicio1.csv", row.names = F)
 # write.csv(ratings1, "ejercicio2.csv", row.names = F)
-ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,scl90_anxiety,chat) %>%
+ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID, order, scl90_anxiety, chat) %>%
   summarise(aff_score=mean(aff_score))
 ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
 
+
+# order effect?
+ratings1_wf$order2 <- ifelse(ratings1_wf$order == "Anxious first","Anxious first","Nonanxious first")
+porder1 <- ggplot(ratings1_wf, aes(x=order2, y=aff_score, col=chat, shape=chat)) +
+  labs(title="Experiment 1", y="Affiliation Score", x="Order") + 
+  scale_color_manual(values = c("#0072B2", "#D55E00")) + 
+  scale_shape_manual(values = c(17, 19)) + stat_summary() + theme_classic() + 
+  theme(legend.position = "bottom", legend.title = element_blank())
+summary(lm(aff_score ~ chat * order, ratings1_wf))
+ggplot(ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),], 
+       aes(x=order, y=scl90_anxiety)) + stat_summary()
+summary(lm(scl90_anxiety ~ order, ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),]))
 
 
 # normal residuals?
@@ -240,12 +252,12 @@ hist(resid(m)); ks.test(resid(m), "pnorm", mean=mean(resid(m)), sd=sd(resid(m)))
 
 
 
-# interaction questionnaire with chat-type
-m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1_wf[,]))
-# effect chat 1
-m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Anxious",]))
-# effect chat 2
-m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Nonanxious",]))
+# # interaction questionnaire with chat-type
+# m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1_wf[,]))
+# # effect chat 1
+# m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Anxious",]))
+# # effect chat 2
+# m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Nonanxious",]))
 
 
 
@@ -331,10 +343,22 @@ ggplot(ratings2, aes(x=bfi44_extraversion,y=aff_score,col=chat)) +
   geom_smooth(method="lm",se=F)
 
 # affiliation score average (primary outcome)
-ratings2_wf <- ratings2 %>% group_by(Participant.Private.ID,bfi44_extraversion,chat) %>%
+ratings2_wf <- ratings2 %>% group_by(Participant.Private.ID, order, bfi44_extraversion, chat) %>%
   summarise(aff_score=mean(aff_score))
 ratings2_wf$bfi44_extraversion <- ratings2_wf$bfi44_extraversion/max(ratings2_wf$bfi44_extraversion)
 
+
+# order effect?
+porder2 <- ggplot(ratings2_wf, aes(x=order, y=aff_score, col=chat, shape=chat)) + 
+  labs(title="Experiment 2", y="Affiliation Score", x="Order") + 
+  scale_color_manual(values = c("#009E73","#CC79A7")) + 
+  scale_shape_manual(values = c(17, 19)) + stat_summary() + theme_classic() + 
+  theme(legend.position = "bottom", legend.title = element_blank())
+summary(lm(aff_score ~ chat * order, ratings2_wf))
+ggplot(ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),], 
+       aes(x=order, y=bfi44_extraversion)) + stat_summary()
+summary(lm(bfi44_extraversion ~ order, ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),]))
+summary(lm(aff_score ~ bfi44_extraversion + order, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
 
 
 # normal residuals?
@@ -345,12 +369,12 @@ hist(resid(m)); ks.test(resid(m), "pnorm", mean=mean(resid(m)), sd=sd(resid(m)))
 
 
 
-# interaction questionnaire with chat-type
-m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2_wf[,]))
-# effect chat 1
-m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
-# effect chat 2
-m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Introvert",]))
+# # interaction questionnaire with chat-type
+# m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2_wf[,]))
+# # effect chat 1
+# m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
+# # effect chat 2
+# m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Introvert",]))
 
 
 
@@ -450,6 +474,8 @@ report_table(t.test(ratings1_wf$aff_score[ratings1_wf$chat=="Anxious"],
 report_table(cor.test(tmpA$diff, tmpA$scl90_anxiety, method = "spearman"))
 # anxious
 report_table(cor.test(tmpA$aff_score, tmpA$scl90_anxiety, method = "spearman"))
+cor(tmpA$aff_score, tmpA$scl90_anxiety)
+2*.34 / sqrt(1 - .34^2) # Cohen's d (to report in response to Reviewer 2 as effect size)
 # non-anxious
 report_table(cor.test(tmpN$aff_score, tmpN$scl90_anxiety, method = "spearman"))
 
@@ -553,6 +579,10 @@ report_table(t.test(ratings2_wf$aff_score[ratings2_wf$chat=="Extrovert"],
                     ratings2_wf$aff_score[ratings2_wf$chat=="Introvert"],paired=T))
 # interaction
 report_table(cor.test(tmpE$diff, tmpE$bfi44_extraversion, method = "spearman"))
+# report_table(cor.test(tmpE$diff[tmpE$order=="Extrovert first"], 
+#                       tmpE$bfi44_extraversion[tmpE$order=="Extrovert first"], method = "spearman"))
+# report_table(cor.test(tmpE$diff[tmpE$order=="Introvert first"], 
+#                       tmpE$bfi44_extraversion[tmpE$order=="Introvert first"], method = "spearman"))
 # extrovert
 report_table(cor.test(tmpE$aff_score, tmpE$bfi44_extraversion, method = "spearman"))
 # introvert

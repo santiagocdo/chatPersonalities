@@ -13,7 +13,7 @@ aff <- aff[order(aff$participant_ID),]
 rat <- read.csv("pilot4/2025_gpt_pcq_ctrl.csv")
 rel_cols <- c("distant","different")
 for (i in 1:length(rel_cols)) {
-  rat[,rel_cols[i]] <- -1*(rat[,rel_cols[i]] - 3) + 4
+  rat[,rel_cols[i]] <- -1*(rat[,rel_cols[i]] - 3) + 3
 }
 rat$aff_score <- rowMeans(rat[,-1] - 3)
 rat <- rat[order(rat$participant_ID),]
