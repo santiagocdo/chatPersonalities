@@ -1,15 +1,18 @@
 rm(list=ls(all=TRUE))
-# data cleaned by Riddhi and Santiago check script cleaning.R
+# data cleaned by Riddhi and Santiago, check script cleaning.R
 
 # print figures? if yes, then 1
 print_fig <- 0
 
+# load relevant libraries, if needed...
 if (!require(gtools)) {install.packages("gtools")}; library(gtools)
 if (!require(reshape2)) {install.packages("reshape2")}; library(reshape2)
 if (!require(ggplot2)) {install.packages("ggplot2")}; library(ggplot2)
 if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
 if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 if (!require(Hmisc)) {install.packages("Hmisc")}; library(Hmisc)
+if (!require(report)) {install.packages("report")}; library(report)
+if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
 
 # interaction (chat1 and chat2) via One Reach (thanks Daniel!)
 # behaviours in ratings
@@ -170,12 +173,14 @@ combine2 <- addQuestionnaireToDataFrame_e2(combine2, bfi44)
 # we need to use good_pids to remove not included PIDs
 length(unique(ratings1$Participant.Private.ID))
 length(unique(ratings2$Participant.Private.ID))
+# sanity checks for sample sizes
 length(unique(task1$Participant.Private.ID))
 length(unique(task2$Participant.Private.ID))
 length(unique(chat1$PID))
 length(unique(chat2$PID))
 length(keep1$PID)
 length(keep2$PID)
+
 
 # age and sex per experiment
 range(demo1$age,na.rm=T); mean(demo1$age,na.rm=T); sd(demo1$age,na.rm=T); nrow(demo1)
@@ -190,7 +195,6 @@ table(c(demo1$sex,demo2$sex))
 
 # does anxiety and extroversion correlate?
 temp <- ratings1[!duplicated(ratings1$Participant.Private.ID),]
-if (!require(report)) {install.packages("report")}; library(report)
 report_table(cor.test(temp$bfi10_extraversion,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_agreeableness,temp$scl90_anxiety, method = "spearman"))
 report_table(cor.test(temp$bfi10_conscientiousness,temp$scl90_anxiety, method = "spearman"))
@@ -202,7 +206,6 @@ report_table(cor.test(temp$bfi10_openness,temp$scl90_anxiety, method = "spearman
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # Statistical Analysis: Ratings - Questionnaires# # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
 # create affiliation score
 ratings1$aff_score <- ratings1$Response - 3
 ratings1$aff_score <- ifelse(ratings1$quest=="different"|ratings1$quest=="distant",
@@ -214,18 +217,8 @@ ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) +
 ggplot(ratings1, aes(x=scl90_anxiety,y=aff_score,col=chat)) + 
   geom_smooth(method="lm",se=F)
 
+
 # affiliation score average (primary outcome)
-# ratings1$sex <- ratings1$age <- NA
-# for (i in 1:nrow(demo1)) {
-#   ratings1$sex[ratings1$Participant.Private.ID==demo1$Participant.Private.ID[i]] <- demo1$sex[i]
-#   ratings1$age[ratings1$Participant.Private.ID==demo1$Participant.Private.ID[i]] <- demo1$age[i]
-# }
-# ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID,sex,age,chat,order,
-#                                      scl90_anxiety,scl90_OCD,scl90_depression,scl90_interSens,scl90_psychotic,scl90_paranoidId,scl90_angerHost,scl90_phobic,
-#                                      bfi10_extraversion,bfi10_agreeableness,bfi10_conscientiousness,bfi10_neuroticism,bfi10_openness) %>%
-#   summarise(aff_score=mean(aff_score))
-# write.csv(ratings1_wf,"ejercicio1.csv", row.names = F)
-# write.csv(ratings1, "ejercicio2.csv", row.names = F)
 ratings1_wf <- ratings1 %>% group_by(Participant.Private.ID, order, scl90_anxiety, chat) %>%
   summarise(aff_score=mean(aff_score))
 ratings1_wf$scl90_anxiety <- ratings1_wf$scl90_anxiety/max(ratings1_wf$scl90_anxiety)
@@ -239,25 +232,25 @@ porder1 <- ggplot(ratings1_wf, aes(x=order2, y=aff_score, col=chat, shape=chat))
   scale_shape_manual(values = c(17, 19)) + stat_summary() + theme_classic() + 
   theme(legend.position = "bottom", legend.title = element_blank())
 summary(lm(aff_score ~ chat * order, ratings1_wf))
-ggplot(ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),], 
-       aes(x=order, y=scl90_anxiety)) + stat_summary()
-summary(lm(scl90_anxiety ~ order, ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),]))
+# ggplot(ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),], 
+#        aes(x=order, y=scl90_anxiety)) + stat_summary()
+# summary(lm(scl90_anxiety ~ order, ratings1_wf[!duplicated(ratings1_wf$Participant.Private.ID),]))
 
 
 # normal residuals?
-m <- lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1_wf[,])
 m <- lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1[,])
 # we can reject the hypothesis that the data is drawn from a normal distribution
 hist(resid(m)); ks.test(resid(m), "pnorm", mean=mean(resid(m)), sd=sd(resid(m)))
 
 
 
-# # interaction questionnaire with chat-type
-# m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1_wf[,]))
-# # effect chat 1
-# m.chat1 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Anxious",]))
-# # effect chat 2
-# m.chat2 <- report_table(lm(aff_score ~ scl90_anxiety, ratings1_wf[ratings1_wf$chat == "Nonanxious",]))
+# Sensitivity Analysis
+# interaction questionnaire with chat-type
+m.int <- report_table(lmer(aff_score ~ scl90_anxiety * chat + (1|Participant.Private.ID), ratings1[,]))
+# effect chat 1
+m.chat1 <- report_table(lmer(aff_score ~ scl90_anxiety + (1|Participant.Private.ID), ratings1[ratings1$chat == "Anxious",]))
+# effect chat 2
+m.chat2 <- report_table(lmer(aff_score ~ scl90_anxiety + (1|Participant.Private.ID), ratings1[ratings1$chat == "Nonanxious",]))
 
 
 
@@ -342,6 +335,7 @@ ggplot(ratings2, aes(x=bfi44_extraversion,y=aff_score,col=chat)) +
 ggplot(ratings2, aes(x=bfi44_extraversion,y=aff_score,col=chat)) + 
   geom_smooth(method="lm",se=F)
 
+
 # affiliation score average (primary outcome)
 ratings2_wf <- ratings2 %>% group_by(Participant.Private.ID, order, bfi44_extraversion, chat) %>%
   summarise(aff_score=mean(aff_score))
@@ -355,26 +349,25 @@ porder2 <- ggplot(ratings2_wf, aes(x=order, y=aff_score, col=chat, shape=chat)) 
   scale_shape_manual(values = c(17, 19)) + stat_summary() + theme_classic() + 
   theme(legend.position = "bottom", legend.title = element_blank())
 summary(lm(aff_score ~ chat * order, ratings2_wf))
-ggplot(ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),], 
-       aes(x=order, y=bfi44_extraversion)) + stat_summary()
-summary(lm(bfi44_extraversion ~ order, ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),]))
-summary(lm(aff_score ~ bfi44_extraversion + order, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
+# ggplot(ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),], 
+#        aes(x=order, y=bfi44_extraversion)) + stat_summary()
+# summary(lm(bfi44_extraversion ~ order, ratings2_wf[!duplicated(ratings2_wf$Participant.Private.ID),]))
 
 
 # normal residuals?
-m <- lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2_wf[,])
 m <- lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2[,])
 # we can reject the hypothesis that the data is drawn from a normal distribution
 hist(resid(m)); ks.test(resid(m), "pnorm", mean=mean(resid(m)), sd=sd(resid(m)))
 
 
 
-# # interaction questionnaire with chat-type
-# m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2_wf[,]))
-# # effect chat 1
-# m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Extrovert",]))
-# # effect chat 2
-# m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion, ratings2_wf[ratings2_wf$chat == "Introvert",]))
+# Sensitivity Analysis
+# interaction questionnaire with chat-type 
+m.int <- report_table(lmer(aff_score ~ bfi44_extraversion * chat + (1|Participant.Private.ID), ratings2[,]))
+# effect chat 1
+m.chat1 <- report_table(lm(aff_score ~ bfi44_extraversion + (1|Participant.Private.ID), ratings2[ratings2$chat == "Extrovert",]))
+# effect chat 2
+m.chat2 <- report_table(lm(aff_score ~ bfi44_extraversion + (1|Participant.Private.ID), ratings2[ratings2$chat == "Introvert",]))
 
 
 
@@ -456,8 +449,7 @@ ks.test(tmp$scl90_anxiety, "pnorm", mean(tmp$scl90_anxiety), sd(tmp$scl90_anxiet
 # ks.test(ratings1$aff_score, "pnorm", mean(ratings1$aff_score), sd(ratings1$aff_score))
 # p < .05 significantly different from normal
 
-
-
+# Main Analysis: Non-Parametric 
 # analysis not assuming normality
 tmpA <- ratings1_wf[ratings1_wf$chat=="Anxious",]
 tmpN <- ratings1_wf[ratings1_wf$chat=="Nonanxious",]
@@ -474,11 +466,11 @@ report_table(t.test(ratings1_wf$aff_score[ratings1_wf$chat=="Anxious"],
 report_table(cor.test(tmpA$diff, tmpA$scl90_anxiety, method = "spearman"))
 # anxious
 report_table(cor.test(tmpA$aff_score, tmpA$scl90_anxiety, method = "spearman"))
-cor(tmpA$aff_score, tmpA$scl90_anxiety)
-2*.34 / sqrt(1 - .34^2) # Cohen's d (to report in response to Reviewer 2 as effect size)
+# cor(tmpA$aff_score, tmpA$scl90_anxiety); 2*.34 / sqrt(1 - .34^2) # Cohen's d (to report in response to Reviewer 2 as effect size)
 # non-anxious
 report_table(cor.test(tmpN$aff_score, tmpN$scl90_anxiety, method = "spearman"))
 
+# figure 2A
 (figure2A <- ggplot(ratings1_wf, aes(x=scl90_anxiety,y=aff_score,col=chat,shape=chat,
                                   linetype=chat)) +
     labs(title = "Participants' Judgements", 
@@ -563,8 +555,7 @@ ks.test(ratings2_wf$bfi44_extraversion, "pnorm", mean(ratings2_wf$bfi44_extraver
 # ks.test(ratings2$aff_score, "pnorm", mean(ratings2$aff_score), sd(ratings2$aff_score))
 # p < .05 significantly different from normal
 
-
-
+# Main Analysis: Non-Parametric 
 # analysis not assuming normality
 tmpE <- ratings2_wf[ratings2_wf$chat=="Extrovert",]
 tmpI <- ratings2_wf[ratings2_wf$chat=="Introvert",]
@@ -579,15 +570,12 @@ report_table(t.test(ratings2_wf$aff_score[ratings2_wf$chat=="Extrovert"],
                     ratings2_wf$aff_score[ratings2_wf$chat=="Introvert"],paired=T))
 # interaction
 report_table(cor.test(tmpE$diff, tmpE$bfi44_extraversion, method = "spearman"))
-# report_table(cor.test(tmpE$diff[tmpE$order=="Extrovert first"], 
-#                       tmpE$bfi44_extraversion[tmpE$order=="Extrovert first"], method = "spearman"))
-# report_table(cor.test(tmpE$diff[tmpE$order=="Introvert first"], 
-#                       tmpE$bfi44_extraversion[tmpE$order=="Introvert first"], method = "spearman"))
 # extrovert
 report_table(cor.test(tmpE$aff_score, tmpE$bfi44_extraversion, method = "spearman"))
 # introvert
 report_table(cor.test(tmpI$aff_score, tmpI$bfi44_extraversion, method = "spearman"))
 
+# figure 3A
 (figure3A <- ggplot(ratings2_wf, aes(x=bfi44_extraversion,y=aff_score,col=chat,shape=chat,
                                   linetype=chat)) +
     labs(title = "Participants' Judgements", 
@@ -694,7 +682,6 @@ combine2$bfi44_extraversion <- combine2$bfi44_extraversion/max(combine2$bfi44_ex
 
 # reshape data frame so we can easy visualize (melt by the count sentiment analysis
 # for each level (mixed, negative, neutral, and positive) for both user and bot
-if (!require(reshape2)) {install.packages("reshape2")}; library(reshape2)
 combine1.lf <- melt(combine1, measure.vars = c("user_Mixed","user_Negative","user_Neutral","user_Positive",
                                                "bots_Mixed","bots_Negative","bots_Neutral","bots_Positive"))
 combine2.lf <- melt(combine2, measure.vars = c("user_Mixed","user_Negative","user_Neutral","user_Positive",
@@ -1007,7 +994,7 @@ exps$exp <- factor(as.character(exps$exp), levels = c("Exp. 3","Exp. 2","Exp. 1"
 # change factor order
 exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
                                             "enjoy","distant","understood"))
-(figS1 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
+(figS4 <- ggplot(exps, aes(x=exp,y=Std_Coefficient,col=effect,shape=effect)) +
     labs(title = "Experiments Summary and Effect Sizes",
          y = "Effect Size") +
     geom_hline(yintercept = 0, col="grey") +
@@ -1035,14 +1022,14 @@ exps$quest <- factor(exps$quest, levels = c("chat-again","different","similar",
           axis.title.y = element_blank(),
           legend.background = element_rect(colour='black',fill='white',linetype='solid')))
 if (print_fig == 1) {
-  ggsave("figures/figS1_v2.pdf", figS1, dpi = 1200, scale = 1, units = "cm",
+  ggsave("figures/figS4_v2.pdf", figS4, dpi = 1200, scale = 1, units = "cm",
          width = 16, height = 12, bg = "white")
 }
 
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # Exploratory Analysis of Influences# # # # # # # # # # # # # # # # # # 
+# # # # # Exploratory Analysis of Influences (Not in Paper) # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 influence <- rbind(data.frame(exp="1", influence1),
                    data.frame(exp="2", influence2))
@@ -1100,9 +1087,9 @@ combine$aff_score <- rowMeans(combine[,rel_cols])
 
 
 # who influence more to who?
-summary(lm(aff_score ~ influence_score, combine))
-summary(lm(aff_score ~ influence_score * scl90_anxiety, combine))
-summary(lm(aff_score ~ influence_score * bfi44_extraversion, combine))
+# summary(lm(aff_score ~ influence_score, combine))
+# summary(lm(aff_score ~ influence_score * scl90_anxiety, combine))
+# summary(lm(aff_score ~ influence_score * bfi44_extraversion, combine))
 
 
 

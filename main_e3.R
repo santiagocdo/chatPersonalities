@@ -26,16 +26,17 @@ scores <- c("extraversion_score","agreeableness_score","conscientiousness_score"
 inv_scores <- c("extraversion_score_inv","agreeableness_score_inv","conscientiousness_score_inv",
                 "openness_score_inv","neuroticism_score_inv")
 
-# examples of distances
-c(2,2,2,2,2) %*% c(-2,-2,-2,-2,-2)
-c(0,0,0,0,0) %*% c(0,0,0,0,0)
-c(2,-2,2,-2,2) %*% c(-2,2,-2,2,-2)
-c(1,1,1,1,1) %*% c(-1,-1,-1,-1,-1)
-c(-2,-2,-2,-2,-2) %*% c(2,2,2,2,2)
+# examples of distances (same as Mean Squared Error)
+# c(2,2,2,2,2) %*% c(-2,-2,-2,-2,-2)
+# c(0,0,0,0,0) %*% c(0,0,0,0,0)
+# c(2,-2,2,-2,2) %*% c(-2,2,-2,2,-2)
+# c(1,1,1,1,1) %*% c(-1,-1,-1,-1,-1)
+# c(-2,-2,-2,-2,-2) %*% c(2,2,2,2,2)
 
 # calculate personality (condition) distances 
 bfi$pers_distance <- bfi$pers_distance2 <- NA
 for (i in 1:nrow(bfi)) {
+  # next two alternatives give back same p values in stats
   bfi$pers_distance[i] <- -1 * (unlist(bfi[i,scores]) %*% unlist(bfi[i,inv_scores]))
   bfi$pers_distance2[i] <- sum((unlist(bfi[i,scores]) - unlist(bfi[i,inv_scores]))^2)
 }
@@ -464,7 +465,7 @@ if (print_fig == 1) {
 wide_format <- wide_format[order(wide_format$dif_mir_inv),]
 wide_format$participant_ID <- factor(wide_format$participant_ID,
                                      levels = wide_format$participant_ID)
-(figS3 <-ggplot(wide_format, aes(x=dif_mir_inv, y=as.factor(participant_ID))) + 
+(figS5 <-ggplot(wide_format, aes(x=dif_mir_inv, y=as.factor(participant_ID))) + 
     labs(x="Mirror - Inverse\n(0 > more affiliation for mirror)",
          y="Participant ID (n=100)") +
     geom_bar(stat = "identity") + 
@@ -503,6 +504,7 @@ levels(comb_dif$who) <- c("GPT-4 Texts","Participants Texts")
 # add the sentiment on column variable (created with the columns in melt)
 comb_dif$sentiment <- substr(comb_dif$variable,6,nchar(comb_dif$variable))
 
+# extra (not in paper)
 ggplot(comb_dif, aes(x=prop_dif,y=aff_score)) +
   labs(x="Sentiment Prop. (Self-Antiself)",y="Affilation (Self-Mirror)") +
   geom_point() + geom_smooth(method="lm") + stat_cor() +
@@ -572,7 +574,7 @@ colnames(combine.lf)[(ncol(combine.lf)-1):ncol(combine.lf)] <- c("sentiment","di
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # Sample Size Calculation # # # # # # # # # # # # # # # # # # # # # #### 
+# # # # # Effect Size Calculation # # # # # # # # # # # # # # # # # # # # # #### 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 vec_mirror <- ratings3_wf$likerts[ratings3_wf$chat=="mirror"]
 vec_inverse <- ratings3_wf$likerts[ratings3_wf$chat!="mirror"]
@@ -581,29 +583,10 @@ var.test(vec_mirror, vec_inverse, alternative = "two.sided")
 t.test(vec_mirror, vec_inverse, var.equal = F)
 cor.test(vec_mirror, vec_inverse)
 
-if (!require(pwr)) {install.packages("pwr")}; library(pwr)
+# standard deviation to estimate effect size
 sd_pooled <- sqrt(((sd(vec_mirror)^2) + (sd(vec_inverse)^2)) / 2)
 # Cohen's d
 effect_size <- (mean(vec_mirror) - mean(vec_inverse)) / sd_pooled
-pwr.t.test(d = .3, power = .8, sig.level = .05, type = "paired")
-
-if (!require(pwrss)) {install.packages("pwrss")}; library(pwrss)
-pwrss.t.2means(mu1 = mean(vec_mirror), mu2 = mean(vec_inverse), 
-               sd1 = sd(vec_mirror), sd2 = sd(vec_inverse), 
-               paired = TRUE, paired.r = cor(vec_mirror,vec_inverse),
-               power = .8, alpha = .05,
-               alternative = "not equal")
-
-m <- lm(value~condition, gptaff)
-summary(m)
-library(effectsize)
-standardize_parameters(m)
-
-r_squared <- .04374
-f2 <- r_squared / (1 - r_squared)
-
-pwr.f2.test(u = 1, f2 = f2, sig.level = .05, power = .8)
-171.5365+1+1
 
 
 
@@ -641,59 +624,12 @@ ggplot(tmp, aes(x=to,y=from,fill=prob)) +
         legend.position = "right") 
 
 
-
-rel_cols <- c("chat.again","different","similar","enjoy","distant","understood")
-combine[,rel_cols] <- combine[,rel_cols] - 3
-combine$different <- -1 * combine$different; combine$distant <- -1 * combine$distant 
-
-combine$aff_score <- rowMeans(combine[,rel_cols])
+# rel_cols <- c("chat.again","different","similar","enjoy","distant","understood")
+# combine[,rel_cols] <- combine[,rel_cols] - 3
+# combine$different <- -1 * combine$different; combine$distant <- -1 * combine$distant 
+# 
+# combine$aff_score <- rowMeans(combine[,rel_cols])
 
 # ggplot(combine, aes(x=gpt_user_mirror,y=aff_score,col=chat)) + 
 #   geom_point(alpha=.1) + stat_cor() + geom_smooth(method="lm") +
 #   facet_grid(. ~ exp)
-
-
-
-
-
-summary(lm(aff_score ~ gpt_user_mirror * chat, combine[combine$exp=="Expt. 1",]))
-summary(lm(aff_score ~ user_gpt_mirror * chat, combine[combine$exp=="Expt. 1",]))
-summary(lm(aff_score ~ gpt_user_mirror * chat, combine[combine$exp=="Expt. 2",]))
-summary(lm(aff_score ~ user_gpt_mirror * chat, combine[combine$exp=="Expt. 2",]))
-
-
-combine_lf <- melt(combine, measure.vars = c("user_gpt_mirror","gpt_user_mirror")) 
-levels(combine_lf$variable) <- c("GPT mirror User", "User mirror GPT")
-
-report_table(t.test(combine$gpt_user_mirror, combine$user_gpt_mirror))
-ggplot(combine_lf, aes(x=variable, y=value, fill=exp)) + 
-  labs(x="Influence", y="p(Mirror Sentiment)", col=NULL) +
-  geom_boxplot(alpha=.1, position = position_dodge(.7)) + 
-  geom_violin(alpha=.1, position = position_dodge(.7)) + 
-  stat_summary(position = position_dodge(.7)) +
-  scale_y_continuous(breaks = c(0,.5,1)) +
-  scale_fill_manual(values = c("Expt. 1" = "salmon", 
-                               "Expt. 2" = "turquoise")) +
-  geom_signif(comparisons = list(c("GPT mirror User", "User mirror GPT")),
-              map_signif_level = TRUE, col="black",textsize = 5) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 30, hjust=1))
-
-
-
-ggplot(combine_lf, aes(x=value,y=aff_score,col=chat,linetype=chat)) + 
-  labs(x="p(Mirror Sentiment)", y="Affliation Score", 
-       col="Condition", linetype="Condition") +
-  geom_point(alpha=.1) +
-  scale_x_continuous(breaks = seq(0,1,by=.5)) +
-  scale_color_manual(values = c("#0072B2","#D55E00","#009E73","#CC79A7")) +
-  scale_linetype_manual(values = c("solid","dashed","solid","dashed")) +
-  stat_cor(p.accuracy = 0.001, size=3) + geom_smooth(method="lm",se=F) +
-  facet_grid(variable ~ exp) +
-  theme_bw()
-
-
-# summary(lm(aff_score~chat,combine[combine$exp=="Expt. 1",]))
-# summary(lm(aff_score~chat,ratings1_wf))
-# summary(lm(aff_score~chat,combine[combine$exp=="Expt. 2",]))
-# summary(lm(aff_score~chat,ratings2_wf))

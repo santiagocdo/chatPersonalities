@@ -1,17 +1,25 @@
 # chatPersonalities
-This repository contains the R analysis scripts for the collaboration beween OneReach(R) and the Computational Psychopathology Research Group at Oxford. Manuscript here: https://osf.io/preprints/psyarxiv/mqunw_v1.
+This repository contains the R analysis scripts for the collaboration beween OneReach(R) and the Computational Psychopathology Research Group at Oxford. Manuscript here: https://osf.io/preprints/psyarxiv/mqunw_v3.
 
 
-# 1. Reproduce Figures and Analysis
+# 0. What are the R scripts in this repository?
 
-- open <code>main.R</code>, this script uses the cleaned data from the folders <code>experiment1/</code> and <code>experiment2/</code>
-- this script also calls <code>functions.R</code> to scored the psychological questionnaires.
-- the output of this script are Figures 2 and Figure 3, as well as Figure S1 and Figure S2. 
-- the statistics reported in the manuscript are within this script.
+- For Experiment 1 and 2, open <code>main.R</code>, this script uses the cleaned data from the folders <code>experiment1/</code> and <code>experiment2/</code>.
+- For Experiment 3 (preregistered: https://aspredicted.org/9yg6-y3xp.pdf), open <code>main_e3.R</code>, this script uses the cleaned data from the folder <code>experiment3/</code>.
+- The sample size calculation for the preregistration can be found here: <code>sample_size_calculation_exp3.R</code>, as well as the pregistration text word <code>asPredicted_v2.docx</code>.
+- The script we used to validate the affiliation score can be found here: <code>affiliation_validation.R</code>.
+- In folder pilot0 you will find pilot data collected before running Experiment 1. But pilot4 is the experiment we ran to validate the affiliation score, requested by Reviewer 2. 
+- The main analysis scripts also call <code>functions.R</code> to scored the psychological questionnaires and process data.
+- The script <code>llm_text_analysis.R</code> is only a toy script to explore future ideas.
+
+# 2. Reproduce Figures and Analysis
+- Figure 2 and Figure 3 are produced with <code>main.R</code>
+- Figure 4 is produced with <code>main_e3.R</code>
 
 
 
-# 2. Cleaning Raw Data
+
+# 2. Cleaning Raw Data (Gorilla counterballance)
 
 ## Experiment 1 (anxiety)
 
