@@ -13,6 +13,8 @@ if (!require(dplyr)) {install.packages("dplyr")}; library(dplyr)
 if (!require(Hmisc)) {install.packages("Hmisc")}; library(Hmisc)
 if (!require(report)) {install.packages("report")}; library(report)
 if (!require(lmerTest)) {install.packages("lmerTest")}; library(lmerTest)
+if (!require(DescTools)) {install.packages("DescTools")};library(DescTools)
+if (!require(effectsize)) {install.packages("effectsize")};library(effectsize)
 
 # interaction (chat1 and chat2) via One Reach (thanks Daniel!)
 # behaviours in ratings
@@ -464,11 +466,14 @@ report_table(t.test(ratings1_wf$aff_score[ratings1_wf$chat=="Anxious"],
                     ratings1_wf$aff_score[ratings1_wf$chat=="Nonanxious"],paired=T))
 # interaction
 report_table(cor.test(tmpA$diff, tmpA$scl90_anxiety, method = "spearman"))
+(tmp<-SpearmanRho(tmpA$diff, tmpA$scl90_anxiety, conf.level = 0.95));r_to_d(tmp)
 # anxious
 report_table(cor.test(tmpA$aff_score, tmpA$scl90_anxiety, method = "spearman"))
+(tmp<-SpearmanRho(tmpA$aff_score, tmpA$scl90_anxiety, conf.level = 0.95));r_to_d(tmp)
 # cor(tmpA$aff_score, tmpA$scl90_anxiety); 2*.34 / sqrt(1 - .34^2) # Cohen's d (to report in response to Reviewer 2 as effect size)
 # non-anxious
 report_table(cor.test(tmpN$aff_score, tmpN$scl90_anxiety, method = "spearman"))
+(tmp<-SpearmanRho(tmpN$aff_score, tmpN$scl90_anxiety, conf.level = 0.95));r_to_d(tmp)
 
 # figure 2A
 (figure2A <- ggplot(ratings1_wf, aes(x=scl90_anxiety,y=aff_score,col=chat,shape=chat,
@@ -570,10 +575,13 @@ report_table(t.test(ratings2_wf$aff_score[ratings2_wf$chat=="Extrovert"],
                     ratings2_wf$aff_score[ratings2_wf$chat=="Introvert"],paired=T))
 # interaction
 report_table(cor.test(tmpE$diff, tmpE$bfi44_extraversion, method = "spearman"))
+(tmp<-SpearmanRho(tmpE$diff, tmpE$bfi44_extraversion, conf.level = 0.95));r_to_d(tmp)
 # extrovert
 report_table(cor.test(tmpE$aff_score, tmpE$bfi44_extraversion, method = "spearman"))
+(tmp<-SpearmanRho(tmpE$aff_score, tmpE$bfi44_extraversion, conf.level = 0.95));r_to_d(tmp)
 # introvert
 report_table(cor.test(tmpI$aff_score, tmpI$bfi44_extraversion, method = "spearman"))
+(tmp<-SpearmanRho(tmpI$aff_score, tmpI$bfi44_extraversion, conf.level = 0.95));r_to_d(tmp)
 
 # figure 3A
 (figure3A <- ggplot(ratings2_wf, aes(x=bfi44_extraversion,y=aff_score,col=chat,shape=chat,
@@ -712,8 +720,8 @@ combine2.lf$sentiment <- substr(combine2.lf$variable,6,nchar(combine2.lf$variabl
 
 
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
-anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
-           combine1.lf[combine1.lf$who=="GPT-4 Texts",]))
+report_table(anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
+                        combine1.lf[combine1.lf$who=="GPT-4 Texts",])))
 report_table(t.test(combine1$bots_Positive[combine1$chat=="Anxious"],
                     combine1$bots_Positive[combine1$chat=="Nonanxious"],paired=T))
 report_table(t.test(combine1$bots_Neutral[combine1$chat=="Anxious"],
@@ -724,8 +732,8 @@ report_table(t.test(combine1$bots_Mixed[combine1$chat=="Anxious"],
                     combine1$bots_Mixed[combine1$chat=="Nonanxious"],paired=T))
 
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
-anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
-           combine1.lf[combine1.lf$who=="Participants Texts",]))
+report_table(anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
+                        combine1.lf[combine1.lf$who=="Participants Texts",])))
 summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
              combine1.lf[combine1.lf$who=="Participants Texts",]))
 
@@ -772,8 +780,8 @@ ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95)
 
 
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
-anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
-           combine2.lf[combine2.lf$who=="GPT-4 Texts",]))
+report_table(anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
+                        combine2.lf[combine2.lf$who=="GPT-4 Texts",])))
 report_table(t.test(combine2$bots_Positive[combine2$chat=="Extrovert"],
                     combine2$bots_Positive[combine2$chat=="Introvert"],paired=T))
 report_table(t.test(combine2$bots_Neutral[combine2$chat=="Extrovert"],
@@ -784,8 +792,8 @@ report_table(t.test(combine2$bots_Mixed[combine2$chat=="Extrovert"],
                     combine2$bots_Mixed[combine2$chat=="Introvert"],paired=T))
 
 # run LMER, LM, and aov as "sensitivity" analysis, so everything says the same we are more confident
-anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
-           combine2.lf[combine2.lf$who=="Participants Texts",]))
+report_table(anova(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
+                        combine2.lf[combine2.lf$who=="Participants Texts",])))
 summary(lmer(prop ~ sentiment * chat + (1|Participant.Private.ID), 
              combine2.lf[combine2.lf$who=="Participants Texts",]))
 

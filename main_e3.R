@@ -183,7 +183,7 @@ porder3 <- ggplot(ratings3_wf[!is.na(ratings3_wf$order),], aes(x=order, y=likert
   scale_shape_manual(values = c(17, 19)) +
   scale_color_manual(values = c("black", "grey50")) + stat_summary() + theme_classic() + 
   theme(legend.position = "bottom", legend.title = element_blank())
-ggarrange(porder1, porder2, porder3, ncol=3)
+# ggarrange(porder1, porder2, porder3, ncol=3)
 summary(lm(likerts ~ chat * order, ratings3_wf[!is.na(ratings3_wf$order),]))
 
 
@@ -225,8 +225,8 @@ ratings3_wf$condition2 <- factor(ifelse(ratings3_wf$chat=="mirror","Mirror","Inv
 
 
 # # # # Figure 4B # # # #
-summary(lm(likerts ~ chat*pers_distance, ratings3_wf))
-report_table(lmer(likerts ~ chat*pers_distance + sex+age+agreeableness_score + (1|participant_ID), ratings3_wf))
+# summary(lm(likerts ~ chat*pers_distance, ratings3_wf))
+# report_table(lmer(likerts ~ chat*pers_distance + sex+age+agreeableness_score + (1|participant_ID), ratings3_wf))
 report_table(lmer(likerts ~ chat*pers_distance + (1|participant_ID), ratings3_wf))
 if (!require(ggpubr)) {install.packages("ggpubr")}; library(ggpubr)
 (fig4B <- ggplot(ratings3_wf, aes(x=pers_distance2, y=likerts, col=condition2)) + 
@@ -379,8 +379,8 @@ combine.lf$sentiment <- substr(combine.lf$variable,6,nchar(combine.lf$variable))
 # aim 1, GPT4 Texts are different between conditions (chatbots) 
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID), 
            combine.lf[combine.lf$who=="GPT-4.1 Texts",])))
-aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
-    combine.lf[combine.lf$who=="GPT-4.1 Texts",])
+# aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
+#     combine.lf[combine.lf$who=="GPT-4.1 Texts",])
 report_table(t.test(combine$bots_Positive[combine$botcondition=="mirror"],
                     combine$bots_Positive[combine$botcondition=="inverse"],paired=T))
 report_table(t.test(combine$bots_Neutral[combine$botcondition=="mirror"],
@@ -393,8 +393,8 @@ report_table(t.test(combine$bots_Mixed[combine$botcondition=="mirror"],
 # aim 2, GPT4 Texts are different between conditions (chatbots)
 report_table(anova(lmer(prop ~ sentiment * botcondition + (1|participant_ID),
                         combine.lf[combine.lf$who=="Participants Texts",])))
-aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
-    combine.lf[combine.lf$who=="Participants Texts",])
+# aov(prop ~ sentiment * botcondition + Error(participant_ID/(sentiment*botcondition)),
+#     combine.lf[combine.lf$who=="Participants Texts",])
 report_table(t.test(combine$user_Positive[combine$botcondition=="mirror"],
                     combine$user_Positive[combine$botcondition=="inverse"],paired=T))
 report_table(t.test(combine$user_Neutral[combine$botcondition=="mirror"],
