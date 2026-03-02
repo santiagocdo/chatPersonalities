@@ -487,9 +487,9 @@ report_table(cor.test(tmpN$aff_score, tmpN$scl90_anxiety, method = "spearman"))
     geom_smooth(method="lm", se = F, size = 1) +
     annotate("text",x=c(.5,.95),y=c(1.5,1.6),label=c("**","**"),col=c("black","#0072B2"),
              size=c(10,7)) +
-    scale_shape_manual(values = c(17, 19)) +
-    # scale_linetype_manual(values = c("solid","dashed")) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00")) + 
+    scale_shape_manual(values = c(17, 19), labels = c("Anxious", "Non-anxious")) +
+    scale_linetype_manual(values = c("solid","dashed"), labels = c("Anxious", "Non-anxious")) +
+    scale_colour_manual(values = c("#0072B2", "#D55E00"), labels = c("Anxious", "Non-anxious")) + 
     scale_x_continuous(breaks = c(0, .5, 1)) +
     # scale_y_continuous(breaks = c(-2:2), labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
     scale_y_continuous(breaks = c(-2:2), labels = c("-2","","0","","+2")) +
@@ -596,7 +596,7 @@ report_table(cor.test(tmpI$aff_score, tmpI$bfi44_extraversion, method = "spearma
     annotate("text",x=c(.5,.95),y=c(1.5,1.3),label=c("*","**"),col=c("black","#009E73"),
              size=c(10,7)) +
     scale_shape_manual(values = c(17, 19)) +
-    # scale_linetype_manual(values = c("solid","dashed")) +
+    scale_linetype_manual(values = c("solid","dashed")) +
     scale_colour_manual(values = c("#009E73","#CC79A7")) + 
     scale_x_continuous(breaks = c(0, .5, 1)) +
     # scale_y_continuous(breaks = c(-2:2), labels = c("Strongly\n Disagree","","Neutral","","Strongly\n Agree")) +
@@ -763,8 +763,8 @@ ann_text <- data.frame(sentiment = c(1,2,3,4,2,4), prop = c(.7,.7,.5,.95,.8,.95)
     stat_summary(fun.data="mean_cl_normal",position = position_dodge(0.5)) +
     geom_text(data = ann_text,col="black", size = 7,
               label = c("***","**",rep("***",2),"**","***")) +
-    scale_colour_manual(values = c("#0072B2", "#D55E00")) +
-    scale_shape_manual(values = c(17,19)) +
+    scale_colour_manual(values = c("#0072B2", "#D55E00"), labels = c("Anxious", "Non-anxious")) +
+    scale_shape_manual(values = c(17,19), labels = c("Anxious", "Non-anxious")) +
     scale_y_continuous(breaks = c(0,.5,1)) +
     facet_wrap(. ~ who, nrow = 2) + 
     theme_classic() +

@@ -246,6 +246,7 @@ summary(lm(likerts~pers_distance2*chat, ratings3_wf))
 # difference between  mirror and inverse (used in regression)
 wf_m <- ratings3_wf[ratings3_wf$chat=="mirror",]
 wf_i <- ratings3_wf[ratings3_wf$chat=="inverse",]
+sum(wf_i$participant_ID == wf_m$participant_ID)==nrow(wf_m)
 wf_m$likert_inv <- wf_i$likerts
 # affiliation for mirror minus affiliation for inverse
 wf_m$dif_mir_inv <- wf_m$likerts - wf_m$likert_inv
@@ -465,6 +466,7 @@ if (print_fig == 1) {
 wide_format <- wide_format[order(wide_format$dif_mir_inv),]
 wide_format$participant_ID <- factor(wide_format$participant_ID,
                                      levels = wide_format$participant_ID)
+report_table(t.test(wide_format$dif_mir_inv, mu = 0, alternative = "greater"))
 (figS5 <-ggplot(wide_format, aes(x=dif_mir_inv, y=as.factor(participant_ID))) + 
     labs(x="Mirror - Inverse\n(0 > more affiliation for mirror)",
          y="Participant ID (n=100)") +

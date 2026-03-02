@@ -78,11 +78,12 @@ corrplot(cor(wf3[,vars]), order = "hclust", method = "ellipse", tl.col = "black"
   mtext("Exp. 3", at=-1, line=1, cex=1.2)
 par(mfrow = c(1, 1))
 
-
+library(reshape2)
 tmp <- rbind(data.frame(melt(round(cor(wf1[,vars]),2)),exp="Expt. 1"),
              data.frame(melt(round(cor(wf2[,vars]),2)),exp="Expt. 2"),
              data.frame(melt(round(cor(wf3[,vars]),2)),exp="Expt. 3"))
 
+library(ggplot2)
 (p <- ggplot(tmp, aes(x = Var1, y = Var2, fill = value)) +
     labs(x = NULL, y = NULL) +
     geom_tile(color = "white") + # Adds a white border to tiles
