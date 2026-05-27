@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 llm_infer_personalities/.claude/
+llm_infer_personalities/claude_code_scripts/outputs/
