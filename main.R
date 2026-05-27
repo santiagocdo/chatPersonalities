@@ -139,8 +139,10 @@ combine2 <- summariseChatInteraction(task=task2, chat=chat2, ratings=ratings2)
 
 # save interactions already order by timeline
 # write.csv(combine1$inters, "llm_infer_personalities/exp1_n89_interactions.csv", row.names = F)
+# write.csv(combine1$combine, "llm_infer_personalities/exp1_n89_inter_summary.csv", row.names = F)
 # write.csv(bfi10, "llm_infer_personalities/exp1_n89_bfi.csv", row.names = F)
 # write.csv(combine2$inters, "llm_infer_personalities/exp2_n97_interactions.csv", row.names = F)
+# write.csv(combine2$combine, "llm_infer_personalities/exp2_n97_inter_summary.csv", row.names = F)
 # write.csv(bfi44, "llm_infer_personalities/exp2_n97_bfi.csv", row.names = F)
 
 # rows are conditional probabilities of the sentiment analysis, thus cells from 

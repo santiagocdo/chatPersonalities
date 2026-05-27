@@ -335,6 +335,7 @@ tmp <- summariseChatInteraction_e3(interactions, participant_ID)
 
 # save interactions already order by timeline
 # write.csv(tmp$inters, "llm_infer_personalities/exp3_n100_interactions.csv", row.names = F)
+# write.csv(tmp$combine, "llm_infer_personalities/exp3_n100_inter_summary.csv", row.names = F)
 
 combine <- tmp$combine
 influence <- tmp$influence
@@ -614,7 +615,7 @@ tmp <- influence[influence$direction!="",] %>%
 # tmp <- influence[influence$direction!="",]
 # tmp <- tmp[tmp$chatId=="9804092Anxious",]; tmp$prob <- tmp$value
 ggplot(tmp, aes(x=to,y=from,fill=prob)) +
-  labs(x="to: interaction t",y="from: interaction t-1") +
+  labs(x="to: interaction t-1",y="from: interaction t") +
   geom_tile(color = "white") + 
   geom_text(aes(label=round(prob,2)), color = "black", size = 3) + 
   scale_fill_gradient(low = "white", high = "red", limit = c(0, 1), space = "Lab", name = "Prob:") +
@@ -626,6 +627,8 @@ ggplot(tmp, aes(x=to,y=from,fill=prob)) +
         legend.position = "right") 
 
 
+t.test(value ~ direction, influence)
+ggplot(influence, aes(x=direction, y=value)) + stat_summary()
 # rel_cols <- c("chat.again","different","similar","enjoy","distant","understood")
 # combine[,rel_cols] <- combine[,rel_cols] - 3
 # combine$different <- -1 * combine$different; combine$distant <- -1 * combine$distant 

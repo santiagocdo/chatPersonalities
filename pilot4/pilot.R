@@ -22,6 +22,7 @@ rat <- rat[order(rat$participant_ID),]
 
 # # # Big-Five # # #
 bfi <- read.csv("pilot4/2025_gpt_bfi_scores_ctrl.csv")
+# bfi <- read.csv("pilot4/2026_gpt_bfi_scores_ctrl.csv")
 rel_cols <- colnames(bfi)[-1]
 bfi[,rel_cols] <- (bfi[,rel_cols] - 3)^2
 # bfi[,rel_cols] <- abs(bfi[,rel_cols] - 3)
@@ -51,3 +52,25 @@ ggplot(wf, aes(x=cdcs,y=aff_score)) + geom_point() + stat_cor() + geom_smooth(me
 ggplot(wf, aes(x=pers_distance,y=aff_score)) + geom_point() + stat_cor() + geom_smooth(method="lm")
 ggplot(wf, aes(x=pers_distance,y=cdcs)) + geom_point() + stat_cor() + geom_smooth(method="lm")
 
+
+
+
+
+# # # # # prepare interactions for LLM personality estimation (same as main_e3.R)
+
+# ratings to conditions
+tmp <- read.csv("pilot4/2026_gptstudyusers_bfi_ctrl.csv")
+tmp <- tmp[tmp$complete_study == "Yes",]
+participant_ID <- unique(tmp$participant_ID)
+# add chat order
+
+# read
+interactions <- read.csv("pilot4/2026_gpt_data_all_bfi_ctrl.csv")
+# participant id
+participant_ID <- intersect(participant_ID, interactions$userid)
+source("functions.R")
+tmp <- summariseChatInteraction_e4(interactions, participant_ID)
+
+# save interactions already order by timeline
+# write.csv(tmp$inters, "llm_infer_personalities/exp4_n104_interactions.csv", row.names = F)
+# write.csv(tmp$combine, "llm_infer_personalities/exp4_n104_inter_summary.csv", row.names = F)

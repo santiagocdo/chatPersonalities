@@ -250,7 +250,7 @@ summariseChatInteraction <- function(task, chat, ratings) {
       usToCh <- rbind(data.frame(usToCh),
                       data.frame(to=vars[seq(3,length(vars),by=3)],
                                  from=vars[seq(1,length(vars),by=3)],
-                                 value=0,direction="p(bot|user)",target=temp))
+                                 value=0,direction="p(user|bot)",target=temp))
     }
     remove(temp)
     
@@ -436,7 +436,166 @@ summariseChatInteraction_e3 <- function(interactions, participant_ID) {
       usToCh <- rbind(data.frame(usToCh),
                       data.frame(to=vars[seq(3,length(vars),by=3)],
                                  from=vars[seq(1,length(vars),by=3)],
+                                 value=0,direction="p(user|bot)",target=tmp))
+    }
+    remove(tmp)
+    
+    # frequency of sentiment_label
+    sent_bots <- data.frame(t(colSums(temp$GPTsentiment==sentiment)))
+    sent_user <- data.frame(t(colSums(temp$usersentiment==sentiment)))
+    # label those columns
+    colnames(sent_bots) <- paste0("bots_",sentiment_label)
+    colnames(sent_user) <- paste0("user_",sentiment_label)
+    # user mean words
+    user_mean_words <- mean(temp$userwordnums)
+    # user mean reaction time
+    if (is.null(temp$RT)) {
+      user_mean_rt <- NA 
+    } else {
+      user_mean_rt <- mean(temp$RT)
+    }
+    # chat mean words
+    bots_mean_words <- mean(temp$GPTwordnums)
+    # total of interactions
+    num_interactions <- nrow(temp)
+    # sentiment mirror %
+    # gpt --> user
+    gpt_user_mirror <- sum(temp$GPTsentiment==temp$usersentiment)/nrow(temp)
+    # user --> gpt
+    user_gpt_mirror <- sum(temp$usersentiment[1:(nrow(temp)-1)]==
+                             temp$GPTsentiment[2:nrow(temp)])/(nrow(temp)-1)
+    
+    # combine all good_ids
+    if (i == 1) {
+      combine <- data.frame(participant_ID=temp$userid[1],
+                            botcondition=temp$botpersonality[1],
+                            sent_bots, bots_mean_words,
+                            sent_user, user_mean_words, user_mean_rt,
+                            num_interactions, gpt_user_mirror, user_gpt_mirror)
+      influence <- data.frame(participant_ID=temp$userid[1],
+                              botcondition=temp$botpersonality[1],
+                              rbind(chToUs,usToCh))
+      inters <- temp
+    } else {
+      combine <- rbind(combine,
+                       data.frame(participant_ID=temp$userid[1],
+                                  botcondition=temp$botpersonality[1],
+                                  sent_bots, bots_mean_words,
+                                  sent_user, user_mean_words, user_mean_rt,
+                                  num_interactions, gpt_user_mirror, user_gpt_mirror))
+      influence <- rbind(influence,data.frame(participant_ID=temp$userid[1],
+                                              botcondition=temp$botpersonality[1],
+                                              rbind(chToUs,usToCh)))
+      inters <- rbind(inters, temp)
+    }
+  }
+  
+  # from and to should be in the correct factor order
+  influence$from <- factor(influence$from, levels = sentiment_label)
+  influence$to <- factor(influence$to, levels = sentiment_label)
+  
+  # output
+  return(list(combine=combine,influence=influence,inters=inters))
+}
+
+# function used to extract overall information from chat interaction
+summariseChatInteraction_e4 <- function(interactions, participant_ID) {
+  # sentiment labels are:
+  sentiment_label <- c("Mixed","Negative","Neutral","Positive")
+  
+  # create participant and condition unique id
+  interactions$participant_condition_id <- paste0(interactions$userid,"_",interactions$botpersonality)
+  
+  # chat id, including participant_Id and bot condition
+  participant_condition_id <- paste0(participant_ID,"_neutral")
+  
+  # for loop for each element within good_ids
+  for (i in 1:length(participant_condition_id)) {
+    # extract one chat (each Participant.Private.ID has two chats)
+    temp <- interactions[interactions$participant_condition_id == participant_condition_id[i],]
+    
+    # FUNDAMENTAL # order chats by time stamp # maybe remove scientific notation with: options(scipen = 999)
+    temp <- temp[order(temp$usertimestamp),]
+    
+    # # # sentiment analysis # # #
+    sentiment <- t(matrix(rep(sentiment_label,nrow(temp)),nrow=4))
+    # remove punctuation
+    temp$GPTsentiment <- gsub("[[:punct:]]", "", temp$GPTsentiment)
+    temp$GPTsentiment <- gsub(" ", "", temp$GPTsentiment)
+    # remove empty spaces
+    temp$usersentiment <- gsub("[[:punct:]]", "", temp$usersentiment)
+    temp$usersentiment <- gsub(" ", "", temp$usersentiment)
+    
+    # all possible relations (use permutations)
+    targets <- gtools::permutations(4,2,sentiment_label,repeats.allowed = T)
+    targets <- paste(targets[,1],"-->",targets[,2])
+    
+    # transition p(bot_sentiment(t)|user_sentiment(t-1))
+    freq <- table(temp$GPTsentiment[2:nrow(temp)],temp$usersentiment[1:(nrow(temp)-1)])
+    freq <- t(freq)
+    chToUs <- reshape2::melt(freq/rowSums(freq))
+    chToUs$direction <- "p(bot|user)"
+    chToUs$target <- paste(chToUs$Var1,"-->",chToUs$Var2)
+    colnames(chToUs)[1:2] <- c("from","to")
+    # Control metrics:
+    # (1) If there is an odd value in Var1 OR Var2
+    all_interactions <- as.character(unique(c(chToUs$to,chToUs$from)))
+    for (j in 1:length(all_interactions)) {
+      if (j == 1) {
+        tmp <- any(sentiment_label == all_interactions[j])
+      } else {
+        tmp <- c(tmp,any(sentiment_label == all_interactions[j]))
+      }
+    }
+    # (2) any is false means that one element in all_interactions is wrong
+    if (any(tmp==F)) {
+      message(paste(i,"id:",participant_ID[i]))
+      chToUs <- data.frame(to=NA,from=NA,value=0,direction="",target=NA)
+    }
+    # (3) if the rows in chToUs are less than 16, add the extra interactions with 0
+    if (nrow(chToUs) < 16 & !any(tmp==F)) {
+      tmp <- outersect(targets,chToUs$target)
+      vars <- unlist(strsplit(tmp, split = " "))
+      chToUs <- rbind(data.frame(chToUs),
+                      data.frame(to=vars[seq(3,length(vars),by=3)],
+                                 from=vars[seq(1,length(vars),by=3)],
                                  value=0,direction="p(bot|user)",target=tmp))
+    }
+    remove(tmp)
+    
+    
+    
+    # # transition p(user_sentiment(t)|bot_sentiment(t-1))
+    freq <- table(temp$usersentiment, temp$GPTsentiment)
+    freq <- t(freq)
+    usToCh <- reshape2::melt(freq/rowSums(freq))
+    usToCh$direction <- "p(user|bot)"
+    usToCh$target <- paste(usToCh$Var1,"-->",usToCh$Var2)
+    colnames(usToCh)[1:2] <- c("from","to")
+    
+    # Control metrics:
+    # (1) If there is an odd value in Var1 OR Var2
+    all_interactions <- as.character(unique(c(usToCh$to,usToCh$from)))
+    for (j in 1:length(all_interactions)) {
+      if (j == 1) {
+        tmp <- any(sentiment_label == all_interactions[j])
+      } else {
+        tmp <- c(tmp,any(sentiment_label == all_interactions[j]))
+      }
+    }
+    # (2) any is false means that one element in all_interactions is wrong
+    if (any(tmp==F)) {
+      # message(paste(i,"id:",good_ids[i]))
+      usToCh <- data.frame(to=NA,from=NA,value=0,direction="",target=NA)
+    }
+    # (3) if the rows in chToUs are less than 16, add the extra interactions with 0
+    if (nrow(usToCh) < 16 & !any(tmp==F)) {
+      tmp <- outersect(targets,usToCh$target)
+      vars <- unlist(strsplit(tmp, split = " "))
+      usToCh <- rbind(data.frame(usToCh),
+                      data.frame(to=vars[seq(3,length(vars),by=3)],
+                                 from=vars[seq(1,length(vars),by=3)],
+                                 value=0,direction="p(user|bot)",target=tmp))
     }
     remove(tmp)
     
