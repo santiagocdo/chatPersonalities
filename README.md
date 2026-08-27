@@ -1,5 +1,10 @@
 # chatPersonalities
-This repository contains the R analysis scripts for the collaboration beween OneReach(R) and the Computational Psychopathology Research Group at Oxford. Manuscript here: https://osf.io/preprints/psyarxiv/mqunw_v3.
+This repository contains the R analysis scripts for the collaboration beween OneReach(R), Computational Psychopathology Research Group, and Acadia University. This work has been published here: https://www.nature.com/articles/s44271-026-00433-8
+
+The full reference is:
+Castiello, S., Pitliya, R. J., Lametti, D. R., & Murphy, R. A. (2026). 
+Affiliation in human-AI interactions is based on shared psychological traits. 
+Communications Psychology, 4(1), 93. Preprint: https://osf.io/preprints/psyarxiv/mqunw_v3.
 
 
 # 0. What are the R scripts in this repository?
